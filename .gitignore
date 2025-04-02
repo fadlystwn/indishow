@@ -50,3 +50,6 @@ spring/
 # Ignore system files.
 .DS_Store
 Thumbs.db
+
+/app/assets/builds/*
+!/app/assets/builds/.keep

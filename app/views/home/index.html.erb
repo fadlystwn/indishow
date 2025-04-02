@@ -1,0 +1,14 @@
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+  <h1 class="text-4xl font-bold text-blue-600">Welcome to My App</h1>
+  <p class="mt-2 text-gray-700">Your ultimate fashion and ticketing platform.</p>
+
+  <% if user_signed_in? %>
+    <p class="mt-4 text-green-600">You are signed in as <%= current_user.email %>!</p>
+    <%= link_to "Dashboard", root_path, class: "mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" %>
+  <% else %>
+    <div class="mt-6">
+      <%= link_to "Sign In", new_user_session_path, class: "px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mr-2" %>
+      <%= link_to "Sign Up", new_user_registration_path, class: "px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" %>
+    </div>
+  <% end %>
+</div>
