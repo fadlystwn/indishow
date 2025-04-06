@@ -5,11 +5,22 @@
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
+      <!-- Email -->
       <div>
         <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
         <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
       </div>
 
+      <!-- Role -->
+      <div>
+        <%= f.label :role, class: "block text-sm font-medium text-gray-700" %>
+        <%= f.select :role,
+            User.roles.keys.map { |r| [r.humanize, r] },
+            { prompt: "Select a role" },
+            class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+      </div>
+
+      <!-- Password -->
       <div>
         <%= f.label :password, class: "block text-sm font-medium text-gray-700" %>
         <% if @minimum_password_length %>
@@ -18,16 +29,19 @@
         <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
       </div>
 
+      <!-- Password Confirmation -->
       <div>
         <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700" %>
         <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
       </div>
 
+      <!-- Submit -->
       <div>
         <%= f.submit "Sign up", class: "w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition" %>
       </div>
     <% end %>
 
+    <!-- Devise Links -->
     <div class="text-center mt-4">
       <%= render "devise/shared/links" %>
     </div>
