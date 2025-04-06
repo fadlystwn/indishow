@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  root to: "home#index" # Now the home page is the root
+  get "dashboard/index"
+  root to: "dashboard#index"
 
   get "home/index"
 
