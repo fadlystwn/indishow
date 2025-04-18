@@ -9,53 +9,7 @@
 <body class="bg-gray-100">
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-indigo-900 text-white shadow-md">
-      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-4">
-          <a href="#" class="text-2xl font-bold">ArtSound</a>
-          <nav class="hidden md:flex space-x-6">
-            <a href="#" class="hover:text-indigo-200">Dashboard</a>
-            <a href="#" class="hover:text-indigo-200">Music</a>
-            <a href="#" class="hover:text-indigo-200">Merch</a>
-            <a href="#" class="hover:text-indigo-200">Stats</a>
-            <a href="#" class="hover:text-indigo-200">Fans</a>
-          </nav>
-        </div>
-        <div class="flex items-center space-x-4">
-          <% if user_signed_in? %>
-            <button class="p-2 rounded-full hover:bg-indigo-800">
-              <i class="fas fa-bell"></i>
-            </button>
-            <div class="relative group">
-              <button class="flex items-center space-x-2 focus:outline-none">
-                <% if current_user.avatar_url.present? %>
-                  <img src="<%= current_user.avatar_url %>" alt="User" class="w-8 h-8 rounded-full">
-                <% else %>
-                  <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
-                    <%= current_user.name_or_email[0].upcase %>
-                  </div>
-                <% end %>
-                <span><%= current_user.name_or_email %></span>
-                <i class="fas fa-chevron-down text-xs"></i>
-              </button>
-              <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
-                <%= link_to "Profile", edit_user_registration_path, class: "block px-4 py-2 text-gray-800 hover:bg-indigo-100" %>
-                <%= link_to "Settings", "#", class: "block px-4 py-2 text-gray-800 hover:bg-indigo-100" %>
-                <div class="border-t border-gray-200"></div>
-                <%= button_to "Sign Out", destroy_user_session_path, method: :delete, 
-                              class: "w-full text-left px-4 py-2 text-gray-800 hover:bg-indigo-100" %>
-              </div>
-            </div>
-          <% else %>
-            <div class="flex space-x-2">
-              <%= link_to "Sign In", new_user_session_path, class: "px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm" %>
-              <%= link_to "Sign Up", new_user_registration_path, class: "px-3 py-1 bg-white text-indigo-900 rounded hover:bg-gray-100 text-sm" %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </header>
-
+    <%= render 'shared/header' %>
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-6">
       <div class="flex flex-col md:flex-row gap-6">
