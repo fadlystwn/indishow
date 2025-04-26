@@ -1,137 +1,61 @@
-<div class="min-h-screen bg-gray-100">
-  <!-- Hero Section -->
-  <div class="bg-indigo-900 text-white py-16 px-4">
-    <div class="container mx-auto text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">Discover Amazing Music</h1>
-      <p class="text-xl mb-8">Support artists directly. Keep 100% of your sales.</p>
-      <div class="max-w-md mx-auto relative">
-        <input type="text" placeholder="Search artists, albums, or tracks" class="w-full px-5 py-3 rounded-full text-gray-900 focus:outline-none">
-        <button class="absolute right-2 top-2 bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-  <div data-controller="hello" data-hello-name-value="World">
-    <button data-action="click->hello#greet">Greet</button>
-  </div>
-  <!-- Main Content -->
-  <div class="container mx-auto px-4 py-8">
-    <!-- Charts Section -->
-    <section class="mb-12">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Top Charts</h2>
-        <a href="#" class="text-indigo-600 hover:underline">View all charts</a>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        <% 5.times do |i| %>
-          <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-            <div class="relative">
-              <img src="https://f4.bcbits.com/img/a<%= rand(100000..9999999) %>_16.jpg" alt="Album cover" class="w-full aspect-square">
-              <div class="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded">
-                #<%= i+1 %>
-              </div>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold truncate">Popular Album <%= i+1 %></h3>
-              <p class="text-gray-600 text-sm truncate">Artist Name</p>
-              <div class="flex justify-between items-center mt-2">
-                <span class="text-indigo-600 font-bold">$<%= rand(5..15) %>.00</span>
-                <button class="text-gray-500 hover:text-indigo-600">
-                  <i class="fas fa-shopping-cart"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </section>
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Music Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <%= render 'shared/header' %>
+  <div class="container mx-auto px-4 py-6">
 
-    <!-- New Releases Section -->
-    <section class="mb-12">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">New Releases</h2>
-        <a href="#" class="text-indigo-600 hover:underline">View all new releases</a>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <% 4.times do |i| %>
-          <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-            <img src="https://f4.bcbits.com/img/a<%= rand(100000..9999999) %>_16.jpg" alt="Album cover" class="w-full aspect-square">
-            <div class="p-4">
-              <h3 class="font-bold truncate">New Album <%= i+1 %></h3>
-              <p class="text-gray-600 text-sm truncate">Emerging Artist</p>
-              <div class="flex justify-between items-center mt-2">
-                <span class="text-indigo-600 font-bold">$<%= rand(5..12) %>.00</span>
-                <div class="flex space-x-2">
-                  <button class="text-gray-500 hover:text-indigo-600">
-                    <i class="fas fa-play"></i>
-                  </button>
-                  <button class="text-gray-500 hover:text-indigo-600">
-                    <i class="fas fa-shopping-cart"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </section>
-
-    <!-- Popular Artists Section -->
-    <section class="mb-12">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Popular Artists</h2>
-        <a href="#" class="text-indigo-600 hover:underline">View all artists</a>
-      </div>
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        <% 6.times do |i| %>
-          <div class="text-center">
-            <div class="w-full aspect-square mb-3 mx-auto">
-              <img src="https://randomuser.me/api/portraits/<%= ['men', 'women'].sample %>/<%= rand(1..99) %>.jpg" alt="Artist" class="w-full h-full rounded-full object-cover border-4 border-white shadow">
-            </div>
-            <h3 class="font-bold">Artist <%= i+1 %></h3>
-            <p class="text-gray-600 text-sm"><%= rand(100..5000) %> followers</p>
-          </div>
-        <% end %>
-      </div>
-    </section>
-
-    <!-- Featured Genre Section -->
-    <section class="mb-12">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Featured Genre: Electronic</h2>
-        <a href="#" class="text-indigo-600 hover:underline">Explore genre</a>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="md:col-span-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
-          <h3 class="text-xl font-bold mb-2">Discover Electronic Beats</h3>
-          <p class="mb-4">The best new electronic music from independent artists worldwide</p>
-          <button class="bg-white text-indigo-800 px-4 py-2 rounded-lg font-bold hover:bg-gray-100">Play Featured Mix</button>
+    <!-- Main Content -->
+    <main class="mt-8">
+      <!-- Stats Section -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <div class="text-gray-500 text-sm">Total Plays</div>
+          <div class="text-2xl font-bold mt-1">12,456</div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <% 2.times do |i| %>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-              <img src="https://f4.bcbits.com/img/a<%= rand(100000..9999999) %>_16.jpg" alt="Album cover" class="w-full aspect-square">
-              <div class="p-3">
-                <h3 class="font-bold text-sm truncate">Punk Music <%= i+1 %></h3>
-                <p class="text-gray-600 text-xs truncate">Punk Band</p>
-              </div>
-            </div>
-          <% end %>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <div class="text-gray-500 text-sm">Followers</div>
+          <div class="text-2xl font-bold mt-1">1,234</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <div class="text-gray-500 text-sm">Sales</div>
+          <div class="text-2xl font-bold mt-1">$3,456</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <div class="text-gray-500 text-sm">Releases</div>
+          <div class="text-2xl font-bold mt-1">8</div>
         </div>
       </div>
-    </section>
+       <%= render 'home/recent_release' %>
+       <%= render 'home/new_release' %>
+    </main>
   </div>
 
-  <!-- Newsletter Section -->
-  <div class="bg-indigo-800 text-white py-12 px-4">
-    <div class="container mx-auto text-center">
-      <h2 class="text-2xl font-bold mb-4">Stay Updated</h2>
-      <p class="mb-6 max-w-2xl mx-auto">Get the latest releases, artist news, and exclusive offers delivered to your inbox.</p>
-      <div class="max-w-md mx-auto flex">
-        <input type="email" placeholder="Your email address" class="flex-grow px-4 py-3 rounded-l-lg text-gray-900 focus:outline-none">
-        <button class="bg-indigo-600 text-white px-6 py-3 rounded-r-lg hover:bg-indigo-700 font-bold">Subscribe</button>
-      </div>
-    </div>
-  </div>
-</div>
+  <script>
+    // Simple script to handle release type selection
+    document.querySelectorAll('.release-type-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Remove active class from all buttons
+        document.querySelectorAll('.release-type-btn').forEach(btn => {
+          btn.classList.remove('bg-teal-600', 'text-white', 'border-teal-600');
+          btn.classList.add('border-gray-300', 'text-gray-700');
+        });
+        // Add active class to clicked button
+        this.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
+        this.classList.remove('border-gray-300', 'text-gray-700');
+        
+        // You could also store the selected type in a hidden field if needed
+        // document.getElementById('release-type').value = this.dataset.type;
+      });
+    });
+  </script>
+</body>
+</html>
