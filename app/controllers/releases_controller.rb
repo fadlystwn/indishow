@@ -6,6 +6,13 @@ class ReleasesController < ApplicationController
     @releases = current_user.releases.order(release_date: :desc)
   end
 
+  def show
+    @release = Release.find(params[:id]) # This will raise 404 if not found
+    # or
+    @release = Release.find_by(id: params[:id])
+    redirect_to releases_path, alert: "Release not found" unless @release
+  end
+
   def new
     @release = current_user.releases.new
   end
@@ -35,10 +42,14 @@ class ReleasesController < ApplicationController
       render :edit, status: :unprocessable_entity
     end
   end
-
   def destroy
+    @release = Release.find(params[:id])
     @release.destroy
-    redirect_to root_path, notice: "Release was successfully destroyed."
+
+    respond_to do |format|
+      format.html { redirect_to releases_path, notice: "Release was successfully deleted." }
+      format.turbo_stream
+    end
   end
 
   private
