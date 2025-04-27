@@ -1,46 +1,76 @@
 <!-- Recent Releases -->
 <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
- <div class="flex justify-between items-center mb-4">
-  <h2 class="text-xl font-semibold">Your Releases</h2>
-  <button class="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700">
-    <i class="fas fa-plus"></i> Add New Release
-  </button>
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Your Releases</h2>
+    <% if user_signed_in? %>
+      <%= link_to new_release_path, class: "flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700" do %>
+        <i class="fas fa-plus"></i> Add New Release
+      <% end %>
+    <% end %>
   </div>
-  <div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cover</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plays</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        <!-- Sample Release Row -->
-        <tr>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="w-10 h-10 bg-gray-200 rounded-sm"></div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900">Summer Nights</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Single</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-06-15</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4,321</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$128.50</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <a href="#" class="text-teal-600 hover:text-teal-900 mr-3">Edit</a>
-            <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-          </td>
-        </tr>
-        <!-- More rows would go here -->
-      </tbody>
-    </table>
-  </div>
+
+  <% if user_signed_in? && @releases.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <!-- Table headers remain the same as before -->
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cover</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artist</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @releases.each do |release| %>
+            <tr>
+              <!-- Table rows remain the same as before -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if release.cover_art.attached? %>
+                  <%= image_tag release.cover_art.variant(:thumb), class: "w-10 h-10 rounded-sm" %>
+                <% else %>
+                  <div class="w-10 h-10 bg-gray-200 rounded-sm"></div>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900"><%= release.title %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500"><%= release.artist %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= release_type_bg_color(release.release_type) %>">
+                  <%= release.release_type_human %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= release.release_date.strftime("%Y-%m-%d") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= number_to_currency(release.price) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <%= link_to "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" %>
+                <%= link_to "Delete", release_path(release), method: :delete, 
+                    data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% elsif user_signed_in? %>
+    <div class="text-center py-8 text-gray-500">
+      <p>You don't have any releases yet.</p>
+      <%= link_to "Create your first release", new_release_path, class: "text-teal-600 hover:underline mt-2 inline-block" %>
+    </div>
+  <% else %>
+    <div class="text-center py-8 text-gray-500">
+      <p>Please <%= link_to "sign in", new_user_session_path, class: "text-teal-600 hover:underline" %> to view your releases.</p>
+    </div>
+  <% end %>
 </div>
