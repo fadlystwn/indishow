@@ -1,0 +1,95 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+  <h2 class="text-xl font-semibold mb-4">Upload New Release</h2>
+  
+  <%= form_with(model: @release, local: true, class: "upload-form", data: { controller: "release-upload" }) do |form| %>
+    <!-- Release Type Selector -->
+    <div class="mb-6">
+      <label class="block text-gray-700 text-sm font-medium mb-2">Release Type</label>
+      <div class="grid grid-cols-4 gap-2">
+        <% Release.release_types.each_key do |type| %>
+          <button type="button" 
+                  class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium <%= 'bg-teal-100 border-teal-500' if @release.release_type == type %>"
+                  data-release-upload-target="typeBtn"
+                  data-action="click->release-upload#selectType"
+                  data-type="<%= type %>">
+            <%= type.titleize %>
+          </button>
+        <% end %>
+        <%= form.hidden_field :release_type, id: "release_type", value: @release.release_type || 'single' %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Left Column -->
+      <div>
+        <!-- Cover Art Upload -->
+        <div class="mb-4">
+          <%= form.label :cover_art, "Cover Art", class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
+               data-controller="file-upload"
+               data-action="dragover->file-upload#highlight dragleave->file-upload#unhighlight drop->file-upload#drop">
+            <div data-file-upload-target="container">
+              <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
+              <p class="text-gray-500 text-sm">Drag & drop your cover art here</p>
+              <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
+              <%= form.file_field :cover_art, 
+                                direct_upload: true,
+                                class: "hidden",
+                                data: { file_upload_target: "input", action: "change->file-upload#displayPreview" } %>
+            </div>
+            <div class="hidden" data-file-upload-target="preview"></div>
+          </div>
+        </div>
+
+        <!-- Audio Upload (if you need this) -->
+        <% if false %> <!-- Remove this if you want audio upload -->
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Audio Files</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <i class="fas fa-music text-gray-400 text-4xl mb-2"></i>
+            <p class="text-gray-500 text-sm">Drag & drop your audio files here</p>
+            <p class="text-gray-400 text-xs mt-1">or click to browse (WAV, FLAC, AIFF, ALAC, MP3, AAC)</p>
+          </div>
+        </div>
+        <% end %>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- Release Info -->
+        <div class="mb-4">
+          <%= form.label :title, class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= form.label :artist, class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <%= form.text_field :artist, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= form.label :release_date, class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <%= form.date_field :release_date, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+        </div>
+
+        <div class="mb-4">
+          <%= form.label :price, class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+            <%= form.number_field :price, min: 0, step: 0.01, class: "w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <%= form.label :description, class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+        </div>
+
+        <div class="flex justify-end mt-6">
+          <%= link_to "Cancel", home_index_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 mr-2 hover:bg-gray-50" %>
+          <%= form.submit "Upload Release", class: "px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

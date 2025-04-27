@@ -1,0 +1,66 @@
+
+
+<div class="container mx-auto px-4 py-6">
+  <div class="flex items-center gap-4 mb-6">
+    <%= link_to releases_path, class: "text-gray-500 hover:text-teal-600" do %>
+      <i class="fas fa-arrow-left"></i>
+    <% end %>
+    <h1 class="text-2xl font-bold text-gray-800">Release Details</h1>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+    <div class="md:flex">
+      <div class="md:w-1/3">
+        <% if @release.cover_art.attached? %>
+          <%= image_tag @release.cover_art.variant(:medium), class: "w-full h-full object-cover" %>
+        <% else %>
+          <div class="w-full h-64 md:h-full bg-gray-100 flex items-center justify-center text-gray-400">
+            <i class="fas fa-compact-disc text-6xl"></i>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="p-6 md:w-2/3">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800"><%= @release.title %></h2>
+            <h3 class="text-xl text-gray-600 mb-4"><%= @release.artist %></h3>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+            <%= @release.release_type_human %>
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-6">
+          <div>
+            <p class="text-sm text-gray-500">Release Date</p>
+            <p class="font-medium"><%= @release.release_date %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Price</p>
+            <p class="font-medium"><%= number_to_currency(@release.price) %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Added By</p>
+            <p class="font-medium"><%= @release.user.email %></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Created</p>
+            <p class="font-medium"><%= @release.created_at.to_formatted_s(:short) %></p>
+          </div>
+        </div>
+
+        <div class="mt-8 flex gap-3">
+          <%= link_to edit_release_path(@release), class: "flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors" do %>
+            <i class="fas fa-edit"></i>
+            <span>Edit Release</span>
+          <% end %>
+          <%= link_to releases_path, class: "flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg transition-colors" do %>
+            <i class="fas fa-list"></i>
+            <span>Back to List</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

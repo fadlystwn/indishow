@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Albums", type: :request do
+RSpec.describe "Releases", type: :request do
   describe "GET /index" do
     pending "add some examples (or delete) #{__FILE__}"
   end
