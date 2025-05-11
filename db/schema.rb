@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_11_151033) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_11_160258) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -50,6 +50,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_11_151033) do
     t.text "favorite_genres"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "avatar_data"
+    t.text "cover_image_data"
     t.index ["slug"], name: "index_profiles_on_slug", unique: true
     t.index ["type"], name: "index_profiles_on_type"
     t.index ["user_id"], name: "index_profiles_on_user_id"

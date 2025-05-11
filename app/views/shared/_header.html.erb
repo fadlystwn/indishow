@@ -45,7 +45,7 @@
           >
             <%= link_to "Profile", edit_user_registration_path, class: "block px-4 py-2 text-gray-800 hover:bg-indigo-100" %>
             <% if current_user.artist? %>
-              <%= link_to "Artist Dashboard", artist_dashboard_path, class: "block px-4 py-2 text-gray-800 hover:bg-indigo-100" %>
+              <%= link_to "Artist Dashboard", home_index_path, class: "block px-4 py-2 text-gray-800 hover:bg-indigo-100" %>
             <% end %>
             <div class="border-t border-gray-200"></div>
             <%= button_to "Sign Out", destroy_user_session_path, method: :delete, 

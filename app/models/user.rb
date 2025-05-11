@@ -9,6 +9,7 @@ class User < ApplicationRecord
 
   # Automatically build correct profile type
   after_initialize :build_role_profile, if: :new_record?
+  accepts_nested_attributes_for :profile, update_only: true
 
   def artist_profile
     profile if artist? && profile.is_a?(ArtistProfile)
