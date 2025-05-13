@@ -4,57 +4,40 @@ class Users::RegistrationsController < Devise::RegistrationsController
   protected
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:email, :password, :password_confirmation, :role, profile_attributes: [:name]])
-    devise_parameter_sanitizer.permit(:account_update, keys: [:email, :password, :password_confirmation, :current_password, profile_attributes: [:name, :bio, :location, :website_url]])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [
+      :email, :password, :password_confirmation, :role,
+      profile_attributes: [:name, :bio, :location, :website_url, :favorite_genres, :type]
+    ])
+    devise_parameter_sanitizer.permit(:account_update, keys: [
+      :email, :password, :password_confirmation, :current_password,
+      profile_attributes: [:id, :name, :bio, :location, :website_url, :favorite_genres, :avatar, :cover_image]
+    ])
   end
 
   def build_resource(hash = {})
-    super.tap do |user|
-      # Build the appropriate profile based on role
-      if user.role.present?
-        profile_type = user.artist? ? :artist_profile : :fan_profile
-        user.build_profile(
-          type: "#{profile_type.to_s.camelize}",
-          name: hash.dig(:profile_attributes, :name)
-        )
-      end
-    end
+    super(hash)
+
+    return unless hash[:profile_attributes] && resource.role.present?
+
+    profile_type = resource.artist? ? 'ArtistProfile' : 'FanProfile'
+    resource.build_profile(hash[:profile_attributes].merge(type: profile_type))
   end
 
   private
 
   def sign_up_params
-    params.require(:user).permit(
-      :email, 
-      :password, 
-      :password_confirmation, 
-      :role,
-      profile_attributes: [
-        :name, 
-        :bio, 
-        :location, 
-        :website_url,
-        :favorite_genres
-      ]
-    )
+    params = super
+    if params[:profile_attributes] && params[:role]
+      profile_type = params[:role] == 'artist' ? 'ArtistProfile' : 'FanProfile'
+      params[:profile_attributes][:type] = profile_type
+    end
+    params
   end
 
   def account_update_params
     params.require(:user).permit(
-      :email, 
-      :password, 
-      :password_confirmation, 
-      :current_password,
-      profile_attributes: [
-        :id,
-        :name, 
-        :bio, 
-        :location, 
-        :website_url,
-        :favorite_genres,
-        :avatar,
-        :cover_image
-      ]
+      :email, :password, :password_confirmation, :current_password,
+      profile_attributes: [:id, :name, :bio, :location, :website_url, :favorite_genres, :avatar, :cover_image]
     )
   end
 end
