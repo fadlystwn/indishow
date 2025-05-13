@@ -66,6 +66,7 @@ gem "tailwindcss-rails", "~> 4.2"
 group :development, :test do
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  gem 'rails-controller-testing'
 end
 
 gem 'sidekiq'

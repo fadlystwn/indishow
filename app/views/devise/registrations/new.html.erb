@@ -1,49 +1,215 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
-  <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Sign up</h2>
+<div class="flex items-center justify-center min-h-screen bg-gray-50">
+  <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg">
+    <div class="text-center mb-8">
+      <svg class="mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      <h2 class="mt-4 text-3xl font-extrabold text-gray-900">Create your account</h2>
+      <p class="mt-2 text-sm text-gray-600">Join our community to get started</p>
+    </div>
 
-    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <!-- Email -->
       <div>
-        <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+            </svg>
+          </div>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", 
+                class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", 
+                placeholder: "you@example.com" %>
+        </div>
       </div>
 
-      <!-- Role -->
+      <!-- Role Selection -->
       <div>
-        <%= f.label :role, class: "block text-sm font-medium text-gray-700" %>
-        <%= f.select :role,
-            User.roles.keys.map { |r| [r.humanize, r] },
-            { prompt: "Select a role" },
-            class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <%= f.label :role, "Account Type", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <%= f.select :role,
+              User.roles.keys.map { |r| [r.humanize, r] },
+              { prompt: "Select your account type" },
+              class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm appearance-none bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
       </div>
+
+      <!-- Profile Fields -->
+      <%= f.fields_for :profile do |pf| %>
+        <!-- Name -->
+        <div>
+          <%= pf.label :name, "Display Name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <%= pf.text_field :name, 
+                  class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                  placeholder: "Your public display name" %>
+          </div>
+        </div>
+
+        <!-- Dynamic Fields Based on Role -->
+        <div id="role-specific-fields" class="hidden">
+          <!-- Artist Fields (hidden by default) -->
+          <div id="artist-fields" class="space-y-4">
+            <div>
+              <%= pf.label :bio, "Artist Bio", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= pf.text_area :bio, rows: 3,
+                    class: "block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                    placeholder: "Tell us about your music..." %>
+            </div>
+
+            <div>
+              <%= pf.label :website_url, "Website", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <%= pf.text_field :website_url,
+                      class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                      placeholder: "https://yourwebsite.com" %>
+              </div>
+            </div>
+
+            <div>
+              <%= pf.label :location, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <%= pf.text_field :location,
+                      class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                      placeholder: "Your city or region" %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fan Fields (hidden by default) -->
+          <div id="fan-fields" class="space-y-4">
+            <div>
+              <%= pf.label :favorite_genres, "Favorite Genres", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" />
+                  </svg>
+                </div>
+                <%= pf.text_field :favorite_genres,
+                  class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                  placeholder: "Rock, Jazz, Hip Hop, etc." %>
+              </div>
+              <p class="mt-1 text-xs text-gray-500">Separate multiple genres with commas</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
 
       <!-- Password -->
       <div>
-        <%= f.label :password, class: "block text-sm font-medium text-gray-700" %>
-        <% if @minimum_password_length %>
-          <em class="text-xs text-gray-500">(<%= @minimum_password_length %> characters minimum)</em>
-        <% end %>
-        <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <div class="flex justify-between items-center">
+          <%= f.label :password, class: "block text-sm font-medium text-gray-700" %>
+          <% if @minimum_password_length %>
+            <span class="text-xs text-gray-500"><%= @minimum_password_length %> characters minimum</span>
+          <% end %>
+        </div>
+        <div class="relative mt-1">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <%= f.password_field :password, autocomplete: "new-password", 
+                class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                placeholder: "••••••••" %>
+        </div>
       </div>
 
       <!-- Password Confirmation -->
       <div>
-        <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700" %>
-        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", 
+                class: "block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                placeholder: "••••••••" %>
+        </div>
       </div>
 
       <!-- Submit -->
       <div>
-        <%= f.submit "Sign up", class: "w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition" %>
+        <%= f.submit "Sign up", 
+              class: "w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200" %>
       </div>
     <% end %>
 
     <!-- Devise Links -->
-    <div class="text-center mt-4">
-      <%= render "devise/shared/links" %>
+    <div class="mt-6">
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500">Already have an account?</span>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <%= render "devise/shared/links", class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.querySelector('#user_role');
+    const roleSpecificFields = document.getElementById('role-specific-fields');
+    const artistFields = document.getElementById('artist-fields');
+    const fanFields = document.getElementById('fan-fields');
+
+    function toggleFields() {
+      if (roleSelect.value === 'artist') {
+        roleSpecificFields.classList.remove('hidden');
+        artistFields.classList.remove('hidden');
+        fanFields.classList.add('hidden');
+      } else if (roleSelect.value === 'fan') {
+        roleSpecificFields.classList.remove('hidden');
+        artistFields.classList.add('hidden');
+        fanFields.classList.remove('hidden');
+      } else {
+        roleSpecificFields.classList.add('hidden');
+      }
+    }
+
+    // Initialize on page load
+    toggleFields();
+
+    // Add event listener for changes
+    roleSelect.addEventListener('change', toggleFields);
+  });
+</script>
