@@ -1,0 +1,67 @@
+<div class="container mx-auto px-4 py-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">My Releases</h1>
+    <%= link_to new_release_path, class: "flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors" do %>
+      <i class="fas fa-plus"></i>
+      <span>New Release</span>
+    <% end %>
+  </div>
+
+  <% if @releases.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @releases.each do |release| %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div class="aspect-square relative">
+            <% if release.cover_art.attached? %>
+              <%= image_tag release.cover_art.variant(:thumb), class: "w-full h-full object-cover" %>
+            <% else %>
+              <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <i class="fas fa-compact-disc text-6xl"></i>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <h2 class="text-lg font-semibold text-gray-800"><%= release.title %></h2>
+                <p class="text-gray-600"><%= release.artist %></p>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                <%= release.release_type_human %>
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+              <span><%= release.release_date %></span>
+              <span><%= number_to_currency(release.price) %></span>
+            </div>
+
+            <div class="flex gap-2">
+              <%= link_to release_path(release), class: "flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg transition-colors" do %>
+                <i class="fas fa-eye"></i>
+                <span>View</span>
+              <% end %>
+              <%= link_to edit_release_path(release), class: "flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg transition-colors" do %>
+                <i class="fas fa-edit"></i>
+                <span>Edit</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <div class="text-gray-400 mb-4">
+        <i class="fas fa-compact-disc text-6xl"></i>
+      </div>
+      <h3 class="text-xl font-medium text-gray-600 mb-2">No releases yet</h3>
+      <p class="text-gray-500 mb-6">Start by adding your first release</p>
+      <%= link_to new_release_path, class: "inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors" do %>
+        <i class="fas fa-plus"></i>
+        <span>Create Release</span>
+      <% end %>
+    </div>
+  <% end %>
+</div> 
