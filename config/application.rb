@@ -28,5 +28,8 @@ module Indishow
       provider :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_CLIENT_SECRET"]
     end
     OmniAuth.config.allowed_request_methods = %i[post]
+
+    # Configure Active Storage to use ImageMagick
+    config.active_storage.variant_processor = :mini_magick
   end
 end

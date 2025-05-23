@@ -26,35 +26,35 @@
           <!-- Cover Art Upload -->
           <div class="mb-4">
             <%= form.label :cover_art, "Cover Art", class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
                  data-controller="file-upload"
                  data-action="dragover->file-upload#highlight dragleave->file-upload#unhighlight drop->file-upload#drop">
-              <% if @release.cover_art.attached? %>
-                <div class="hidden" data-file-upload-target="container">
-                  <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
-                  <p class="text-gray-500 text-sm">Drag & drop your cover art here</p>
-                  <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
-                </div>
-                <div data-file-upload-target="preview">
-                  <%= image_tag @release.cover_art.variant(:medium), class: "mx-auto max-h-64 rounded" %>
-                  <button type="button" 
-                          class="mt-2 text-sm text-teal-600 hover:text-teal-800"
-                          data-action="click->file-upload#clearFile">
-                    Change Image
-                  </button>
-                </div>
-              <% else %>
-                <div data-file-upload-target="container">
-                  <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
-                  <p class="text-gray-500 text-sm">Drag & drop your cover art here</p>
-                  <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
-                </div>
-                <div class="hidden" data-file-upload-target="preview"></div>
-              <% end %>
+              <div data-file-upload-target="container" 
+                   class="cursor-pointer <%= 'hidden' if @release.cover_art.attached? %>">
+                <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
+                <p class="text-gray-500 text-sm">Drag & drop your cover art here</p>
+                <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
+              </div>
+              <div data-file-upload-target="preview" class="<%= 'hidden' unless @release.cover_art.attached? %>">
+                <% if @release.cover_art.attached? %>
+                  <div class="flex flex-col items-center">
+                    <div class="relative">
+                      <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-md mb-2" %>
+                      <button type="button" 
+                              class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                              data-action="click->file-upload#clearFile">
+                        ×
+                      </button>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2"><%= @release.cover_art.filename %></p>
+                  </div>
+                <% end %>
+              </div>
               <%= form.file_field :cover_art, 
                                 direct_upload: true,
+                                accept: "image/*",
                                 class: "hidden",
-                                data: { file_upload_target: "input", action: "change->file-upload#displayPreview" } %>
+                                data: { file_upload_target: "input", action: "change->file-upload#inputChange" } %>
             </div>
           </div>
         </div>
