@@ -28,8 +28,9 @@ class TracksController < ApplicationController
   end
 
   def destroy
+    track_title = @track.title
     @track.destroy
-    redirect_to @release, notice: 'Track was successfully deleted.'
+    redirect_to @release, success: "Track \"#{track_title}\" was successfully deleted."
   end
 
   private
