@@ -1,5 +1,6 @@
 class Release < ApplicationRecord
   belongs_to :user
+  has_many :tracks, dependent: :destroy
 
   enum release_type: { single: 0, ep: 1, album: 2, compilation: 3 }
 
