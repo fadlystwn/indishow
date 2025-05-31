@@ -1,0 +1,64 @@
+<%# Dashboard Header %>
+<div class="bg-white shadow">
+  <div class="container mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+    <%# Main Content %>
+    <div class="md:col-span-3">
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-900">Your Releases</h2>
+          <%= link_to new_release_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium" do %>
+            Add New Release
+          <% end %>
+        </div>
+
+        <% if @releases.any? %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% @releases.each do |release| %>
+              <div class="bg-white border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-square">
+                  <% if release.cover_art.attached? %>
+                    <%= image_tag release.cover_art.variant(:medium), class: "w-full h-full object-cover" %>
+                  <% else %>
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                      </svg>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="p-4">
+                  <h3 class="font-medium text-gray-900 mb-1"><%= release.title %></h3>
+                  <p class="text-sm text-gray-500"><%= release.release_type_human %></p>
+                  <div class="mt-4 flex justify-between items-center">
+                    <span class="text-sm text-gray-500"><%= release.release_date.strftime("%b %d, %Y") %></span>
+                    <%= link_to "Edit", edit_release_path(release), class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No releases</h3>
+            <p class="mt-1 text-sm text-gray-500">Get started by creating a new release.</p>
+            <div class="mt-6">
+              <%= link_to new_release_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+                Create your first release
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
