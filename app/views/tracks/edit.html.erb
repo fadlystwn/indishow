@@ -1,0 +1,12 @@
+<div class="max-w-2xl mx-auto py-8 px-4">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Track</h1>
+    <p class="text-gray-600">
+      Editing track from: <span class="font-semibold"><%= @release.title %></span>
+    </p>
+  </div>
+
+  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-6">
+    <%= render 'form', track: @track %>
+  </div>
+</div>

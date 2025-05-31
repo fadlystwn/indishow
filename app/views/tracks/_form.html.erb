@@ -1,0 +1,38 @@
+<%= form_with(model: [@release, @track], local: true, class: "space-y-6") do |form| %>
+  <% if @track.errors.any? %>
+    <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+      <h2 class="text-lg font-semibold text-red-800 mb-2">
+        <%= pluralize(@track.errors.count, "error") %> prohibited this track from being saved:
+      </h2>
+      <ul class="list-disc list-inside text-red-700">
+        <% @track.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_field :title, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Enter track title" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :duration, "Duration (seconds)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.number_field :duration, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Duration in seconds (optional)", min: 1 %>
+    <p class="mt-1 text-sm text-gray-500">Enter duration in seconds (e.g., 180 for 3 minutes)</p>
+  </div>
+
+  <div class="field">
+    <%= form.label :position, "Track Number", class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.number_field :position, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Track position (auto-assigned if left blank)", min: 1 %>
+    <p class="mt-1 text-sm text-gray-500">Leave blank to auto-assign the next position</p>
+  </div>
+
+  <div class="flex items-center justify-between">
+    <div class="actions">
+      <%= form.submit class: "inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+    <%= link_to 'Cancel', @release, class: "inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+  </div>
+<% end %>

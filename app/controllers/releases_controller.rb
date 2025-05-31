@@ -43,11 +43,11 @@ class ReleasesController < ApplicationController
     end
   end
   def destroy
-    @release = Release.find(params[:id])
+    release_title = @release.title
     @release.destroy
 
     respond_to do |format|
-      format.html { redirect_to releases_path, notice: "Release was successfully deleted." }
+      format.html { redirect_to releases_path, success: "Release \"#{release_title}\" was successfully deleted." }
       format.turbo_stream
     end
   end

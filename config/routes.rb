@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  resources :releases
+  resources :releases do
+    resources :tracks, only: [:new, :create, :edit, :update, :destroy]
+  end
   get "home/index"
   root to: "home#index"
 
