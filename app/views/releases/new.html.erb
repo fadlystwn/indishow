@@ -47,10 +47,22 @@
               <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
             </div>
             <div data-file-upload-target="preview" class="hidden">
-              <% if @release.cover_art.attached? %>
+              <% if @release.cover_art.attached? && @release.persisted? %>
                 <div class="flex flex-col items-center">
                   <div class="relative">
                     <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-md mb-2" %>
+                    <button type="button" 
+                            class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                            data-action="click->file-upload#clearFile">
+                      ×
+                    </button>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-2"><%= @release.cover_art.filename %></p>
+                </div>
+              <% elsif @release.cover_art.attached? %>
+                <div class="flex flex-col items-center">
+                  <div class="relative">
+                    <%= image_tag url_for(@release.cover_art), class: "max-w-full max-h-64 rounded-md mb-2" %>
                     <button type="button" 
                             class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
                             data-action="click->file-upload#clearFile">
