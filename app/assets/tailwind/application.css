@@ -7,14 +7,14 @@
 }
 
 .border-dashed:hover {
-  border-color: #4fd1c5; /* teal-400 */
+  border-color: #FF4D4D; /* music-primary */
 }
 
 .release-type-btn {
   transition: all 0.2s ease;
 }
 
-.release-type-btn:hover:not(.bg-teal-100) {
-  background-color: #f0fdfa; /* teal-50 */
-  border-color: #4fd1c5; /* teal-400 */
+.release-type-btn:hover:not(.bg-music-primary\/20) {
+  background-color: rgba(255, 77, 77, 0.1); /* music-primary/10 */
+  border-color: #FF4D4D; /* music-primary */
 }
