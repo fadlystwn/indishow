@@ -1,23 +1,23 @@
 <!-- Header -->
-<header class="bg-skenara-background text-skenara-text border-b border-skenara-secondary">
+<header class="bg-music-background text-music-text border-b border-music-surface">
   <div class="container mx-auto px-4 py-3 flex justify-between items-center">
     <div class="flex items-center space-x-4">
-      <%= link_to root_path, class: "text-2xl font-bold text-skenara-highlightGreen" do %>
+      <%= link_to root_path, class: "text-2xl font-display text-music-primary" do %>
         Skenara
       <% end %>
       <nav class="hidden md:flex space-x-6">
-        <%= link_to "Music", "#", class: "text-skenara-text hover:text-skenara-highlightGreen transition-colors" %>
-        <%= link_to "Merch", "#", class: "text-skenara-text hover:text-skenara-highlightGreen transition-colors" %>
-        <%= link_to "Stats", "#", class: "text-skenara-text hover:text-skenara-highlightGreen transition-colors" %>
-        <%= link_to "Fans", "#", class: "text-skenara-text hover:text-skenara-highlightGreen transition-colors" %>
+        <%= link_to "Music", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
+        <%= link_to "Merch", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
+        <%= link_to "Stats", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
+        <%= link_to "Fans", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
         <% if user_signed_in? && current_user.artist? %>
-          <%= link_to "My Artist Page", artist_profile_path(current_user.artist_profile), class: "text-skenara-text hover:text-skenara-highlightGreen transition-colors" %>
+          <%= link_to "My Artist Page", artist_profile_path(current_user.artist_profile), class: "text-music-text hover:text-music-primary transition-colors" %>
         <% end %>
       </nav>
     </div>
     <div class="flex items-center space-x-4">
       <% if user_signed_in? %>
-        <button class="p-2 rounded-full text-skenara-text hover:bg-skenara-primary hover:bg-opacity-20 transition-colors">
+        <button class="p-2 rounded-full text-music-text hover:bg-music-primary hover:bg-opacity-20 transition-colors">
           <%= icon_tag "bell", class: "h-5 w-5" %>
         </button>
         <div class="relative" data-controller="dropdown">
@@ -29,16 +29,16 @@
             <% if current_user.profile&.avatar&.attached? %>
               <%= image_tag current_user.profile.avatar, class: "w-8 h-8 rounded-full object-cover" %>
             <% else %>
-              <div class="w-8 h-8 rounded-full bg-skenara-primary flex items-center justify-center text-skenara-text">
+              <div class="w-8 h-8 rounded-full bg-music-primary flex items-center justify-center text-music-text">
                 <%= current_user.name_or_email[0].upcase %>
               </div>
             <% end %>
-            <span class="text-skenara-text"><%= current_user.name_or_email %></span>
-            <%= icon_tag "chevron-down", variant: :mini, class: "h-4 w-4 text-skenara-text" %>
+            <span class="text-music-text"><%= current_user.name_or_email %></span>
+            <%= icon_tag "chevron-down", variant: :mini, class: "h-4 w-4 text-music-text" %>
           </button>
           <div 
             data-dropdown-target="menu"
-            class="absolute right-0 mt-2 w-48 bg-skenara-background border border-skenara-secondary rounded-md shadow-lg py-1 z-50 hidden"
+            class="absolute right-0 mt-2 w-48 bg-music-surface border border-music-surface rounded-md shadow-lg py-1 z-50 hidden"
             data-transition-enter="transition ease-out duration-100"
             data-transition-enter-start="transform opacity-0 scale-95"
             data-transition-enter-end="transform opacity-100 scale-100"
@@ -46,19 +46,19 @@
             data-transition-leave-start="transform opacity-100 scale-100"
             data-transition-leave-end="transform opacity-0 scale-95"
           >
-            <%= link_to "Profile", edit_user_registration_path, class: "block px-4 py-2 text-skenara-text hover:bg-skenara-primary hover:bg-opacity-20" %>
+            <%= link_to "Profile", edit_user_registration_path, class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
             <% if current_user.artist? %>
-              <%= link_to "Artist Dashboard", home_index_path, class: "block px-4 py-2 text-skenara-text hover:bg-skenara-primary hover:bg-opacity-20" %>
+              <%= link_to "Artist Dashboard", home_index_path, class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
             <% end %>
-            <div class="border-t border-skenara-secondary"></div>
+            <div class="border-t border-music-surface"></div>
             <%= button_to "Sign Out", destroy_user_session_path, method: :delete, 
-                          class: "w-full text-left px-4 py-2 text-skenara-text hover:bg-skenara-primary hover:bg-opacity-20" %>
+                          class: "w-full text-left px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
           </div>
         </div>
       <% else %>
         <div class="flex space-x-2">
-          <%= link_to "Sign In", new_user_session_path, class: "px-3 py-1 bg-skenara-primary text-skenara-text rounded hover:bg-opacity-90 transition-colors text-sm" %>
-          <%= link_to "Sign Up", new_user_registration_path, class: "px-3 py-1 bg-skenara-highlightGreen text-skenara-background rounded hover:bg-opacity-90 transition-colors text-sm" %>
+          <%= link_to "Sign In", new_user_session_path, class: "px-3 py-1 bg-music-primary text-music-text rounded-button hover:bg-opacity-90 transition-colors text-sm shadow-button" %>
+          <%= link_to "Sign Up", new_user_registration_path, class: "px-3 py-1 bg-music-secondary text-music-text rounded-button hover:bg-opacity-90 transition-colors text-sm shadow-button" %>
         </div>
       <% end %>
     </div>

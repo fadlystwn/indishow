@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-50">
+<html lang="en" class="bg-music-background">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,30 +22,30 @@
     }
   </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen text-music-text">
   
   <!-- Hero Section -->
-  <div class="bg-indigo-700">
+  <div class="bg-music-surface">
     <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
-      <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+      <h1 class="text-4xl font-display tracking-tight text-music-text sm:text-5xl lg:text-6xl">
         Discover amazing independent music
       </h1>
-      <p class="mt-6 max-w-3xl mx-auto text-xl text-indigo-100">
+      <p class="mt-6 max-w-3xl mx-auto text-xl text-music-text-secondary">
         Support artists directly. Keep 100% of your sales.
       </p>
       <div class="mt-10 flex justify-center">
-        <div class="inline-flex rounded-md shadow">
-          <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50">
+        <div class="inline-flex rounded-button shadow-button">
+          <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-button bg-music-primary hover:bg-opacity-90 text-music-text transition duration-200">
             Browse artists
           </a>
         </div>
         <div class="ml-3 inline-flex">
           <% if user_signed_in? %>
-            <%= link_to new_release_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-800 bg-opacity-60 hover:bg-opacity-70" do %>
+            <%= link_to new_release_path, class: "inline-flex items-center justify-center px-5 py-3 border border-music-text text-base font-medium rounded-button text-music-text hover:bg-music-surface hover:border-music-primary transition duration-200" do %>
               Sell your music
             <% end %>
           <% else %>
-            <%= link_to new_user_registration_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-800 bg-opacity-60 hover:bg-opacity-70" do %>
+            <%= link_to new_user_registration_path, class: "inline-flex items-center justify-center px-5 py-3 border border-music-text text-base font-medium rounded-button text-music-text hover:bg-music-surface hover:border-music-primary transition duration-200" do %>
               Sell your music
             <% end %>
           <% end %>
@@ -57,38 +57,38 @@
   <!-- Featured Albums -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-900">Featured albums</h2>
-      <%= link_to releases_path, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
+      <h2 class="text-2xl font-bold text-music-text">Featured albums</h2>
+      <%= link_to releases_path, class: "text-sm font-medium text-music-primary hover:text-opacity-90" do %>
         View all
       <% end %>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
       <% @featured_releases.each do |release| %>
-        <div class="group">
-          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 relative">
+        <div class="group bg-music-surface rounded-genre p-4 shadow-genre hover:shadow-genre-hover transition duration-200">
+          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-genre bg-music-surface relative">
             <% if release.cover_art.attached? %>
               <%= image_tag release.cover_art.variant(:medium), alt: release.title, class: "w-full h-full object-cover object-center group-hover:opacity-75" %>
             <% else %>
-              <div class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
-                <i class="fas fa-music text-white text-4xl"></i>
+              <div class="w-full h-full bg-gradient-to-br from-music-primary to-music-secondary flex items-center justify-center">
+                <i class="fas fa-music text-music-text text-4xl"></i>
               </div>
             <% end %>
-            <button class="absolute bottom-2 right-2 bg-indigo-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <i class="fas fa-play text-white"></i>
+            <button class="absolute bottom-4 right-4 bg-music-primary rounded-full p-3 opacity-0 group-hover:opacity-100 transition-all transform hover:scale-105 duration-200 shadow-button">
+              <%= icon_tag "play", class: "h-5 w-5 text-music-text" %>
             </button>
           </div>
           <div class="mt-2">
-            <%= link_to release_path(release), class: "text-sm font-medium text-gray-900 hover:text-indigo-600" do %>
+            <%= link_to release_path(release), class: "text-sm font-medium text-music-text hover:text-music-primary" do %>
               <%= release.title %>
             <% end %>
-            <div class="block text-sm text-gray-500">
+            <div class="block text-sm text-music-text-secondary">
               <%= release.artist %>
             </div>
           </div>
           <div class="mt-1 flex justify-between items-center">
-            <span class="text-sm text-gray-500"><%= number_to_currency(release.price) %></span>
-            <button class="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded">
+            <span class="text-sm text-music-text-secondary"><%= number_to_currency(release.price) %></span>
+            <button class="text-xs bg-music-primary hover:bg-opacity-90 px-3 py-1.5 rounded-button text-music-text transition duration-200">
               + Add to cart
             </button>
           </div>
@@ -98,54 +98,54 @@
   </div>
 
   <!-- Genres Section -->
-  <div class="bg-gray-50">
+  <div class="bg-music-surface">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">Browse by genre</h2>
-        <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all genres</a>
+        <h2 class="text-2xl font-bold text-music-text">Browse by genre</h2>
+        <a href="#" class="text-sm font-medium text-music-primary hover:text-opacity-90">View all genres</a>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
-          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-            <i class="fas fa-guitar text-indigo-600"></i>
+        <a href="#" class="p-4 rounded-genre shadow-genre hover:shadow-genre-hover text-center bg-gradient-to-br from-music-genre-rock to-music-surface transition-all duration-200">
+          <div class="mx-auto h-12 w-12 rounded-full bg-music-surface/30 flex items-center justify-center mb-2">
+            <i class="fas fa-guitar text-music-text"></i>
           </div>
-          <span class="text-sm font-medium text-gray-900">Rock</span>
+          <span class="text-sm font-medium text-music-text">Rock</span>
         </a>
 
-        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
-          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-            <i class="fas fa-headphones text-indigo-600"></i>
+        <a href="#" class="p-4 rounded-genre shadow-genre hover:shadow-genre-hover text-center bg-gradient-to-br from-music-genre-electronic to-music-surface transition-all duration-200">
+          <div class="mx-auto h-12 w-12 rounded-full bg-music-surface/30 flex items-center justify-center mb-2">
+            <i class="fas fa-headphones text-music-text"></i>
           </div>
-          <span class="text-sm font-medium text-gray-900">Electronic</span>
+          <span class="text-sm font-medium text-music-text">Electronic</span>
         </a>
 
-        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
-          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-            <i class="fas fa-drum text-indigo-600"></i>
+        <a href="#" class="p-4 rounded-genre shadow-genre hover:shadow-genre-hover text-center bg-gradient-to-br from-music-genre-hiphop to-music-surface transition-all duration-200">
+          <div class="mx-auto h-12 w-12 rounded-full bg-music-surface/30 flex items-center justify-center mb-2">
+            <i class="fas fa-drum text-music-text"></i>
           </div>
-          <span class="text-sm font-medium text-gray-900">Hip Hop</span>
+          <span class="text-sm font-medium text-music-text">Hip Hop</span>
         </a>
 
-        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
-          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-            <i class="fas fa-music text-indigo-600"></i>
+        <a href="#" class="p-4 rounded-genre shadow-genre hover:shadow-genre-hover text-center bg-gradient-to-br from-music-genre-classical to-music-surface transition-all duration-200">
+          <div class="mx-auto h-12 w-12 rounded-full bg-music-surface/30 flex items-center justify-center mb-2">
+            <i class="fas fa-music text-music-text"></i>
           </div>
-          <span class="text-sm font-medium text-gray-900">Jazz</span>
+          <span class="text-sm font-medium text-music-text">Classical</span>
         </a>
 
-        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
-          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-            <i class="fas fa-record-vinyl text-indigo-600"></i>
+        <a href="#" class="p-4 rounded-genre shadow-genre hover:shadow-genre-hover text-center bg-gradient-to-br from-music-genre-indie to-music-surface transition-all duration-200">
+          <div class="mx-auto h-12 w-12 rounded-full bg-music-surface/30 flex items-center justify-center mb-2">
+            <i class="fas fa-record-vinyl text-music-text"></i>
           </div>
-          <span class="text-sm font-medium text-gray-900">Metal</span>
+          <span class="text-sm font-medium text-music-text">Indie</span>
         </a>
 
-        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
-          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-            <i class="fas fa-microphone text-indigo-600"></i>
+        <a href="#" class="p-4 rounded-genre shadow-genre hover:shadow-genre-hover text-center bg-gradient-to-br from-music-genre-world to-music-surface transition-all duration-200">
+          <div class="mx-auto h-12 w-12 rounded-full bg-music-surface/30 flex items-center justify-center mb-2">
+            <i class="fas fa-microphone text-music-text"></i>
           </div>
-          <span class="text-sm font-medium text-gray-900">Folk</span>
+          <span class="text-sm font-medium text-music-text">World</span>
         </a>
       </div>
     </div>
@@ -154,54 +154,54 @@
   <!-- Recent Activity Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-900">Recent fan activity</h2>
-      <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all activity</a>
+      <h2 class="text-2xl font-bold text-music-text">Recent fan activity</h2>
+      <a href="#" class="text-sm font-medium text-music-primary hover:text-opacity-90">View all activity</a>
     </div>
 
     <div class="space-y-6">
       <!-- Sample Activity Items -->
-      <div class="bg-white shadow-sm rounded-lg p-4">
+      <div class="bg-music-surface shadow-genre rounded-genre p-4">
         <div class="flex items-start">
           <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/32.jpg" alt="User avatar" />
           <div class="ml-4">
             <div class="flex items-center">
-              <span class="font-medium text-gray-900">Sarah Johnson</span>
-              <span class="ml-2 text-sm text-gray-500">purchased</span>
+              <span class="font-medium text-music-text">Sarah Johnson</span>
+              <span class="ml-2 text-sm text-music-text-secondary">purchased</span>
             </div>
             <div class="mt-1 flex">
               <div class="flex-shrink-0">
-                <div class="h-12 w-12 bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center">
-                  <i class="fas fa-music text-white"></i>
+                <div class="h-12 w-12 bg-gradient-to-br from-music-primary to-music-secondary rounded-genre flex items-center justify-center">
+                  <i class="fas fa-music text-music-text"></i>
                 </div>
               </div>
               <div class="ml-3">
-                <a href="#" class="text-sm font-medium text-gray-900 hover:text-indigo-600">Cosmic Journey</a>
-                <a href="#" class="block text-sm text-gray-500 hover:text-indigo-500">Stellar Sounds</a>
-                <div class="mt-1 text-xs text-gray-500">2 hours ago</div>
+                <a href="#" class="text-sm font-medium text-music-text hover:text-music-primary">Cosmic Journey</a>
+                <a href="#" class="block text-sm text-music-text-secondary hover:text-music-primary">Stellar Sounds</a>
+                <div class="mt-1 text-xs text-music-text-secondary">2 hours ago</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="bg-white shadow-sm rounded-lg p-4">
+      <div class="bg-music-surface shadow-genre rounded-genre p-4">
         <div class="flex items-start">
           <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/45.jpg" alt="User avatar" />
           <div class="ml-4">
             <div class="flex items-center">
-              <span class="font-medium text-gray-900">Mike Chen</span>
-              <span class="ml-2 text-sm text-gray-500">is listening to</span>
+              <span class="font-medium text-music-text">Mike Chen</span>
+              <span class="ml-2 text-sm text-music-text-secondary">is listening to</span>
             </div>
             <div class="mt-1 flex">
               <div class="flex-shrink-0">
-                <div class="h-12 w-12 bg-gradient-to-br from-green-400 to-blue-500 rounded flex items-center justify-center">
-                  <i class="fas fa-music text-white"></i>
+                <div class="h-12 w-12 bg-gradient-to-br from-music-primary to-music-secondary rounded-genre flex items-center justify-center">
+                  <i class="fas fa-music text-music-text"></i>
                 </div>
               </div>
               <div class="ml-3">
-                <a href="#" class="text-sm font-medium text-gray-900 hover:text-indigo-600">Urban Echoes</a>
-                <a href="#" class="block text-sm text-gray-500 hover:text-indigo-500">City Beats</a>
-                <div class="mt-1 text-xs text-gray-500">5 hours ago</div>
+                <a href="#" class="text-sm font-medium text-music-text hover:text-music-primary">Urban Echoes</a>
+                <a href="#" class="block text-sm text-music-text-secondary hover:text-music-primary">City Beats</a>
+                <div class="mt-1 text-xs text-music-text-secondary">5 hours ago</div>
               </div>
             </div>
           </div>
@@ -209,15 +209,6 @@
       </div>
     </div>
   </div>
-
-  <% if user_signed_in? %>
-    <!-- User's Releases Section for signed-in users -->
-    <div class="bg-gray-50">
-      <div class="container mx-auto px-4 py-6">
-        <%= render 'home/recent_release' %>
-      </div>
-    </div>
-  <% end %>
 
   <script>
     // Simple script to handle release type selection
