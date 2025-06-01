@@ -45,11 +45,14 @@ class User < ApplicationRecord
   def build_role_profile
     return if profile.present?
 
+    # Extract name from email as default
+    default_name = email.split('@').first.humanize
+
     case role
     when 'artist'
-      build_profile(type: 'ArtistProfile')
+      build_profile(type: 'ArtistProfile', name: default_name)
     when 'fan'
-      build_profile(type: 'FanProfile')
+      build_profile(type: 'FanProfile', name: default_name)
     end
   end
 end

@@ -1,5 +1,5 @@
 class ArtistProfile < Profile
-  before_validation :generate_slug, if: -> { slug.blank? && name.present? }
+  before_validation :generate_slug, if: -> { slug.blank? }
 
   validates :slug, presence: true, uniqueness: true
   validates :bio, length: { maximum: 1000 }
@@ -13,9 +13,15 @@ class ArtistProfile < Profile
   has_one_attached :avatar
   has_one_attached :cover_image
 
+  def to_param
+    slug
+  end
+
   private
 
   def generate_slug
+    return if name.blank?
+    
     self.slug = name.parameterize
     counter = 1
     while ArtistProfile.exists?(slug: slug) && (slug != name.parameterize + "-#{counter}")

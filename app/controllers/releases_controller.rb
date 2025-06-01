@@ -1,16 +1,15 @@
 class ReleasesController < ApplicationController
-  before_action :authenticate_user! # Requires user to be logged in
-  before_action :set_release, only: [ :edit, :update, :destroy ]
+  before_action :authenticate_user!, except: [:show] # Allow public access to show
+  before_action :set_release, only: [:show, :edit, :update, :destroy]
+  before_action :authorize_release_owner!, only: [:edit, :update, :destroy]
 
   def index
     @releases = current_user.releases.order(release_date: :desc)
   end
 
   def show
-    @release = Release.find(params[:id]) # This will raise 404 if not found
-    # or
-    @release = Release.find_by(id: params[:id])
-    redirect_to releases_path, alert: "Release not found" unless @release
+    # @release is already set by set_release
+    # Show page is accessible by everyone (fans can view and buy)
   end
 
   def new
@@ -21,7 +20,7 @@ class ReleasesController < ApplicationController
     @release = current_user.releases.new(release_params)
 
     if @release.save
-      redirect_to root_path, notice: "Release was successfully created."
+      redirect_to release_path(@release), notice: "Release was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -37,17 +36,18 @@ class ReleasesController < ApplicationController
 
   def update
     if @release.update(release_params)
-      redirect_to root_path, notice: "Release was successfully updated."
+      redirect_to release_path(@release), notice: "Release was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
   end
+
   def destroy
     release_title = @release.title
     @release.destroy
 
     respond_to do |format|
-      format.html { redirect_to releases_path, success: "Release \"#{release_title}\" was successfully deleted." }
+      format.html { redirect_to dashboard_path, notice: "Release \"#{release_title}\" was successfully deleted." }
       format.turbo_stream
     end
   end
@@ -55,9 +55,19 @@ class ReleasesController < ApplicationController
   private
 
   def set_release
-    @release = current_user.releases.find(params[:id])
+    @release = if params[:id].match?(/\A\d+\z/)
+                 Release.find(params[:id])
+               else
+                 Release.find_by!(slug: params[:id])
+               end
   end
 
+  def authorize_release_owner!
+    unless @release.user == current_user
+      flash[:alert] = "You are not authorized to perform this action."
+      redirect_to release_path(@release)
+    end
+  end
   def release_params
     params.require(:release).permit(
       :title,
