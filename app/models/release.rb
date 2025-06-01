@@ -2,11 +2,7 @@ class Release < ApplicationRecord
   belongs_to :user
   has_many :tracks, dependent: :destroy
 
-  enum :release_type, [:single, :ep, :album, :compilation] Release < ApplicationRecord
-  belongs_to :user
-  has_many :tracks, dependent: :destroy
-
-  enum release_type: { single: 0, ep: 1, album: 2, compilation: 3 }
+  enum :release_type, [:single, :ep, :album, :compilation]
 
   before_validation :generate_slug, if: -> { slug.blank? && title.present? }
 
