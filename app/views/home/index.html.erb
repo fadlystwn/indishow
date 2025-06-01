@@ -3,38 +3,221 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Music Dashboard</title>
+  <title>IndiShow - Discover amazing independent music</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    .aspect-w-1 {
+      position: relative;
+      padding-bottom: 100%;
+    }
+    .aspect-w-1 > * {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  </style>
 </head>
 <body class="min-h-screen">
   
-  <div class="container mx-auto px-4 py-6">
-
-    <!-- Main Content -->
-    <main class="mt-8">
-      <!-- Stats Section -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <div class="text-gray-500 text-sm">Total Plays</div>
-          <div class="text-2xl font-bold mt-1">12,456</div>
+  <!-- Hero Section -->
+  <div class="bg-indigo-700">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+        Discover amazing independent music
+      </h1>
+      <p class="mt-6 max-w-3xl mx-auto text-xl text-indigo-100">
+        Support artists directly. Keep 100% of your sales.
+      </p>
+      <div class="mt-10 flex justify-center">
+        <div class="inline-flex rounded-md shadow">
+          <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50">
+            Browse artists
+          </a>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <div class="text-gray-500 text-sm">Followers</div>
-          <div class="text-2xl font-bold mt-1">1,234</div>
-        </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <div class="text-gray-500 text-sm">Sales</div>
-          <div class="text-2xl font-bold mt-1">$3,456</div>
-        </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-          <div class="text-gray-500 text-sm">Releases</div>
-          <div class="text-2xl font-bold mt-1">8</div>
+        <div class="ml-3 inline-flex">
+          <% if user_signed_in? %>
+            <%= link_to new_release_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-800 bg-opacity-60 hover:bg-opacity-70" do %>
+              Sell your music
+            <% end %>
+          <% else %>
+            <%= link_to new_user_registration_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-800 bg-opacity-60 hover:bg-opacity-70" do %>
+              Sell your music
+            <% end %>
+          <% end %>
         </div>
       </div>
-       <%= render 'home/recent_release' %>
-    </main>
+    </div>
   </div>
+
+  <!-- Featured Albums -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-900">Featured albums</h2>
+      <%= link_to releases_path, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
+        View all
+      <% end %>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <% @featured_releases.each do |release| %>
+        <div class="group">
+          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 relative">
+            <% if release.cover_art.attached? %>
+              <%= image_tag release.cover_art.variant(:medium), alt: release.title, class: "w-full h-full object-cover object-center group-hover:opacity-75" %>
+            <% else %>
+              <div class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                <i class="fas fa-music text-white text-4xl"></i>
+              </div>
+            <% end %>
+            <button class="absolute bottom-2 right-2 bg-indigo-600 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <i class="fas fa-play text-white"></i>
+            </button>
+          </div>
+          <div class="mt-2">
+            <%= link_to release_path(release), class: "text-sm font-medium text-gray-900 hover:text-indigo-600" do %>
+              <%= release.title %>
+            <% end %>
+            <div class="block text-sm text-gray-500">
+              <%= release.artist %>
+            </div>
+          </div>
+          <div class="mt-1 flex justify-between items-center">
+            <span class="text-sm text-gray-500"><%= number_to_currency(release.price) %></span>
+            <button class="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded">
+              + Add to cart
+            </button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Genres Section -->
+  <div class="bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">Browse by genre</h2>
+        <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all genres</a>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
+          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
+            <i class="fas fa-guitar text-indigo-600"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Rock</span>
+        </a>
+
+        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
+          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
+            <i class="fas fa-headphones text-indigo-600"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Electronic</span>
+        </a>
+
+        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
+          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
+            <i class="fas fa-drum text-indigo-600"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Hip Hop</span>
+        </a>
+
+        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
+          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
+            <i class="fas fa-music text-indigo-600"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Jazz</span>
+        </a>
+
+        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
+          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
+            <i class="fas fa-record-vinyl text-indigo-600"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Metal</span>
+        </a>
+
+        <a href="#" class="bg-white p-4 rounded-lg shadow-sm text-center hover:bg-indigo-50 transition-colors">
+          <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
+            <i class="fas fa-microphone text-indigo-600"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Folk</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-900">Recent fan activity</h2>
+      <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all activity</a>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Sample Activity Items -->
+      <div class="bg-white shadow-sm rounded-lg p-4">
+        <div class="flex items-start">
+          <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/32.jpg" alt="User avatar" />
+          <div class="ml-4">
+            <div class="flex items-center">
+              <span class="font-medium text-gray-900">Sarah Johnson</span>
+              <span class="ml-2 text-sm text-gray-500">purchased</span>
+            </div>
+            <div class="mt-1 flex">
+              <div class="flex-shrink-0">
+                <div class="h-12 w-12 bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center">
+                  <i class="fas fa-music text-white"></i>
+                </div>
+              </div>
+              <div class="ml-3">
+                <a href="#" class="text-sm font-medium text-gray-900 hover:text-indigo-600">Cosmic Journey</a>
+                <a href="#" class="block text-sm text-gray-500 hover:text-indigo-500">Stellar Sounds</a>
+                <div class="mt-1 text-xs text-gray-500">2 hours ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white shadow-sm rounded-lg p-4">
+        <div class="flex items-start">
+          <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/45.jpg" alt="User avatar" />
+          <div class="ml-4">
+            <div class="flex items-center">
+              <span class="font-medium text-gray-900">Mike Chen</span>
+              <span class="ml-2 text-sm text-gray-500">is listening to</span>
+            </div>
+            <div class="mt-1 flex">
+              <div class="flex-shrink-0">
+                <div class="h-12 w-12 bg-gradient-to-br from-green-400 to-blue-500 rounded flex items-center justify-center">
+                  <i class="fas fa-music text-white"></i>
+                </div>
+              </div>
+              <div class="ml-3">
+                <a href="#" class="text-sm font-medium text-gray-900 hover:text-indigo-600">Urban Echoes</a>
+                <a href="#" class="block text-sm text-gray-500 hover:text-indigo-500">City Beats</a>
+                <div class="mt-1 text-xs text-gray-500">5 hours ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if user_signed_in? %>
+    <!-- User's Releases Section for signed-in users -->
+    <div class="bg-gray-50">
+      <div class="container mx-auto px-4 py-6">
+        <%= render 'home/recent_release' %>
+      </div>
+    </div>
+  <% end %>
 
   <script>
     // Simple script to handle release type selection

@@ -10,6 +10,9 @@
         <%= link_to "Merch", "#", class: "hover:text-indigo-200" %>
         <%= link_to "Stats", "#", class: "hover:text-indigo-200" %>
         <%= link_to "Fans", "#", class: "hover:text-indigo-200" %>
+        <% if user_signed_in? && current_user.artist? %>
+          <%= link_to "My Artist Page", artist_profile_path(current_user.artist_profile), class: "hover:text-indigo-200" %>
+        <% end %>
       </nav>
     </div>
     <div class="flex items-center space-x-4">
