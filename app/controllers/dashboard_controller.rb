@@ -1,6 +1,7 @@
 class DashboardController < ApplicationController
   before_action :authenticate_user!
+  
   def index
-    @albums = current_user.albums
+    @releases = current_user.releases.order(release_date: :desc)
   end
 end
