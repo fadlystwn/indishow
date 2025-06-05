@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "music", to: "music#index"
   resources :releases do
     resources :tracks, only: [:new, :create, :edit, :update, :destroy]
   end

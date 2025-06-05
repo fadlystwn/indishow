@@ -1,0 +1,222 @@
+<div class="min-h-screen bg-music-background">
+  <!-- Page Header -->
+  <div class="bg-music-surface shadow-genre border-b border-music-border">
+    <div class="container mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold font-display text-music-text">Browse Music</h1>
+      <p class="text-music-text-secondary mt-2">Discover amazing independent music from talented artists</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8">
+    <!-- Filters and Sort Controls -->
+    <div class="bg-music-surface rounded-genre shadow-genre border border-music-border p-6 mb-8">
+      <%= form_with url: music_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4 items-end" do |form| %>
+        <!-- Genre Filter -->
+        <div>
+          <%= form.label :genre, "Genre", class: "block text-sm font-medium text-music-text mb-2" %>
+          <%= form.select :genre, 
+                options_for_select([['All Genres', '']] + @available_genres.map { |g| [g, g] }, @current_genre),
+                {},
+                class: "w-full px-3 py-2 bg-music-background border border-music-border rounded-button text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors" %>
+        </div>
+
+        <!-- Release Type Filter -->
+        <div>
+          <%= form.label :type, "Type", class: "block text-sm font-medium text-music-text mb-2" %>
+          <%= form.select :type,
+                options_for_select([
+                  ['All Types', ''],
+                  ['Album', 'album'],
+                  ['EP', 'ep'],
+                  ['Single', 'single'],
+                  ['Compilation', 'compilation']
+                ], @current_type),
+                {},
+                class: "w-full px-3 py-2 bg-music-background border border-music-border rounded-button text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors" %>
+        </div>
+
+        <!-- Sort Options -->
+        <div>
+          <%= form.label :sort, "Sort by", class: "block text-sm font-medium text-music-text mb-2" %>
+          <%= form.select :sort,
+                options_for_select([
+                  ['Newest First', 'newest'],
+                  ['Oldest First', 'oldest'],
+                  ['Price: Low to High', 'price_low'],
+                  ['Price: High to Low', 'price_high'],
+                  ['Title A-Z', 'title']
+                ], @current_sort),
+                {},
+                class: "w-full px-3 py-2 bg-music-background border border-music-border rounded-button text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors" %>
+        </div>
+
+        <!-- Filter Button -->
+        <div>
+          <%= form.submit "Apply Filters", 
+                class: "w-full px-4 py-2 bg-music-primary hover:bg-music-primary/90 text-music-text font-medium rounded-button transition-colors shadow-button" %>
+        </div>
+      <% end %>
+
+      <!-- Clear Filters -->
+      <% if params[:genre].present? || params[:type].present? || (params[:sort].present? && params[:sort] != 'newest') %>
+        <div class="mt-4 text-center">
+          <%= link_to "Clear All Filters", music_path, 
+                class: "text-music-text-secondary hover:text-music-text transition-colors text-sm" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="text-music-text-secondary">
+        <% if @releases.total_count > 0 %>
+          Showing <%= @releases.offset_value + 1 %>-<%= [@releases.offset_value + @releases.limit_value, @releases.total_count].min %> 
+          of <%= @releases.total_count %> releases
+        <% else %>
+          No releases found
+        <% end %>
+      </div>
+      
+      <div class="text-music-text-secondary text-sm">
+        Page <%= @releases.current_page %> of <%= @releases.total_pages %>
+      </div>
+    </div>
+
+    <!-- Music Grid (4 columns) -->
+    <% if @releases.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <% @releases.each do |release| %>
+          <div class="bg-music-surface rounded-genre shadow-genre hover:shadow-genre-hover border border-music-border overflow-hidden transition-all duration-200 group">
+            <!-- Cover Art -->
+            <div class="aspect-square relative bg-music-background">
+              <% if release.cover_art.attached? %>
+                <%= image_tag release.cover_art.variant(:medium), 
+                      alt: release.title, 
+                      class: "w-full h-full object-cover group-hover:opacity-75 transition-opacity duration-200" %>
+              <% else %>
+                <div class="w-full h-full bg-gradient-to-br from-music-primary to-music-secondary flex items-center justify-center">
+                  <i class="fas fa-music text-music-text text-4xl opacity-50"></i>
+                </div>
+              <% end %>
+              
+              <!-- Play Button Overlay -->
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <button class="bg-music-primary/90 hover:bg-music-primary text-music-text rounded-full p-4 shadow-button transform hover:scale-105 transition-all duration-200">
+                  <i class="fas fa-play text-xl"></i>
+                </button>
+              </div>
+
+              <!-- Release Type Badge -->
+              <div class="absolute top-2 left-2">
+                <span class="px-2 py-1 bg-music-surface/90 text-music-text text-xs font-medium rounded-button backdrop-blur-sm">
+                  <%= release.release_type.titleize %>
+                </span>
+              </div>
+
+              <!-- Genre Badge -->
+              <% if release.genre.present? %>
+                <div class="absolute top-2 right-2">
+                  <span class="px-2 py-1 bg-music-primary/90 text-music-text text-xs font-medium rounded-button backdrop-blur-sm">
+                    <%= release.genre %>
+                  </span>
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Release Info -->
+            <div class="p-4">
+              <div class="mb-2">
+                <% if release.slug.present? %>
+                  <%= link_to release_path(release), class: "block" do %>
+                    <h3 class="text-lg font-semibold text-music-text hover:text-music-primary transition-colors line-clamp-1">
+                      <%= release.title %>
+                    </h3>
+                  <% end %>
+                <% else %>
+                  <h3 class="text-lg font-semibold text-music-text line-clamp-1">
+                    <%= release.title %>
+                  </h3>
+                <% end %>
+                
+                <% if release.user.artist_profile %>
+                  <%= link_to artist_profile_path(release.user.artist_profile), 
+                        class: "text-music-text-secondary hover:text-music-primary transition-colors text-sm" do %>
+                    <%= release.user.artist_profile.name %>
+                  <% end %>
+                <% else %>
+                  <span class="text-music-text-secondary text-sm">
+                    <%= release.user.name_or_email %>
+                  </span>
+                <% end %>
+              </div>
+
+              <!-- Release Details -->
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-music-text-secondary text-sm">
+                  <%= release.release_date.strftime("%Y") %>
+                </span>
+                <span class="text-music-accent font-semibold">
+                  <%= number_to_currency(release.price) %>
+                </span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex gap-2">
+                <% if release.slug.present? %>
+                  <%= link_to release_path(release), 
+                        class: "flex-1 flex items-center justify-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-text px-3 py-2 rounded-button text-sm font-medium transition-colors shadow-button" do %>
+                    <i class="fas fa-eye"></i>
+                    <span>View</span>
+                  <% end %>
+                <% end %>
+                
+                <button class="flex items-center justify-center gap-2 bg-music-surface hover:bg-music-border text-music-text border border-music-border px-3 py-2 rounded-button text-sm font-medium transition-colors">
+                  <i class="fas fa-cart-plus"></i>
+                  <span>Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-center">
+        <%= paginate @releases %>
+      </div>
+    <% else %>
+      <!-- Empty State -->
+      <div class="text-center py-16">
+        <div class="bg-music-surface rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 border border-music-border">
+          <i class="fas fa-music text-4xl text-music-text-secondary"></i>
+        </div>
+        <h3 class="text-2xl font-semibold text-music-text mb-2">No music found</h3>
+        <p class="text-music-text-secondary mb-6 max-w-md mx-auto">
+          <% if params[:genre].present? || params[:type].present? %>
+            Try adjusting your filters to see more results.
+          <% else %>
+            It looks like there's no music available right now. Check back later!
+          <% end %>
+        </p>
+        
+        <% if params[:genre].present? || params[:type].present? %>
+          <%= link_to "Clear Filters", music_path, 
+                class: "inline-flex items-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-text px-6 py-3 rounded-button font-medium transition-colors shadow-button" do %>
+            <i class="fas fa-filter"></i>
+            <span>Clear All Filters</span>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Utility Styles -->
+<style>
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

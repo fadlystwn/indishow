@@ -87,6 +87,13 @@
             </div>
 
             <div class="mb-4">
+              <%= form.label :genre, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= form.select :genre, options_for_select([['Select a genre', '']] + Release::GENRES.map { |genre| [genre, genre] }, @release.genre), 
+                             {}, 
+                             { class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" } %>
+            </div>
+
+            <div class="mb-4">
               <%= form.label :description, class: "block text-music-text text-sm font-medium mb-2" %>
               <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary placeholder-music-text-secondary" %>
             </div>

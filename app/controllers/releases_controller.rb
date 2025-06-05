@@ -76,6 +76,7 @@ class ReleasesController < ApplicationController
       :release_date,
       :price,
       :description,
+      :genre,
       :cover_art
     )
   end
