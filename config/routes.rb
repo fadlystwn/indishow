@@ -11,7 +11,12 @@ Rails.application.routes.draw do
     registrations: "users/registrations"
   }
 
-  resources :artist_profiles, path: 'artists', only: [:show, :edit, :update]
+  resources :artist_profiles, path: 'artists', only: [:show, :edit, :update] do
+    member do
+      post 'follow', to: 'follows#create'
+      delete 'unfollow', to: 'follows#destroy'
+    end
+  end
   resources :fan_profiles, path: 'fans', only: [:index, :show, :edit, :update]
   
   # Dashboard route for authenticated users

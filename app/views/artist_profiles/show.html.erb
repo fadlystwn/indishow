@@ -58,6 +58,9 @@
           <% if @artist_profile.location.present? %>
             <span class="bg-music-surface border border-music-border px-3 py-1 rounded-genre text-sm"><%= @artist_profile.location %></span>
           <% end %>
+          <span class="bg-music-primary bg-opacity-20 border border-music-primary px-3 py-1 rounded-genre text-sm text-music-primary">
+            <%= pluralize(@artist_profile.user.followers.count, 'follower') %>
+          </span>
         </div>
         <div class="flex space-x-4">
           <button class="bg-music-primary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center shadow-button transition-all duration-200">
@@ -75,14 +78,40 @@
               </svg>
               Edit Profile
             <% end %>
+          <% elsif user_signed_in? && current_user.fan? %>
+            <%# Show Follow/Unfollow button for fans %>
+            <% if current_user.following?(@artist_profile.user) %>
+              <%= button_to unfollow_artist_profile_path(@artist_profile), method: :delete, 
+                            class: "bg-music-background hover:bg-opacity-80 border border-music-border text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200",
+                            data: { confirm: "Are you sure you want to unfollow #{@artist_profile.name}?" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Following
+              <% end %>
+            <% else %>
+              <%= button_to follow_artist_profile_path(@artist_profile), method: :post,
+                            class: "bg-music-secondary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                </svg>
+                Follow
+              <% end %>
+            <% end %>
+          <% elsif user_signed_in? && current_user.artist? %>
+            <%# Show message for artists %>
+            <div class="text-music-text-secondary italic">
+              Sign up as a fan to follow artists
+            </div>
           <% else %>
-            <%# Show Follow button for other users %>
-            <button class="bg-music-secondary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200">
+            <%# Show sign up button for non-logged in users %>
+            <%= link_to new_user_registration_path, 
+                        class: "bg-music-secondary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
               </svg>
               Follow
-            </button>
+            <% end %>
           <% end %>
         </div>
       </div>

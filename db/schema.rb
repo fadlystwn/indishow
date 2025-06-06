@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_05_161208) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_06_151037) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_05_161208) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "followed_artists", force: :cascade do |t|
+    t.integer "follower_id", null: false
+    t.integer "followed_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["followed_id"], name: "index_followed_artists_on_followed_id"
+    t.index ["follower_id", "followed_id"], name: "index_followed_artists_on_follower_id_and_followed_id", unique: true
+    t.index ["follower_id"], name: "index_followed_artists_on_follower_id"
+  end
+
+  create_table "follows", force: :cascade do |t|
+    t.integer "follower_id", null: false
+    t.integer "followed_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["followed_id"], name: "index_follows_on_followed_id"
+    t.index ["follower_id", "followed_id"], name: "index_follows_on_follower_id_and_followed_id", unique: true
+    t.index ["follower_id"], name: "index_follows_on_follower_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -73,6 +93,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_05_161208) do
     t.index ["user_id"], name: "index_releases_on_user_id"
   end
 
+  create_table "saved_releases", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "release_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["release_id"], name: "index_saved_releases_on_release_id"
+    t.index ["user_id", "release_id"], name: "index_saved_releases_on_user_id_and_release_id", unique: true
+    t.index ["user_id"], name: "index_saved_releases_on_user_id"
+  end
+
   create_table "tracks", force: :cascade do |t|
     t.string "title"
     t.integer "duration"
@@ -101,7 +131,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_05_161208) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "followed_artists", "users", column: "followed_id"
+  add_foreign_key "followed_artists", "users", column: "follower_id"
+  add_foreign_key "follows", "users", column: "followed_id"
+  add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "releases", "users"
+  add_foreign_key "saved_releases", "releases"
+  add_foreign_key "saved_releases", "users"
   add_foreign_key "tracks", "releases"
 end

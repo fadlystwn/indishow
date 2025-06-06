@@ -10,8 +10,8 @@ class FanProfilesController < ApplicationController
   end
 
   def show
-    # For fans, we can show their favorite genres, activity, reviews, etc.
-    # For now, we'll keep it simple
+    # Load followed artists for the following section
+    @followed_artists = @fan_profile.user.followed_artists.includes(:profile, profile: { avatar_attachment: :blob })
   end
 
   def edit
