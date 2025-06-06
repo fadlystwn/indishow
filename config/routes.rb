@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   }
 
   resources :artist_profiles, path: 'artists', only: [:show, :edit, :update]
+  resources :fan_profiles, path: 'fans', only: [:index, :show, :edit, :update]
   
   # Dashboard route for authenticated users
   get 'dashboard', to: 'dashboard#index'

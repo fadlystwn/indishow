@@ -8,4 +8,8 @@ class Profile < ApplicationRecord
   def display_name
     name.presence || user.email.split('@').first
   end
+
+  def to_param
+    slug.presence || id
+  end
 end

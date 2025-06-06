@@ -9,10 +9,12 @@
         <%= link_to "Music", music_path, class: "text-music-text hover:text-music-primary transition-colors" %>
         <%= link_to "Merch", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
         <%= link_to "Stats", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
-        <%= link_to "Fans", "#", class: "text-music-text hover:text-music-primary transition-colors" %>
+        <%= link_to "Fans", fan_profiles_path, class: "text-music-text hover:text-music-primary transition-colors" %>
         <% if user_signed_in? && current_user.artist? %>
           <%= link_to "Dashboard", dashboard_path, class: "text-music-text hover:text-music-primary transition-colors" %>
           <%= link_to "My Artist Page", artist_profile_path(current_user.artist_profile), class: "text-music-text hover:text-music-primary transition-colors" %>
+        <% elsif user_signed_in? && current_user.fan? && current_user.fan_profile %>
+          <%= link_to "My Fan Page", fan_profile_path(current_user.fan_profile), class: "text-music-text hover:text-music-primary transition-colors" %>
         <% end %>
       </nav>
     </div>
@@ -47,10 +49,14 @@
             data-transition-leave-start="transform opacity-100 scale-100"
             data-transition-leave-end="transform opacity-0 scale-95"
           >
-            <%= link_to "Profile", edit_user_registration_path, class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
             <% if current_user.artist? %>
+              <%= link_to "My Artist Page", artist_profile_path(current_user.artist_profile), class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
               <%= link_to "Dashboard", dashboard_path, class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
+            <% elsif current_user.fan? && current_user.fan_profile %>
+              <%= link_to "My Fan Page", fan_profile_path(current_user.fan_profile), class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
             <% end %>
+            <div class="border-t border-music-surface"></div>
+            <%= link_to "Account Settings", edit_user_registration_path, class: "block px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
             <div class="border-t border-music-surface"></div>
             <%= button_to "Sign Out", destroy_user_session_path, method: :delete, 
                           class: "w-full text-left px-4 py-2 text-music-text hover:bg-music-primary hover:bg-opacity-20" %>
