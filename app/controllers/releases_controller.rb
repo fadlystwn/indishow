@@ -1,5 +1,6 @@
 class ReleasesController < ApplicationController
   before_action :authenticate_user!, except: [:show] # Allow public access to show
+  before_action :authorize_artist_user!, except: [:show] # Restrict fan users from all actions except show
   before_action :set_release, only: [:show, :edit, :update, :destroy]
   before_action :authorize_release_owner!, only: [:edit, :update, :destroy]
 
@@ -66,6 +67,13 @@ class ReleasesController < ApplicationController
     unless @release.user == current_user
       flash[:alert] = "You are not authorized to perform this action."
       redirect_to release_path(@release)
+    end
+  end
+
+  def authorize_artist_user!
+    unless current_user&.artist?
+      flash[:alert] = "Access denied. Only artists can manage releases."
+      redirect_to root_path
     end
   end
   def release_params

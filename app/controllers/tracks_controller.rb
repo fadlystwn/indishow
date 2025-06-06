@@ -1,5 +1,8 @@
 class TracksController < ApplicationController
+  before_action :authenticate_user!
+  before_action :authorize_artist_user!
   before_action :set_release
+  before_action :authorize_release_owner!
   before_action :set_track, only: [:edit, :update, :destroy]
 
   def new
@@ -77,4 +80,19 @@ class TracksController < ApplicationController
   def track_params
     params.require(:track).permit(:title, :duration, :position)
   end
+
+  def authorize_artist_user!
+    unless current_user&.artist?
+      flash[:alert] = "Access denied. Only artists can manage tracks."
+      redirect_to root_path
+    end
+  end
+
+  def authorize_release_owner!
+    unless @release.user == current_user
+      flash[:alert] = "You are not authorized to perform this action."
+      redirect_to release_path(@release)
+    end
+  end
+end
 end
