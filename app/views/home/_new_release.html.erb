@@ -3,19 +3,31 @@
   <h2 class="text-xl font-semibold mb-4">Upload New Release</h2>
   
   <!-- Release Type Selector -->
-  <div class="mb-6">
+  <div class="mb-6" data-controller="release-upload">
     <label class="block text-gray-700 text-sm font-medium mb-2">Release Type</label>
     <div class="grid grid-cols-4 gap-2">
-      <button class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium" data-type="single">
+      <button type="button" class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium border-gray-300 text-gray-700" 
+              data-release-upload-target="typeBtn" 
+              data-action="click->release-upload#selectType" 
+              data-type="single">
         Single
       </button>
-      <button class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium" data-type="ep">
+      <button type="button" class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium border-gray-300 text-gray-700" 
+              data-release-upload-target="typeBtn" 
+              data-action="click->release-upload#selectType" 
+              data-type="ep">
         EP
       </button>
-      <button class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium" data-type="album">
+      <button type="button" class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium border-gray-300 text-gray-700" 
+              data-release-upload-target="typeBtn" 
+              data-action="click->release-upload#selectType" 
+              data-type="album">
         Album
       </button>
-      <button class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium" data-type="compilation">
+      <button type="button" class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium border-gray-300 text-gray-700" 
+              data-release-upload-target="typeBtn" 
+              data-action="click->release-upload#selectType" 
+              data-type="compilation">
         Compilation
       </button>
     </div>

@@ -1,14 +1,13 @@
-// app/javascript/controllers/release_upload_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["typeBtn"]
+  static targets = ["button"]
 
   selectType(event) {
     event.preventDefault()
     
     // Remove active class from all buttons
-    this.typeBtnTargets.forEach(btn => {
+    this.buttonTargets.forEach(btn => {
       btn.classList.remove('bg-teal-600', 'text-white', 'border-teal-600');
       btn.classList.add('border-gray-300', 'text-gray-700');
     });
@@ -18,11 +17,10 @@ export default class extends Controller {
     clickedButton.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
     clickedButton.classList.remove('border-gray-300', 'text-gray-700');
     
-    // Update hidden field value
-    const selectedType = clickedButton.dataset.type;
-    const hiddenField = document.getElementById('release_type');
-    if (hiddenField) {
-      hiddenField.value = selectedType;
-    }
+    // You could also store the selected type in a hidden field if needed
+    // const hiddenField = document.getElementById('release-type');
+    // if (hiddenField) {
+    //   hiddenField.value = clickedButton.dataset.type;
+    // }
   }
 }
