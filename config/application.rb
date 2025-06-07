@@ -31,5 +31,8 @@ module Skenaria
 
     # Configure Active Storage to use ImageMagick
     config.active_storage.variant_processor = :mini_magick
+
+    # Configure Sidekiq as the Active Job queue adapter
+    config.active_job.queue_adapter = :sidekiq
   end
 end

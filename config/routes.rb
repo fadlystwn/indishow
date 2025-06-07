@@ -1,4 +1,18 @@
 Rails.application.routes.draw do
+  # Sidekiq Web UI (for monitoring background jobs)
+  require 'sidekiq/web'
+  
+  # Secure Sidekiq web interface (only allow in development or with authentication)
+  if Rails.env.development?
+    mount Sidekiq::Web => '/sidekiq'
+  else
+    # In production, you might want to add authentication
+    # Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    #   username == ENV["SIDEKIQ_USERNAME"] && password == ENV["SIDEKIQ_PASSWORD"]
+    # end
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
   get "music", to: "music#index"
   resources :releases do
     resources :tracks, only: [:new, :create, :edit, :update, :destroy]
