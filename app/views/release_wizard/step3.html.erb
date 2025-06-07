@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-music-background py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-center mb-4">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 text-sm font-medium text-green-600">Select Type</span>
+          </div>
+          <div class="w-16 h-1 bg-green-600 rounded"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 text-sm font-medium text-green-600">Release Info</span>
+          </div>
+          <div class="w-16 h-1 bg-green-600 rounded"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center text-sm font-medium">3</div>
+            <span class="ml-2 text-sm font-medium text-music-text">Upload Tracks</span>
+          </div>
+        </div>
+      </div>
+      <div class="w-full bg-gray-300 rounded-full h-2">
+        <div class="bg-teal-600 h-2 rounded-full transition-all duration-300" style="width: 100%" data-release-wizard-target="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-music-surface rounded-lg shadow-lg border border-music-border p-8"
+         data-controller="release-wizard" 
+         data-release-wizard-step-value="3"
+         data-release-wizard-selected-type-value="<%= @release_draft.release_type %>"
+         data-release-wizard-track-requirements-value="<%= @track_requirements.to_json %>"
+         data-release-wizard-base-url-value="<%= release_wizard_path(@release_draft.id) %>"
+         data-release-wizard-update-url-value="<%= update_step_release_wizard_path(@release_draft.id) %>">
+      
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-music-text mb-2">Upload Your Tracks</h1>
+        <p class="text-music-text-secondary text-lg mb-4">
+          Add tracks to your <%= @release_draft.release_type.titleize.downcase %>
+        </p>
+        <div class="inline-flex items-center px-4 py-2 bg-teal-50 border border-teal-200 rounded-md">
+          <i class="fas fa-info-circle text-teal-600 mr-2"></i>
+          <span class="text-sm text-teal-800">
+            <%= @track_requirements[:description] %>
+          </span>
+        </div>
+      </div>
+
+      <% if flash[:alert] %>
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <!-- Track Upload Section -->
+      <div class="mb-8" data-release-wizard-target="trackUpload">
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:border-teal-400 hover:bg-teal-50 transition-all duration-200">
+          <i class="fas fa-music text-gray-400 text-4xl mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Upload Audio Files</h3>
+          <p class="text-gray-600 upload-description mb-4">
+            Upload <%= @track_requirements[:description] %>
+          </p>
+          <p class="text-sm text-gray-500 mb-4">
+            Supported formats: WAV, FLAC, AIFF, ALAC, MP3, AAC (Max 100MB per file)
+          </p>
+          <label class="cursor-pointer">
+            <span class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors">
+              <i class="fas fa-upload mr-2"></i>
+              Choose Files
+            </span>
+            <input type="file" 
+                   multiple 
+                   accept="audio/*" 
+                   class="hidden"
+                   data-action="change->release-wizard#handleTrackUpload">
+          </label>
+        </div>
+      </div>
+
+      <!-- Uploaded Tracks List -->
+      <div class="mb-8">
+        <h3 class="text-lg font-medium text-music-text mb-4">Uploaded Tracks</h3>
+        <div class="space-y-4" data-release-wizard-target="trackList">
+          <% if @tracks.any? %>
+            <% @tracks.each_with_index do |track, index| %>
+              <div class="track-item bg-gray-50 p-4 rounded-lg border border-gray-200" data-track-index="<%= index %>">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-gray-500 bg-white px-2 py-1 rounded">#<%= track.position %></span>
+                    <div>
+                      <h4 class="font-medium text-gray-900"><%= track.title %></h4>
+                      <% if track.duration.present? %>
+                        <p class="text-sm text-gray-500">Duration: <%= Time.at(track.duration).utc.strftime("%M:%S") %></p>
+                      <% end %>
+                    </div>
+                  </div>
+                  <%= link_to release_track_path(@release_draft, track), 
+                            method: :delete,
+                            data: { turbo_confirm: "Are you sure?" },
+                            class: "text-red-500 hover:text-red-700" do %>
+                    <i class="fas fa-trash text-sm"></i>
+                  <% end %>
+                </div>
+                <div class="mb-2">
+                  <%= text_field_tag "tracks[#{index}][title]", track.title,
+                                   class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500",
+                                   placeholder: "Track title" %>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-green-600 h-2 rounded-full track-progress" style="width: 100%"></div>
+                </div>
+                <p class="text-xs text-green-600 mt-1">Upload complete</p>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-8 text-gray-500">
+              <i class="fas fa-music text-3xl mb-4 opacity-50"></i>
+              <p>No tracks uploaded yet</p>
+              <p class="text-sm">Use the upload area above to add your audio files</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="flex justify-between items-center pt-6 border-t border-music-border">
+        <%= link_to "Back", step2_release_wizard_path(@release_draft), 
+                    class: "px-6 py-3 border border-music-border rounded-md text-music-text hover:bg-music-background transition-colors" %>
+        
+        <button type="button" 
+                class="px-6 py-3 bg-teal-600 text-white rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                data-release-wizard-target="continueBtn"
+                data-action="click->release-wizard#goNext"
+                <%= 'disabled' unless @tracks.any? && @tracks.count >= @track_requirements[:min] && (@track_requirements[:max].nil? || @tracks.count <= @track_requirements[:max]) %>>
+          Review & Publish
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

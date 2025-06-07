@@ -5,7 +5,7 @@ class ReleasesController < ApplicationController
   before_action :authorize_release_owner!, only: [:edit, :update, :destroy]
 
   def index
-    @releases = current_user.releases.order(release_date: :desc)
+    @releases = current_user.releases.published.order(release_date: :desc)
   end
 
   def show
@@ -57,9 +57,9 @@ class ReleasesController < ApplicationController
 
   def set_release
     @release = if params[:id].match?(/\A\d+\z/)
-                 Release.find(params[:id])
+                 Release.published.find(params[:id])
                else
-                 Release.find_by!(slug: params[:id])
+                 Release.published.find_by!(slug: params[:id])
                end
   end
 

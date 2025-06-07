@@ -14,6 +14,20 @@ Rails.application.routes.draw do
   end
 
   get "music", to: "music#index"
+  
+  # New multi-step release wizard
+  resources :release_wizard, only: [:show, :create] do
+    collection do
+      get :step1
+      post :create_draft
+    end
+    member do
+      get :step2
+      get :step3
+      post :update_step
+    end
+  end
+
   resources :releases do
     resources :tracks, only: [:new, :create, :edit, :update, :destroy]
   end

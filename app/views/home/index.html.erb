@@ -41,7 +41,7 @@
         </div>
         <div class="ml-3 inline-flex">
           <% if user_signed_in? && current_user.artist? %>
-            <%= link_to new_release_path, class: "inline-flex items-center justify-center px-5 py-3 border border-music-text text-base font-medium rounded-button text-music-text hover:bg-music-surface hover:border-music-primary transition duration-200" do %>
+            <%= link_to step1_release_wizard_index_path, class: "inline-flex items-center justify-center px-5 py-3 border border-music-text text-base font-medium rounded-button text-music-text hover:bg-music-surface hover:border-music-primary transition duration-200" do %>
               Sell your music
             <% end %>
           <% elsif !user_signed_in? %>

@@ -3,8 +3,8 @@
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-semibold">Your Releases</h2>
     <% if user_signed_in? %>
-      <%= link_to new_release_path, class: "flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700" do %>
-        <i class="fas fa-plus"></i> Add New Release
+      <%= link_to step1_release_wizard_index_path, class: "flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700" do %>
+        <i class="fas fa-plus"></i> Create New Release
       <% end %>
     <% end %>
   </div>
@@ -69,7 +69,7 @@
   <% elsif user_signed_in? %>
     <div class="text-center py-8 text-gray-500">
       <p>You don't have any releases yet.</p>
-      <%= link_to "Create your first release", new_release_path, class: "text-teal-600 hover:underline mt-2 inline-block" %>
+      <%= link_to "Create your first release", step1_release_wizard_index_path, class: "text-teal-600 hover:underline mt-2 inline-block" %>
     </div>
   <% else %>
     <div class="text-center py-8 text-gray-500">
