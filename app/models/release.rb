@@ -3,7 +3,7 @@ class Release < ApplicationRecord
   has_many :tracks, dependent: :destroy
 
   enum :release_type, [:single, :ep, :album, :compilation]
-  enum :status, { draft: 0, published: 1 }
+  enum :status, { draft: "draft", published: "published" }, default: "draft"
   
   GENRES = [
     'Rock', 'Pop', 'Hip Hop', 'Electronic', 'Classical', 'Jazz',

@@ -159,6 +159,43 @@ class ReleaseWizardController < ApplicationController
             duration: track_data[:duration],
             position: index + 1
           )
+          
+          # Handle audio file upload if present
+          if track_data[:audio_file].present?
+            track.audio_file.attach(track_data[:audio_file])
+          end
+          
+          unless track.save
+            track_errors.concat(track.errors.full_messages)
+          end
+        end
+      end
+    elsif params[:audio_files].present?
+      # Handle direct file uploads (for JavaScript-based uploads)
+      audio_files = params[:audio_files].is_a?(Array) ? params[:audio_files] : [params[:audio_files]]
+      track_count = audio_files.length
+      requirements = get_track_requirements(@release_draft.release_type)
+      
+      if track_count < requirements[:min]
+        track_errors << "#{@release_draft.release_type.titleize} requires at least #{requirements[:min]} track(s). You uploaded #{track_count}."
+      elsif requirements[:max] && track_count > requirements[:max]
+        track_errors << "#{@release_draft.release_type.titleize} can have at most #{requirements[:max]} track(s). You uploaded #{track_count}."
+      end
+      
+      if track_errors.empty?
+        @release_draft.tracks.destroy_all # Clear existing tracks
+        
+        audio_files.each_with_index do |audio_file, index|
+          # Extract title from filename
+          title = File.basename(audio_file.original_filename, File.extname(audio_file.original_filename))
+          
+          track = @release_draft.tracks.build(
+            title: title,
+            position: index + 1
+          )
+          
+          track.audio_file.attach(audio_file)
+          
           unless track.save
             track_errors.concat(track.errors.full_messages)
           end
@@ -200,7 +237,11 @@ class ReleaseWizardController < ApplicationController
   end
 
   def step2_params
-    params.require(:release).permit(:title, :artist, :release_date, :price, :description, :genre, :cover_art)
+    params.require(:release).permit(:title, :artist, :release_date, :price, :description, :genre, :cover_art, :release_type)
+  end
+
+  def track_upload_params
+    params.permit(audio_files: [])
   end
 
   def authorize_artist_user!

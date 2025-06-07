@@ -34,8 +34,8 @@
         </p>
       </div>
 
-      <%= form_with(model: @release_draft, url: update_step_release_wizard_path(@release_draft.id), local: true, class: "space-y-6") do |form| %>
-        <%= form.hidden_field :release_type, value: @release_draft.release_type %>
+      <%= form_tag update_step_release_wizard_path(@release_draft.id), method: :post, local: true, authenticity_token: true, class: "space-y-6" do %>
+        <%= hidden_field_tag 'release[release_type]', @release_draft.release_type %>
         <input type="hidden" name="step" value="2">
 
         <% if @release_draft.errors.any? %>
@@ -53,7 +53,7 @@
           <!-- Left Column: Cover Art -->
           <div>
             <div class="mb-6">
-              <%= form.label :cover_art, "Cover Art", class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[cover_art]', "Cover Art", class: "block text-music-text text-sm font-medium mb-2" %>
               <div class="border-2 border-dashed border-music-border rounded-lg p-8 text-center cursor-pointer bg-music-background/50 hover:border-teal-500 hover:bg-teal-50 transition-all duration-200"
                    data-controller="file-upload"
                    data-action="dragover->file-upload#highlight dragleave->file-upload#unhighlight drop->file-upload#drop">
@@ -78,7 +78,7 @@
                     </div>
                   <% end %>
                 </div>
-                <%= form.file_field :cover_art, 
+                <%= file_field_tag 'release[cover_art]', 
                                   direct_upload: true,
                                   accept: "image/*",
                                   class: "hidden",
@@ -94,8 +94,8 @@
           <div class="space-y-6">
             <!-- Title -->
             <div>
-              <%= form.label :title, class: "block text-music-text text-sm font-medium mb-2" %>
-              <%= form.text_field :title, 
+              <%= label_tag 'release[title]', 'Title', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= text_field_tag 'release[title]', @release_draft.title,
                                 class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text placeholder-music-text-secondary #{'border-red-500' if @release_draft.errors[:title].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
                                 placeholder: "Enter your #{@release_draft.release_type&.titleize&.downcase || 'release'} title" %>
               <% if @release_draft.errors[:title].any? %>
@@ -105,8 +105,8 @@
 
             <!-- Artist -->
             <div>
-              <%= form.label :artist, class: "block text-music-text text-sm font-medium mb-2" %>
-              <%= form.text_field :artist, 
+              <%= label_tag 'release[artist]', 'Artist', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= text_field_tag 'release[artist]', @release_draft.artist,
                                 class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text placeholder-music-text-secondary #{'border-red-500' if @release_draft.errors[:artist].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
                                 placeholder: "Artist or band name" %>
               <% if @release_draft.errors[:artist].any? %>
@@ -116,8 +116,8 @@
 
             <!-- Release Date -->
             <div>
-              <%= form.label :release_date, class: "block text-music-text text-sm font-medium mb-2" %>
-              <%= form.date_field :release_date, 
+              <%= label_tag 'release[release_date]', 'Release Date', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= date_field_tag 'release[release_date]', @release_draft.release_date,
                                 class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release_draft.errors[:release_date].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" %>
               <% if @release_draft.errors[:release_date].any? %>
                 <p class="text-sm text-red-500 mt-1"><%= @release_draft.errors.full_messages_for(:release_date).first %></p>
@@ -126,10 +126,10 @@
 
             <!-- Price -->
             <div>
-              <%= form.label :price, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[price]', 'Price', class: "block text-music-text text-sm font-medium mb-2" %>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-music-text-secondary">$</span>
-                <%= form.number_field :price, 
+                <%= number_field_tag 'release[price]', @release_draft.price,
                                     min: 0, 
                                     step: 0.01, 
                                     class: "w-full pl-8 pr-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release_draft.errors[:price].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
@@ -143,11 +143,10 @@
 
             <!-- Genre -->
             <div>
-              <%= form.label :genre, class: "block text-music-text text-sm font-medium mb-2" %>
-              <%= form.select :genre, 
+              <%= label_tag 'release[genre]', 'Genre', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= select_tag 'release[genre]', 
                             options_for_select([['Select a genre', '']] + Release::GENRES.map { |genre| [genre, genre] }, @release_draft.genre), 
-                            {}, 
-                            { class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release_draft.errors[:genre].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" } %>
+                            class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release_draft.errors[:genre].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" %>
               <% if @release_draft.errors[:genre].any? %>
                 <p class="text-sm text-red-500 mt-1"><%= @release_draft.errors.full_messages_for(:genre).first %></p>
               <% end %>
@@ -155,8 +154,8 @@
 
             <!-- Description -->
             <div>
-              <%= form.label :description, class: "block text-music-text text-sm font-medium mb-2" %>
-              <%= form.text_area :description, 
+              <%= label_tag 'release[description]', 'Description', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= text_area_tag 'release[description]', @release_draft.description,
                                 rows: 4, 
                                 class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text placeholder-music-text-secondary #{'border-red-500' if @release_draft.errors[:description].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
                                 placeholder: "Tell your fans about this #{@release_draft.release_type&.titleize&.downcase || 'release'}..." %>
@@ -172,7 +171,7 @@
           <%= link_to "Back", step1_release_wizard_index_path, 
                       class: "px-6 py-3 border border-music-border rounded-md text-music-text hover:bg-music-background transition-colors" %>
           
-          <%= form.submit "Continue to Upload Tracks", 
+          <%= submit_tag "Continue to Upload Tracks", 
                         class: "px-6 py-3 bg-teal-600 text-white rounded-md font-medium hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors" %>
         </div>
       <% end %>
