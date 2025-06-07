@@ -14,8 +14,10 @@
         <div class="bg-music-surface shadow-genre rounded-genre p-6 border border-music-border">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-music-text">Your Releases</h2>
-            <%= link_to step1_release_wizard_index_path, class: "flex items-center gap-2 px-4 py-2 bg-music-primary text-music-text rounded-button hover:bg-opacity-80 transition-all duration-200 shadow-button" do %>
-              <i class="fas fa-plus"></i> Create New Release
+            <% if @releases.any? %>
+              <%= link_to step1_release_wizard_index_path, class: "flex items-center gap-2 px-4 py-2 bg-music-primary text-music-text rounded-button hover:bg-opacity-80 transition-all duration-200 shadow-button" do %>
+                <i class="fas fa-plus"></i> Create New Release
+              <% end %>
             <% end %>
           </div>
 
