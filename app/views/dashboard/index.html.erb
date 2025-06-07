@@ -90,6 +90,14 @@
           <% end %>
         </div>
       </div>
+
+      <%# Sidebar %>
+      <div class="md:col-span-1 space-y-6">
+        <% if current_user.artist? %>
+          <%# Followers Component %>
+          <%= render 'followers' %>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>
