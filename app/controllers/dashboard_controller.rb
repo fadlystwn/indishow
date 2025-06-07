@@ -2,7 +2,7 @@ class DashboardController < ApplicationController
   before_action :authenticate_user!
   
   def index
-    @releases = current_user.releases.order(release_date: :desc)
+    @releases = current_user.releases.published.order(release_date: :desc)
     
     # Load follower data for artists
     if current_user.artist?
