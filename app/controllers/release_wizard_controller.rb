@@ -22,6 +22,8 @@ class ReleaseWizardController < ApplicationController
   end
 
   def create_draft
+    Rails.logger.info "🎵 [RELEASE_WIZARD] Creating new release draft for user #{current_user.id} with type: #{params[:release_type]}"
+    
     # Create the initial draft when user starts wizard
     @release_draft = current_user.releases.new(
       title: '',
@@ -34,29 +36,38 @@ class ReleaseWizardController < ApplicationController
     
     if @release_draft.save(validate: false)
       session[:release_draft_id] = @release_draft.id
+      Rails.logger.info "✅ [RELEASE_WIZARD] Created draft release #{@release_draft.id} for user #{current_user.id}"
       redirect_to step2_release_wizard_path(@release_draft.id)
     else
+      Rails.logger.error "❌ [RELEASE_WIZARD] Failed to create draft release for user #{current_user.id}: #{@release_draft.errors.full_messages.join(', ')}"
       redirect_to step1_release_wizard_index_path, alert: "Error creating draft release"
     end
   end
 
   def step2
+    Rails.logger.info "📝 [RELEASE_WIZARD] User #{current_user.id} accessing step 2 for release draft #{@release_draft.id}"
+    
     # Step 2: Release Info Form
     return redirect_to step1_release_wizard_index_path unless @release_draft.release_type.present?
     
     # Auto-fill artist name from user profile if available
     if @release_draft.artist.blank? && current_user.artist_profile&.name.present?
       @release_draft.artist = current_user.artist_profile.name
+      Rails.logger.info "🎤 [RELEASE_WIZARD] Auto-filled artist name from profile for release #{@release_draft.id}"
     end
   end
 
   def step3
+    Rails.logger.info "🎶 [RELEASE_WIZARD] User #{current_user.id} accessing step 3 (track upload) for release draft #{@release_draft.id}"
+    
     # Step 3: Upload Tracks
     return redirect_to step1_release_wizard_index_path unless @release_draft.release_type.present?
     return redirect_to step2_release_wizard_path(@release_draft.id) unless valid_for_step2?
     
     @track_requirements = get_track_requirements(@release_draft.release_type)
     @tracks = @release_draft.tracks.order(:position)
+    
+    Rails.logger.info "📊 [TRACK_REQ] Release #{@release_draft.id} requires #{@track_requirements[:min]}-#{@track_requirements[:max] || '∞'} tracks, currently has #{@tracks.count}"
   end
 
   def update_step
@@ -128,9 +139,17 @@ class ReleaseWizardController < ApplicationController
   end
 
   def update_step2
+    Rails.logger.info "📝 [RELEASE_UPDATE] Updating step 2 data for release #{@release_draft.id}: #{step2_params.except(:cover_art).to_h}"
+    
+    if step2_params[:cover_art].present?
+      Rails.logger.info "🖼️ [COVER_ART] Uploading cover art for release #{@release_draft.id}"
+    end
+    
     if @release_draft.update(step2_params)
+      Rails.logger.info "✅ [RELEASE_UPDATE] Successfully updated release #{@release_draft.id} step 2 data"
       redirect_to step3_release_wizard_path(@release_draft.id)
     else
+      Rails.logger.warn "❌ [RELEASE_UPDATE] Failed to update release #{@release_draft.id}: #{@release_draft.errors.full_messages.join(', ')}"
       render :step2, status: :unprocessable_entity
     end
   end
