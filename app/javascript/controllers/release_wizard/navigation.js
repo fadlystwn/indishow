@@ -11,26 +11,42 @@ export class Navigation {
   }
 
   goNext() {
-    if (this.controller.stepValue === 1 && this.controller.selectedTypeValue) {
+    if (this.controller.stepValue === 1) {
+      // For step 1, we must have a selected type
+      if (!this.controller.selectedTypeValue) {
+        console.error('❌ Cannot proceed: No release type selected')
+        return
+      }
       this.submitStep1()
     } else if (this.controller.stepValue === 2) {
       this.submitStep2()
     } else if (this.controller.stepValue === 3) {
       this.submitStep3()
+    } else {
+      console.error('❌ Invalid step:', this.controller.stepValue)
     }
   }
 
   submitStep1() {
+    if (!this.controller.selectedTypeValue) {
+      console.error('❌ No release type selected')
+      return
+    }
+    
+    console.log('📝 Submitting step 1 with type:', this.controller.selectedTypeValue)
+    
     const form = document.createElement('form')
     form.method = 'POST'
     form.action = this.controller.createUrlValue
     
+    // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content
     const csrfInput = document.createElement('input')
     csrfInput.type = 'hidden'
     csrfInput.name = 'authenticity_token'
     csrfInput.value = csrfToken
     
+    // Add release type
     const typeInput = document.createElement('input')
     typeInput.type = 'hidden'
     typeInput.name = 'release_type'
@@ -39,6 +55,7 @@ export class Navigation {
     form.appendChild(csrfInput)
     form.appendChild(typeInput)
     
+    // Submit the form
     document.body.appendChild(form)
     form.submit()
   }

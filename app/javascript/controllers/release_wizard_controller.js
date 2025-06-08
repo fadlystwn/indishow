@@ -33,10 +33,20 @@ export default class extends Controller {
     
     if (this.stepValue === 1) {
       this.uiUtils.highlightSelectedType()
-      // Ensure button starts disabled
+      // Initialize button state based on whether a type is selected
       if (this.hasContinueBtnTarget) {
-        this.continueBtnTarget.disabled = !this.selectedTypeValue
-        console.log('🔘 Continue button initial state:', this.continueBtnTarget.disabled ? 'disabled' : 'enabled')
+        const hasSelectedType = Boolean(this.selectedTypeValue)
+        this.continueBtnTarget.disabled = !hasSelectedType
+        
+        if (hasSelectedType) {
+          this.continueBtnTarget.classList.remove('opacity-50', 'cursor-not-allowed')
+          this.continueBtnTarget.classList.add('hover:bg-teal-700')
+        } else {
+          this.continueBtnTarget.classList.add('opacity-50', 'cursor-not-allowed')
+          this.continueBtnTarget.classList.remove('hover:bg-teal-700')
+        }
+        
+        console.log('🔘 Continue button initial state:', hasSelectedType ? 'enabled' : 'disabled')
       }
     }
     
@@ -48,8 +58,8 @@ export default class extends Controller {
   // Step 1: Release Type Selection
   selectType(event) {
     event.preventDefault()
-    
-    console.log('🎯 Release type selected:', event.currentTarget.dataset.type)
+    const type = event.currentTarget.dataset.type
+    console.log('🎯 Release type selected:', type)
     
     // Remove active class from all cards
     this.typeCardTargets.forEach(card => {
@@ -62,15 +72,24 @@ export default class extends Controller {
     clickedCard.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50')
     clickedCard.classList.remove('hover:border-teal-300')
     
-    // Update selected type
-    this.selectedTypeValue = clickedCard.dataset.type
+    // Update selected type value
+    this.selectedTypeValue = type
     
-    // Enable continue button - with better error handling
+    // Update continue button state
     if (this.hasContinueBtnTarget) {
-      this.continueBtnTarget.disabled = false
-      this.continueBtnTarget.classList.remove('opacity-50', 'cursor-not-allowed')
-      this.continueBtnTarget.classList.add('hover:bg-teal-700')
-      console.log('✅ Continue button enabled')
+      if (type) {
+        // Enable and style the button
+        this.continueBtnTarget.disabled = false
+        this.continueBtnTarget.classList.remove('opacity-50', 'cursor-not-allowed')
+        this.continueBtnTarget.classList.add('hover:bg-teal-700')
+        console.log('✅ Continue button enabled for type:', type)
+      } else {
+        // Disable the button if no type is selected
+        this.continueBtnTarget.disabled = true
+        this.continueBtnTarget.classList.add('opacity-50', 'cursor-not-allowed')
+        this.continueBtnTarget.classList.remove('hover:bg-teal-700')
+        console.log('⚠️ Continue button disabled: no type selected')
+      }
     } else {
       console.error('❌ Continue button target not found')
     }

@@ -1,6 +1,21 @@
 import { Controller } from "@hotwired/stimulus"
 import { DirectUpload } from "@rails/activestorage"
 
+// Define DirectUploadController for type safety
+class DirectUploadController {
+  constructor(file, url, controller) {
+    this.directUpload = new DirectUpload(file, url, this)
+    this.controller = controller
+  }
+
+  directUploadWillStoreFileWithXHR(xhr) {
+    xhr.upload.addEventListener("progress", event => {
+      const progress = event.loaded / event.total * 100
+      this.controller.uploadProgress(progress)
+    })
+  }
+}
+
 export default class extends Controller {
   static targets = ["input", "container", "preview"]
 
