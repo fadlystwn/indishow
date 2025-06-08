@@ -64,8 +64,10 @@ export class Navigation {
     stepInput.name = 'step'
     stepInput.value = '3'
     
-    // Add track data
-    this.controller.uploadedTracksValue.forEach((track, index) => {
+    // Get prepared track data from TrackUpload
+    const trackData = this.controller.trackUpload.prepareFormData()
+    
+    trackData.forEach((track, index) => {
       const titleInput = document.createElement('input')
       titleInput.type = 'hidden'
       titleInput.name = `tracks[${index}][title]`
@@ -76,8 +78,14 @@ export class Navigation {
       positionInput.name = `tracks[${index}][position]`
       positionInput.value = track.position
       
+      const blobInput = document.createElement('input')
+      blobInput.type = 'hidden'
+      blobInput.name = `tracks[${index}][audio_file_blob_id]`
+      blobInput.value = track.audio_file_blob_id
+      
       form.appendChild(titleInput)
       form.appendChild(positionInput)
+      form.appendChild(blobInput)
     })
     
     form.appendChild(csrfInput)

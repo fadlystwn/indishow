@@ -55,22 +55,22 @@
             <div class="mb-6">
               <%= label_tag 'release[cover_art]', "Cover Art", class: "block text-music-text text-sm font-medium mb-2" %>
               <div class="border-2 border-dashed border-music-border rounded-lg p-8 text-center cursor-pointer bg-music-background/50 hover:border-teal-500 hover:bg-teal-50 transition-all duration-200"
-                   data-controller="file-upload"
-                   data-action="dragover->file-upload#highlight dragleave->file-upload#unhighlight drop->file-upload#drop">
-                <div data-file-upload-target="container" 
+                   data-controller="image-upload-base"
+                   data-action="dragover->image-upload-base#highlight dragleave->image-upload-base#unhighlight drop->image-upload-base#drop">
+                <div data-image-upload-base-target="container" 
                      class="cursor-pointer <%= 'hidden' if @release_draft.cover_art.attached? %>">
                   <i class="fas fa-image text-music-text-secondary text-4xl mb-4"></i>
                   <p class="text-music-text-secondary text-sm mb-2">Drag & drop your cover art here</p>
                   <p class="text-music-text-secondary/70 text-xs">or click to browse (1200x1200px recommended)</p>
                 </div>
-                <div data-file-upload-target="preview" class="<%= 'hidden' unless @release_draft.cover_art.attached? %>">
+                <div data-image-upload-base-target="preview" class="<%= 'hidden' unless @release_draft.cover_art.attached? %>">
                   <% if @release_draft.cover_art.attached? %>
                     <div class="flex flex-col items-center">
                       <div class="relative">
                         <%= image_tag @release_draft.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-md mb-2" %>
                         <button type="button" 
                                 class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 shadow-lg"
-                                data-action="click->file-upload#clearFile">
+                                data-action="click->image-upload-base#clearFile">
                           ×
                         </button>
                       </div>
@@ -82,7 +82,7 @@
                                   direct_upload: true,
                                   accept: "image/*",
                                   class: "hidden",
-                                  data: { file_upload_target: "input", action: "change->file-upload#inputChange" } %>
+                                  data: { image_upload_base_target: "input", action: "change->image-upload-base#inputChange" } %>
               </div>
               <% if @release_draft.errors[:cover_art].any? %>
                 <p class="text-sm text-red-500 mt-1"><%= @release_draft.errors.full_messages_for(:cover_art).first %></p>

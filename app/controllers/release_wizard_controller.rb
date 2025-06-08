@@ -182,6 +182,9 @@ class ReleaseWizardController < ApplicationController
           # Handle audio file upload if present
           if track_data[:audio_file].present?
             track.audio_file.attach(track_data[:audio_file])
+          elsif track_data[:audio_file_blob_id].present?
+            # Handle DirectUpload blob ID
+            track.audio_file.attach(track_data[:audio_file_blob_id])
           end
           
           unless track.save

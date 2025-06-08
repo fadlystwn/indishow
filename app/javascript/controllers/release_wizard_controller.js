@@ -20,12 +20,24 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log('🔌 Release wizard controller connected - Step:', this.stepValue)
+    console.log('📊 Available targets:', {
+      typeCards: this.typeCardTargets.length,
+      hasContinueBtn: this.hasContinueBtnTarget,
+      hasProgressBar: this.hasProgressBarTarget
+    })
+    
     this.uiUtils.updateProgressBar()
     this.uiUtils.updateStepIndicator()
     this.uiUtils.updateNavigationButtons()
     
     if (this.stepValue === 1) {
       this.uiUtils.highlightSelectedType()
+      // Ensure button starts disabled
+      if (this.hasContinueBtnTarget) {
+        this.continueBtnTarget.disabled = !this.selectedTypeValue
+        console.log('🔘 Continue button initial state:', this.continueBtnTarget.disabled ? 'disabled' : 'enabled')
+      }
     }
     
     if (this.stepValue === 3) {
@@ -36,6 +48,8 @@ export default class extends Controller {
   // Step 1: Release Type Selection
   selectType(event) {
     event.preventDefault()
+    
+    console.log('🎯 Release type selected:', event.currentTarget.dataset.type)
     
     // Remove active class from all cards
     this.typeCardTargets.forEach(card => {
@@ -51,10 +65,15 @@ export default class extends Controller {
     // Update selected type
     this.selectedTypeValue = clickedCard.dataset.type
     
-    // Enable continue button
-    this.continueBtnTarget.disabled = false
-    this.continueBtnTarget.classList.remove('opacity-50', 'cursor-not-allowed')
-    this.continueBtnTarget.classList.add('hover:bg-teal-700')
+    // Enable continue button - with better error handling
+    if (this.hasContinueBtnTarget) {
+      this.continueBtnTarget.disabled = false
+      this.continueBtnTarget.classList.remove('opacity-50', 'cursor-not-allowed')
+      this.continueBtnTarget.classList.add('hover:bg-teal-700')
+      console.log('✅ Continue button enabled')
+    } else {
+      console.error('❌ Continue button target not found')
+    }
   }
 
   // Track Upload Event Handlers
@@ -68,6 +87,36 @@ export default class extends Controller {
 
   updateTrackTitle(event) {
     this.trackUpload.updateTrackTitle(event)
+  }
+
+  // Drag and drop handlers for audio uploads
+  highlight(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    const uploadArea = this.trackUploadTarget.querySelector('.border-dashed')
+    uploadArea.classList.add('border-teal-500', 'bg-teal-50')
+    uploadArea.classList.remove('border-gray-300')
+  }
+
+  unhighlight(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    const uploadArea = this.trackUploadTarget.querySelector('.border-dashed')
+    uploadArea.classList.remove('border-teal-500', 'bg-teal-50')
+    uploadArea.classList.add('border-gray-300')
+  }
+
+  drop(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    this.unhighlight(event)
+    
+    const files = Array.from(event.dataTransfer.files)
+    if (files.length > 0) {
+      // Create a mock event for the trackUpload handler
+      const mockEvent = { target: { files: files } }
+      this.trackUpload.handleUpload(mockEvent)
+    }
   }
 
   // Navigation Event Handlers

@@ -1,3 +1,5 @@
+import { DirectUpload } from "@rails/activestorage"
+
 export class TrackUpload {
   constructor(controller) {
     this.controller = controller
@@ -42,27 +44,43 @@ export class TrackUpload {
     this.controller.uploadedTracksValue = [...this.controller.uploadedTracksValue, trackData]
     this.addTrackToUI(trackData, index)
     
-    this.simulateUploadProgress(index)
+    this.uploadFileToServer(file, index)
     this.validateTrackCount()
     this.updateContinueButton()
   }
 
-  simulateUploadProgress(trackIndex) {
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 15
-      if (progress >= 100) {
-        progress = 100
-        clearInterval(interval)
-      }
-      
-      this.updateTrackProgress(trackIndex, progress)
-      
-      if (progress === 100) {
+  uploadFileToServer(file, trackIndex) {
+    // Get the direct upload URL from a hidden input or data attribute
+    const uploadUrl = '/rails/active_storage/direct_uploads'
+    const upload = new DirectUpload(file, uploadUrl, this)
+
+    upload.create((error, blob) => {
+      if (error) {
+        console.error('Upload error:', error)
+        this.showError(`Error uploading ${file.name}. Please try again.`)
+        this.controller.uploadedTracksValue[trackIndex].uploadProgress = 0
+      } else {
+        // Store the blob signed_id for form submission
+        this.controller.uploadedTracksValue[trackIndex].blobSignedId = blob.signed_id
         this.controller.uploadedTracksValue[trackIndex].uploadProgress = 100
+        this.updateTrackProgress(trackIndex, 100)
         this.updateContinueButton()
       }
-    }, 200)
+    })
+  }
+
+  // DirectUpload progress callback
+  directUploadWillStoreFileWithXHR(xhr) {
+    const trackIndex = this.getCurrentTrackIndex()
+    xhr.upload.addEventListener("progress", event => {
+      const progress = (event.loaded / event.total) * 100
+      this.updateTrackProgress(trackIndex, progress)
+      this.controller.uploadedTracksValue[trackIndex].uploadProgress = progress
+    })
+  }
+
+  getCurrentTrackIndex() {
+    return this.controller.uploadedTracksValue.length - 1
   }
 
   addTrackToUI(trackData, index) {
@@ -205,6 +223,23 @@ export class TrackUpload {
     if (descriptionElement) {
       descriptionElement.textContent = description
     }
+  }
+
+  // Prepare form data for submission
+  prepareFormData() {
+    const formData = []
+    
+    this.controller.uploadedTracksValue.forEach((track, index) => {
+      if (track.blobSignedId && track.uploadProgress === 100) {
+        formData.push({
+          title: track.title,
+          position: track.position,
+          audio_file_blob_id: track.blobSignedId
+        })
+      }
+    })
+    
+    return formData
   }
 
   extractTitleFromFilename(filename) {

@@ -1,4 +1,4 @@
-// This is a base controller that delegates to specialized controllers
+// This is a base controller for image uploads that delegates to specialized controllers
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -44,7 +44,7 @@ export default class extends Controller {
         '<p class="text-xs text-gray-500">' + this.formatFileSize(file.size) + '</p>' +
         '<button type="button" ' +
         'class="mt-2 text-sm text-red-500 hover:text-red-700" ' +
-        'data-action="click->file-upload#clearFile">' +
+        'data-action="click->image-upload-base#clearFile">' +
         'Remove' +
         '</button>' +
       '</div>'
