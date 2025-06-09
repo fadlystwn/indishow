@@ -55,35 +55,72 @@
 
       <!-- Track Upload Section -->
       <div class="mb-8" data-release-wizard-target="trackUpload">
-        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:border-teal-400 hover:bg-teal-50 transition-all duration-200"
-             data-action="dragover->release-wizard#highlight dragleave->release-wizard#unhighlight drop->release-wizard#drop">
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:border-teal-400 hover:bg-teal-50 transition-all duration-200 cursor-pointer group"
+             data-action="dragover->release-wizard#highlight dragleave->release-wizard#unhighlight drop->release-wizard#drop click->release-wizard#triggerFileInput">
           <div class="upload-container">
-            <i class="fas fa-music text-gray-400 text-4xl mb-4"></i>
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4 group-hover:bg-teal-50 transition-colors">
+              <i class="fas fa-music text-gray-400 text-3xl group-hover:text-teal-500 transition-colors"></i>
+            </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Upload Audio Files</h3>
             <p class="text-gray-600 upload-description mb-4">
-              Upload <%= @track_requirements[:description] %>
+              <%= @track_requirements[:description] %>
             </p>
-            <p class="text-sm text-gray-500 mb-4">
-              Supported formats: WAV, FLAC, AIFF, ALAC, MP3, AAC (Max 100MB per file)
-            </p>
-            <label class="cursor-pointer">
-              <span class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors">
+            <div class="max-w-sm mx-auto bg-white rounded-lg border border-gray-200 p-4 mb-4">
+              <div class="text-sm text-left">
+                <h4 class="font-medium text-gray-900 mb-2">Supported Formats:</h4>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="flex items-center text-gray-600">
+                    <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
+                    <span>WAV, FLAC</span>
+                  </div>
+                  <div class="flex items-center text-gray-600">
+                    <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
+                    <span>AIFF, ALAC</span>
+                  </div>
+                  <div class="flex items-center text-gray-600">
+                    <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
+                    <span>MP3, AAC</span>
+                  </div>
+                  <div class="flex items-center text-gray-600">
+                    <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
+                    <span>Max 100MB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-center">
+              <label class="inline-flex items-center px-6 py-3 bg-teal-600 text-white rounded-lg cursor-pointer hover:bg-teal-700 transition-colors shadow-sm">
                 <i class="fas fa-upload mr-2"></i>
-                Choose Files
-              </span>
-              <input type="file" 
-                     multiple 
-                     accept="audio/*"
-                     class="hidden"
-                     data-action="change->release-wizard#handleTrackUpload" />
-            </label>
+                <span class="font-medium">Choose Files</span>
+                <input type="file" 
+                       multiple 
+                       accept="audio/*"
+                       class="hidden"
+                       data-action="change->release-wizard#handleTrackUpload" />
+              </label>
+              <p class="text-sm text-gray-500 mt-3">
+                or drag and drop audio files here
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Uploaded Tracks List -->
       <div class="mb-8">
-        <h3 class="text-lg font-medium text-music-text mb-4">Uploaded Tracks</h3>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium text-music-text">Uploaded Tracks</h3>
+          <% if @release_draft.release_type == 'single' %>
+            <span class="text-sm text-gray-500">Max 1 track</span>
+          <% else %>
+            <span class="text-sm text-gray-500">
+              Min <%= @track_requirements[:min] %> track<%= @track_requirements[:min] > 1 ? 's' : '' %>
+              <% if @track_requirements[:max] %>
+                , Max <%= @track_requirements[:max] %> tracks
+              <% end %>
+            </span>
+          <% end %>
+        </div>
         <div class="space-y-4" data-release-wizard-target="trackList">
           <% if @tracks.any? %>
             <% @tracks.each_with_index do |track, index| %>

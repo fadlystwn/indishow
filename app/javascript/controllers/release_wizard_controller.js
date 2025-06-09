@@ -125,6 +125,16 @@ export default class extends Controller {
     uploadArea.classList.add('border-gray-300')
   }
 
+  triggerFileInput(event) {
+    // Don't trigger if clicking on the actual button/input
+    if (event.target.closest('label')) return
+    
+    const fileInput = this.trackUploadTarget.querySelector('input[type="file"]')
+    if (fileInput) {
+      fileInput.click()
+    }
+  }
+
   drop(event) {
     event.preventDefault()
     event.stopPropagation()
@@ -132,9 +142,13 @@ export default class extends Controller {
     
     const files = Array.from(event.dataTransfer.files)
     if (files.length > 0) {
-      // Create a mock event for the trackUpload handler
-      const mockEvent = { target: { files: files } }
-      this.trackUpload.handleUpload(mockEvent)
+      const fileInput = this.trackUploadTarget.querySelector('input[type="file"]')
+      if (fileInput) {
+        // Create a mock event that matches the change event structure
+        fileInput.files = event.dataTransfer.files
+        const changeEvent = new Event('change', { bubbles: true })
+        fileInput.dispatchEvent(changeEvent)
+      }
     }
   }
 
