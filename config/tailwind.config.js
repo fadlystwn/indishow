@@ -17,6 +17,7 @@ module.exports = {
         music: {
           background: '#0F0F0F',       // Deep black background
           surface: '#1A1A1A',         // Card surfaces
+          border: '#333333',          // Border color for form elements
           primary: '#FF4D4D',         // Vibrant red for primary actions
           secondary: '#4D4DFF',       // Electric blue for secondary elements
           accent: '#FFD700',          // Gold for highlights

@@ -1,0 +1,169 @@
+<div class="min-h-screen bg-music-background py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-center mb-4">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 text-sm font-medium text-green-600">Select Type</span>
+          </div>
+          <div class="w-16 h-1 bg-green-600 rounded"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 text-sm font-medium text-green-600">Release Info</span>
+          </div>
+          <div class="w-16 h-1 bg-green-600 rounded"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 text-sm font-medium text-green-600">Upload Tracks</span>
+          </div>
+        </div>
+      </div>
+      <div class="w-full bg-green-600 rounded-full h-2"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-music-surface rounded-lg shadow-lg border border-music-border p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-music-text mb-2">Review & Publish</h1>
+        <p class="text-music-text-secondary text-lg">
+          Review your <%= @release_draft.release_type.titleize.downcase %> before publishing
+        </p>
+      </div>
+
+      <!-- Release Preview -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Cover Art & Basic Info -->
+        <div class="bg-white rounded-lg p-6 border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Release Overview</h3>
+          
+          <div class="flex items-start gap-4 mb-6">
+            <% if @release_draft.cover_art.attached? %>
+              <%= image_tag @release_draft.cover_art.variant(:medium), 
+                          class: "w-24 h-24 rounded-md object-cover border border-gray-200" %>
+            <% else %>
+              <div class="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200">
+                <i class="fas fa-image text-gray-400 text-2xl"></i>
+              </div>
+            <% end %>
+            
+            <div class="flex-1">
+              <h4 class="text-xl font-bold text-gray-900 mb-1"><%= @release_draft.title %></h4>
+              <p class="text-gray-600 mb-2">by <%= @release_draft.artist %></p>
+              <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span class="bg-teal-100 text-teal-800 px-2 py-1 rounded text-xs font-medium">
+                  <%= @release_draft.release_type.titleize %>
+                </span>
+                <span><%= @release_draft.release_date.strftime("%B %d, %Y") %></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Price:</span>
+              <span class="text-sm text-gray-900 ml-2">
+                <% if @release_draft.price > 0 %>
+                  $<%= number_with_precision(@release_draft.price, precision: 2) %>
+                <% else %>
+                  Free
+                <% end %>
+              </span>
+            </div>
+            
+            <% if @release_draft.genre.present? %>
+              <div>
+                <span class="text-sm font-medium text-gray-700">Genre:</span>
+                <span class="text-sm text-gray-900 ml-2"><%= @release_draft.genre %></span>
+              </div>
+            <% end %>
+            
+            <% if @release_draft.description.present? %>
+              <div>
+                <span class="text-sm font-medium text-gray-700">Description:</span>
+                <p class="text-sm text-gray-900 mt-1"><%= @release_draft.description %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Track List -->
+        <div class="bg-white rounded-lg p-6 border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            Tracks (<%= @release_draft.tracks.count %>)
+          </h3>
+          
+          <div class="space-y-3">
+            <% @release_draft.tracks.order(:position).each do |track| %>
+              <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-md">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded">
+                    #<%= track.position %>
+                  </span>
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900"><%= track.title %></h4>
+                    <% if track.duration.present? %>
+                      <p class="text-xs text-gray-500">
+                        <%= Time.at(track.duration).utc.strftime("%M:%S") %>
+                      </p>
+                    <% end %>
+                  </div>
+                </div>
+                
+                <%= link_to step3_release_wizard_path(@release_draft.id), 
+                          class: "text-teal-600 hover:text-teal-700 text-xs" do %>
+                  Edit
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Validation Status -->
+      <% if @release_draft.valid? %>
+        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-600 mr-3"></i>
+            <div>
+              <h4 class="font-medium text-green-800">Ready to Publish</h4>
+              <p class="text-sm text-green-700">Your release has been validated and is ready to be published.</p>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+          <div class="flex items-start">
+            <i class="fas fa-exclamation-triangle text-red-600 mr-3 mt-0.5"></i>
+            <div>
+              <h4 class="font-medium text-red-800">Issues Found</h4>
+              <ul class="text-sm text-red-700 mt-1 list-disc list-inside">
+                <% @release_draft.errors.full_messages.each do |error| %>
+                  <li><%= error %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div class="flex justify-between items-center pt-6 border-t border-music-border">
+        <%= link_to "Back to Tracks", step3_release_wizard_path(@release_draft.id), 
+                    class: "px-6 py-3 border border-music-border rounded-md text-music-text hover:bg-music-background transition-colors" %>
+        
+        <div class="flex gap-4">
+          <%= link_to "Save as Draft", "#", 
+                      class: "px-6 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors" %>
+          
+          <%= form_with url: release_wizard_path(@release_draft.id), method: :post, local: true, class: "inline" do |form| %>
+            <%= form.submit "Publish Release", 
+                          class: "px-6 py-3 bg-teal-600 text-white rounded-md font-medium hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors #{'opacity-50 cursor-not-allowed' unless @release_draft.valid?}",
+                          disabled: !@release_draft.valid? %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

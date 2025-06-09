@@ -6,7 +6,7 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Skenara
+module Skenaria
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
@@ -31,5 +31,8 @@ module Skenara
 
     # Configure Active Storage to use ImageMagick
     config.active_storage.variant_processor = :mini_magick
+
+    # Configure Sidekiq as the Active Job queue adapter
+    config.active_job.queue_adapter = :sidekiq
   end
 end

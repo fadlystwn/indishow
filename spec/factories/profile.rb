@@ -1,10 +1,10 @@
 FactoryBot.define do
   factory :profile do
-    name { Faker::Name.name }
-    bio { Faker::Lorem.paragraph }
-    location { Faker::Address.city }
-    website_url { Faker::Internet.url }
-    favorite_genres { ['rock', 'jazz'] }
+    sequence(:name) { |n| "Artist #{n}" }
+    bio { "Sample bio for artist profile" }
+    location { "New York, NY" }
+    website_url { "https://example.com" }
+    favorite_genres { 'rock,jazz' }
 
     factory :artist_profile, class: 'ArtistProfile' do
       type { 'ArtistProfile' }

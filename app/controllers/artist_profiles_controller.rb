@@ -4,6 +4,7 @@ class ArtistProfilesController < ApplicationController
 
   def show
     @releases = Release.where(user: @artist_profile.user)
+                      .published
                       .order(release_date: :desc)
                       .includes(cover_art_attachment: :blob)
                       .with_attached_cover_art

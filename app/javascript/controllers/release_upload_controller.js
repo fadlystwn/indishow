@@ -5,16 +5,24 @@ export default class extends Controller {
   static targets = ["typeBtn"]
 
   selectType(event) {
+    event.preventDefault()
+    
     // Remove active class from all buttons
     this.typeBtnTargets.forEach(btn => {
-      btn.classList.remove('bg-teal-100', 'border-teal-500')
-    })
-
+      btn.classList.remove('bg-teal-600', 'text-white', 'border-teal-600');
+      btn.classList.add('border-gray-300', 'text-gray-700');
+    });
+    
     // Add active class to clicked button
-    event.currentTarget.classList.add('bg-teal-100', 'border-teal-500')
-
+    const clickedButton = event.currentTarget;
+    clickedButton.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
+    clickedButton.classList.remove('border-gray-300', 'text-gray-700');
+    
     // Update hidden field value
-    const selectedType = event.currentTarget.dataset.type
-    document.getElementById('release_type').value = selectedType
+    const selectedType = clickedButton.dataset.type;
+    const hiddenField = document.getElementById('release_type');
+    if (hiddenField) {
+      hiddenField.value = selectedType;
+    }
   }
 }

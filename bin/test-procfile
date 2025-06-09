@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# Procfile Setup Test Script
+# This script tests that all Procfile processes can start correctly
+
+echo "🚀 Testing Procfile Setup for Rails Application"
+echo "================================================"
+
+# Check if required gems are installed
+echo "📦 Checking required gems..."
+if ! bundle check > /dev/null 2>&1; then
+    echo "❌ Bundle check failed. Run 'bundle install' first."
+    exit 1
+fi
+
+# Check if Redis is running (required for Sidekiq)
+echo "🔴 Checking Redis connection..."
+if ! redis-cli ping > /dev/null 2>&1; then
+    echo "⚠️  Redis is not running. Sidekiq worker will fail."
+    echo "   Start Redis with: redis-server"
+else
+    echo "✅ Redis is running"
+fi
+
+# Test Puma can start
+echo "🔧 Testing Puma web server..."
+# Test Puma configuration by starting it briefly
+puma_output=$(PORT=0 timeout 2s bundle exec puma -C config/puma.rb 2>&1)
+if echo "$puma_output" | grep -q "Puma starting"; then
+    echo "✅ Puma configuration is valid and server started"
+elif echo "$puma_output" | grep -q "Address already in use"; then
+    echo "✅ Puma configuration is valid (port conflict is expected in testing)"
+else
+    echo "❌ Puma failed to start"
+    echo "Error output: $puma_output"
+fi
+
+# Test Sidekiq can start
+echo "🔧 Testing Sidekiq worker..."
+# Test Sidekiq by running it for 3 seconds then stopping
+if timeout 3s bundle exec sidekiq -C config/sidekiq.yml -e test > /dev/null 2>&1; then
+    echo "✅ Sidekiq configuration is valid"
+elif [ $? -eq 124 ]; then
+    # Timeout exit code (124) means it ran successfully for 3 seconds
+    echo "✅ Sidekiq started and ran successfully"
+else
+    echo "❌ Sidekiq failed to start (check Redis connection)"
+fi
+
+# Test database migration
+echo "🔧 Testing database migration..."
+if bundle exec rails db:migrate > /dev/null 2>&1; then
+    echo "✅ Database migration successful"
+else
+    echo "❌ Database migration failed"
+fi
+
+# Test asset precompilation
+echo "🔧 Testing asset precompilation..."
+if RAILS_ENV=production bundle exec rails assets:precompile > /dev/null 2>&1; then
+    echo "✅ Asset precompilation successful"
+    # Clean up
+    bundle exec rails assets:clobber > /dev/null 2>&1
+else
+    echo "❌ Asset precompilation failed"
+fi
+
+echo ""
+echo "🎉 Procfile setup test completed!"
+echo ""
+echo "📋 To run your application:"
+echo "   Development: foreman start -f Procfile.dev"
+echo "   Production:  foreman start -f Procfile"
+echo ""
+echo "📊 Monitor background jobs at: http://localhost:3000/sidekiq"

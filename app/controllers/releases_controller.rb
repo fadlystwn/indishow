@@ -1,16 +1,16 @@
 class ReleasesController < ApplicationController
-  before_action :authenticate_user! # Requires user to be logged in
-  before_action :set_release, only: [ :edit, :update, :destroy ]
+  before_action :authenticate_user!, except: [:show] # Allow public access to show
+  before_action :authorize_artist_user!, except: [:show] # Restrict fan users from all actions except show
+  before_action :set_release, only: [:show, :edit, :update, :destroy]
+  before_action :authorize_release_owner!, only: [:edit, :update, :destroy]
 
   def index
-    @releases = current_user.releases.order(release_date: :desc)
+    @releases = current_user.releases.published.order(release_date: :desc)
   end
 
   def show
-    @release = Release.find(params[:id]) # This will raise 404 if not found
-    # or
-    @release = Release.find_by(id: params[:id])
-    redirect_to releases_path, alert: "Release not found" unless @release
+    # @release is already set by set_release
+    # Show page is accessible by everyone (fans can view and buy)
   end
 
   def new
@@ -18,11 +18,15 @@ class ReleasesController < ApplicationController
   end
 
   def create
+    Rails.logger.info "📀 Creating release: #{release_params[:title]} by #{release_params[:artist]}"
+    
     @release = current_user.releases.new(release_params)
 
     if @release.save
-      redirect_to root_path, notice: "Release was successfully created."
+      Rails.logger.info "✅ Release created successfully: #{@release.title}"
+      redirect_to release_path(@release), notice: "Release was successfully created."
     else
+      Rails.logger.warn "❌ Release creation failed: #{@release.errors.full_messages.join(', ')}"
       render :new, status: :unprocessable_entity
     end
   end
@@ -36,28 +40,60 @@ class ReleasesController < ApplicationController
   end
 
   def update
+    Rails.logger.info "📝 Updating release: #{@release.title} (ID: #{@release.id})"
+    
     if @release.update(release_params)
-      redirect_to root_path, notice: "Release was successfully updated."
+      Rails.logger.info "✅ Release updated successfully: #{@release.title}"
+      redirect_to release_path(@release), notice: "Release was successfully updated."
     else
+      Rails.logger.warn "❌ Release update failed: #{@release.errors.full_messages.join(', ')}"
       render :edit, status: :unprocessable_entity
     end
   end
+
   def destroy
-    release_title = @release.title
+    @release_title = @release.title
     @release.destroy
 
     respond_to do |format|
-      format.html { redirect_to releases_path, success: "Release \"#{release_title}\" was successfully deleted." }
-      format.turbo_stream
+      format.html { redirect_to dashboard_path, notice: "Release \"#{@release_title}\" was successfully deleted." }
+      format.turbo_stream { flash.now[:notice] = "Release \"#{@release_title}\" was successfully deleted." }
     end
   end
 
   private
 
   def set_release
-    @release = current_user.releases.find(params[:id])
+    if action_name == 'show'
+      # For show action, only find published releases (public access)
+      @release = if params[:id].match?(/\A\d+\z/)
+                   Release.published.find(params[:id])
+                 else
+                   Release.published.find_by!(slug: params[:id])
+                 end
+    else
+      # For edit/update/destroy, find the release first, then authorize ownership
+      @release = if params[:id].match?(/\A\d+\z/)
+                   Release.find(params[:id])
+                 else
+                   Release.find_by!(slug: params[:id])
+                 end
+    end
   end
 
+  def authorize_release_owner!
+    unless @release.user == current_user
+      flash[:alert] = "You are not authorized to perform this action."
+      redirect_to release_path(@release)
+    end
+  end
+
+  def authorize_artist_user!
+    unless current_user&.artist?
+      flash[:alert] = "Access denied. Only artists can manage releases."
+      redirect_to root_path
+    end
+  end
   def release_params
     params.require(:release).permit(
       :title,
@@ -66,6 +102,7 @@ class ReleasesController < ApplicationController
       :release_date,
       :price,
       :description,
+      :genre,
       :cover_art
     )
   end

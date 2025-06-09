@@ -1,11 +1,11 @@
-<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
-  <h2 class="text-xl font-semibold mb-4">Upload New Release</h2>
+<div class="bg-music-surface rounded-lg shadow-genre border border-music-border p-6 mb-8">
+  <h2 class="text-xl font-semibold mb-4 text-music-text">Upload New Release</h2>
 
   <%= form_with(model: @release, local: true, class: "upload-form", data: { controller: "release-upload" }) do |form| %>
 
     <% if @release.errors.any? %>
-      <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
-        <h3 class="font-semibold mb-2 text-red-700">Please correct the following errors:</h3>
+      <div class="mb-6 p-4 bg-red-900/20 border border-red-500/30 text-red-300 rounded">
+        <h3 class="font-semibold mb-2 text-red-300">Please correct the following errors:</h3>
         <ul class="list-disc list-inside text-sm">
           <% @release.errors.full_messages.each do |msg| %>
             <li><%= msg %></li>
@@ -16,11 +16,11 @@
 
     <!-- Release Type Selector -->
     <div class="mb-6">
-      <label class="block text-gray-700 text-sm font-medium mb-2">Release Type</label>
+      <label class="block text-music-text text-sm font-medium mb-2">Release Type</label>
       <div class="grid grid-cols-4 gap-2">
         <% Release.release_types.each_key do |type| %>
           <button type="button" 
-                  class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium <%= 'bg-teal-100 border-teal-500' if @release.release_type == type %>"
+                  class="release-type-btn py-2 px-4 border border-music-border rounded-md text-sm font-medium bg-music-surface text-music-text hover:bg-music-primary/10 hover:border-music-primary transition-all duration-200 <%= 'bg-music-primary/20 border-music-primary text-music-primary' if @release.release_type == type %>"
                   data-release-upload-target="typeBtn"
                   data-action="click->release-upload#selectType"
                   data-type="<%= type %>">
@@ -36,40 +36,40 @@
       <div>
         <!-- Cover Art Upload -->
         <div class="mb-4">
-          <%= form.label :cover_art, "Cover Art", class: "block text-gray-700 text-sm font-medium mb-2" %>
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
-               data-controller="file-upload"
-               data-action="dragover->file-upload#highlight dragleave->file-upload#unhighlight drop->file-upload#drop">
-            <div data-file-upload-target="container" 
+          <%= form.label :cover_art, "Cover Art", class: "block text-music-text text-sm font-medium mb-2" %>
+          <div class="border-2 border-dashed border-music-border rounded-lg p-8 text-center cursor-pointer bg-music-surface/50 hover:border-music-primary/50 hover:bg-music-primary/5 transition-all duration-200"
+               data-controller="image-upload-base"
+               data-action="dragover->image-upload-base#highlight dragleave->image-upload-base#unhighlight drop->image-upload-base#drop">
+            <div data-image-upload-base-target="container" 
                  class="cursor-pointer">
-              <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
-              <p class="text-gray-500 text-sm">Drag & drop your cover art here</p>
-              <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
+              <i class="fas fa-image text-music-text-secondary text-4xl mb-2"></i>
+              <p class="text-music-text-secondary text-sm">Drag & drop your cover art here</p>
+              <p class="text-music-text-secondary/70 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
             </div>
-            <div data-file-upload-target="preview" class="hidden">
+            <div data-image-upload-base-target="preview" class="hidden">
               <% if @release.cover_art.attached? && @release.persisted? %>
                 <div class="flex flex-col items-center">
                   <div class="relative">
                     <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-md mb-2" %>
                     <button type="button" 
-                            class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                            data-action="click->file-upload#clearFile">
+                            class="absolute top-0 right-0 bg-music-primary text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-music-primary/80 shadow-button"
+                            data-action="click->image-upload-base#clearFile">
                       ×
                     </button>
                   </div>
-                  <p class="text-sm text-gray-600 mt-2"><%= @release.cover_art.filename %></p>
+                  <p class="text-sm text-music-text-secondary mt-2"><%= @release.cover_art.filename %></p>
                 </div>
               <% elsif @release.cover_art.attached? %>
                 <div class="flex flex-col items-center">
                   <div class="relative">
                     <%= image_tag url_for(@release.cover_art), class: "max-w-full max-h-64 rounded-md mb-2" %>
                     <button type="button" 
-                            class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                            data-action="click->file-upload#clearFile">
+                            class="absolute top-0 right-0 bg-music-primary text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-music-primary/80 shadow-button"
+                            data-action="click->image-upload-base#clearFile">
                       ×
                     </button>
                   </div>
-                  <p class="text-sm text-gray-600 mt-2"><%= @release.cover_art.filename %></p>
+                  <p class="text-sm text-music-text-secondary mt-2"><%= @release.cover_art.filename %></p>
                 </div>
               <% end %>
             </div>
@@ -77,10 +77,10 @@
                               direct_upload: true,
                               accept: "image/*",
                               class: "hidden",
-                              data: { file_upload_target: "input", action: "change->file-upload#inputChange" } %>
+                              data: { image_upload_base_target: "input", action: "change->image-upload-base#inputChange" } %>
           </div>
           <% if @release.errors[:cover_art].any? %>
-            <p class="text-sm text-red-600 mt-1"><%= @release.errors.full_messages_for(:cover_art).first %></p>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:cover_art).first %></p>
           <% end %>
         </div>
       </div>
@@ -89,55 +89,66 @@
       <div>
         <!-- Title -->
         <div class="mb-4">
-          <%= form.label :title, class: "block text-gray-700 text-sm font-medium mb-2" %>
-          <%= form.text_field :title, class: "w-full px-3 py-2 border rounded-md #{'border-red-500' if @release.errors[:title].any?} focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+          <%= form.label :title, class: "block text-music-text text-sm font-medium mb-2" %>
+          <%= form.text_field :title, class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-surface text-music-text placeholder-music-text-secondary #{'border-red-500' if @release.errors[:title].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
           <% if @release.errors[:title].any? %>
-            <p class="text-sm text-red-600 mt-1"><%= @release.errors.full_messages_for(:title).first %></p>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:title).first %></p>
           <% end %>
         </div>
 
         <!-- Artist -->
         <div class="mb-4">
-          <%= form.label :artist, class: "block text-gray-700 text-sm font-medium mb-2" %>
-          <%= form.text_field :artist, class: "w-full px-3 py-2 border rounded-md #{'border-red-500' if @release.errors[:artist].any?} focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+          <%= form.label :artist, class: "block text-music-text text-sm font-medium mb-2" %>
+          <%= form.text_field :artist, class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-surface text-music-text placeholder-music-text-secondary #{'border-red-500' if @release.errors[:artist].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
           <% if @release.errors[:artist].any? %>
-            <p class="text-sm text-red-600 mt-1"><%= @release.errors.full_messages_for(:artist).first %></p>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:artist).first %></p>
           <% end %>
         </div>
 
         <!-- Release Date -->
         <div class="mb-4">
-          <%= form.label :release_date, class: "block text-gray-700 text-sm font-medium mb-2" %>
-          <%= form.date_field :release_date, class: "w-full px-3 py-2 border rounded-md #{'border-red-500' if @release.errors[:release_date].any?} focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+          <%= form.label :release_date, class: "block text-music-text text-sm font-medium mb-2" %>
+          <%= form.date_field :release_date, class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-surface text-music-text #{'border-red-500' if @release.errors[:release_date].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
           <% if @release.errors[:release_date].any? %>
-            <p class="text-sm text-red-600 mt-1"><%= @release.errors.full_messages_for(:release_date).first %></p>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:release_date).first %></p>
           <% end %>
         </div>
 
         <!-- Price -->
         <div class="mb-4">
-          <%= form.label :price, class: "block text-gray-700 text-sm font-medium mb-2" %>
+          <%= form.label :price, class: "block text-music-text text-sm font-medium mb-2" %>
           <div class="relative">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-            <%= form.number_field :price, min: 0, step: 0.01, class: "w-full pl-8 pr-3 py-2 border rounded-md #{'border-red-500' if @release.errors[:price].any?} focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-music-text-secondary">$</span>
+            <%= form.number_field :price, min: 0, step: 0.01, class: "w-full pl-8 pr-3 py-2 border border-music-border rounded-md bg-music-surface text-music-text #{'border-red-500' if @release.errors[:price].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
           </div>
           <% if @release.errors[:price].any? %>
-            <p class="text-sm text-red-600 mt-1"><%= @release.errors.full_messages_for(:price).first %></p>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:price).first %></p>
+          <% end %>
+        </div>
+
+        <!-- Genre -->
+        <div class="mb-4">
+          <%= form.label :genre, class: "block text-music-text text-sm font-medium mb-2" %>
+          <%= form.select :genre, options_for_select([['Select a genre', '']] + Release::GENRES.map { |genre| [genre, genre] }, @release.genre), 
+                         {}, 
+                         { class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-surface text-music-text #{'border-red-500' if @release.errors[:genre].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" } %>
+          <% if @release.errors[:genre].any? %>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:genre).first %></p>
           <% end %>
         </div>
 
         <!-- Description -->
         <div class="mb-4">
-          <%= form.label :description, class: "block text-gray-700 text-sm font-medium mb-2" %>
-          <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border rounded-md #{'border-red-500' if @release.errors[:description].any?} focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+          <%= form.label :description, class: "block text-music-text text-sm font-medium mb-2" %>
+          <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-surface text-music-text placeholder-music-text-secondary #{'border-red-500' if @release.errors[:description].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
           <% if @release.errors[:description].any? %>
-            <p class="text-sm text-red-600 mt-1"><%= @release.errors.full_messages_for(:description).first %></p>
+            <p class="text-sm text-red-400 mt-1"><%= @release.errors.full_messages_for(:description).first %></p>
           <% end %>
         </div>
 
         <div class="flex justify-end mt-6">
-          <%= link_to "Cancel", home_index_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 mr-2 hover:bg-gray-50" %>
-          <%= form.submit "Upload Release", class: "px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+          <%= link_to "Cancel", home_index_path, class: "px-4 py-2 border border-music-border rounded-md text-music-text-secondary mr-2 hover:bg-music-surface hover:text-music-text transition-colors duration-200" %>
+          <%= form.submit "Upload Release", class: "px-4 py-2 bg-music-primary text-white rounded-md hover:bg-music-primary/80 focus:outline-none focus:ring-2 focus:ring-music-primary shadow-button transition-all duration-200" %>
         </div>
       </div>
     </div>

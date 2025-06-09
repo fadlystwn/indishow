@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_23_150816) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_07_034537) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_150816) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "follows", force: :cascade do |t|
+    t.integer "follower_id", null: false
+    t.integer "followed_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["followed_id"], name: "index_follows_on_followed_id"
+    t.index ["follower_id", "followed_id"], name: "index_follows_on_follower_id_and_followed_id", unique: true
+    t.index ["follower_id"], name: "index_follows_on_follower_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -67,6 +77,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_150816) do
     t.date "release_date", null: false
     t.decimal "price", precision: 10, scale: 2, default: "0.0"
     t.text "description"
+    t.string "slug"
+    t.string "genre"
+    t.string "status", default: "draft", null: false
+    t.index ["slug", "user_id"], name: "index_releases_on_slug_and_user_id", unique: true
+    t.index ["status"], name: "index_releases_on_status"
     t.index ["user_id"], name: "index_releases_on_user_id"
   end
 
@@ -98,6 +113,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_23_150816) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "follows", "users", column: "followed_id"
+  add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "releases", "users"
   add_foreign_key "tracks", "releases"

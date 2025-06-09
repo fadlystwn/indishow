@@ -1,0 +1,107 @@
+<%# Followers Component for Artist Dashboard %>
+<div class="bg-music-surface shadow-genre rounded-genre p-6 border border-music-border">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-semibold text-music-text flex items-center">
+      <svg class="w-5 h-5 mr-2 text-music-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      Followers
+    </h2>
+    <% if @followers_count > 0 %>
+      <span class="bg-music-primary bg-opacity-20 border border-music-primary px-3 py-1 rounded-genre text-sm text-music-primary font-medium">
+        <%= pluralize(@followers_count, 'follower') %>
+      </span>
+    <% end %>
+  </div>
+
+  <% if @recent_followers.any? %>
+    <%# Recent Followers Section %>
+    <div class="mb-6">
+      <h3 class="text-sm font-medium text-music-text-secondary uppercase tracking-wider mb-4">Recent Followers</h3>
+      <div class="space-y-3">
+        <% @recent_followers.each do |follower| %>
+          <% follower_profile = follower.profile %>
+          <div class="flex items-center space-x-3 p-3 bg-music-background rounded-genre hover:bg-music-border transition-colors duration-200">
+            <%# Follower Avatar %>
+            <div class="flex-shrink-0">
+              <% if follower_profile&.avatar&.attached? %>
+                <%= image_tag follower_profile.avatar, class: "w-10 h-10 rounded-full object-cover border border-music-border" %>
+              <% else %>
+                <div class="w-10 h-10 rounded-full bg-music-surface border border-music-border flex items-center justify-center">
+                  <svg class="w-5 h-5 text-music-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+              <% end %>
+            </div>
+
+            <%# Follower Info %>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-music-text truncate">
+                    <% if follower_profile %>
+                      <%= link_to follower_profile.name, fan_profile_path(follower_profile), 
+                                  class: "hover:text-music-primary transition-colors" %>
+                    <% else %>
+                      <%= follower.name_or_email %>
+                    <% end %>
+                  </p>
+                  <% if follower_profile&.location.present? %>
+                    <p class="text-xs text-music-text-secondary flex items-center mt-1">
+                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <%= follower_profile.location %>
+                    </p>
+                  <% end %>
+                </div>
+                <%# Follow Date %>
+                <div class="text-right">
+                  <% follow_record = Follow.find_by(follower: follower, followed: current_user) %>
+                  <p class="text-xs text-music-text-secondary">
+                    <%= time_ago_in_words(follow_record&.created_at || Time.current) %> ago
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# View All Followers Link %>
+    <% if @followers_count > @recent_followers.count %>
+      <div class="text-center pt-4 border-t border-music-border">
+        <%= link_to artist_profile_path(current_user.artist_profile, anchor: 'followers'), 
+                    class: "inline-flex items-center text-sm text-music-secondary hover:text-music-primary transition-colors font-medium" do %>
+          View all <%= @followers_count %> followers
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        <% end %>
+      </div>
+    <% end %>
+
+  <% else %>
+    <%# Empty State %>
+    <div class="text-center py-8">
+      <svg class="mx-auto h-12 w-12 text-music-text-secondary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <h3 class="text-sm font-medium text-music-text mb-2">No followers yet</h3>
+      <p class="text-sm text-music-text-secondary mb-4">Share your music to start building your fanbase!</p>
+      <% if current_user.artist_profile %>
+        <%= link_to artist_profile_path(current_user.artist_profile), 
+                    class: "inline-flex items-center px-4 py-2 bg-music-primary text-music-text rounded-button hover:bg-opacity-80 transition-colors text-sm font-medium" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          View My Profile
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

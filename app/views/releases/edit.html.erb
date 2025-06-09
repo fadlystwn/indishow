@@ -1,101 +1,110 @@
 <%= turbo_frame_tag dom_id(@release) do %>
-  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
-    <h2 class="text-xl font-semibold mb-4">Edit Release</h2>
-    
-    <%= form_with(model: @release, local: true, class: "upload-form", data: { controller: "release-upload" }) do |form| %>
-      <!-- Release Type Selector -->
-      <div class="mb-6">
-        <label class="block text-gray-700 text-sm font-medium mb-2">Release Type</label>
-        <div class="grid grid-cols-4 gap-2">
-          <% Release.release_types.each_key do |type| %>
-            <button type="button" 
-                    class="release-type-btn py-2 px-4 border rounded-md text-sm font-medium <%= 'bg-teal-100 border-teal-500' if @release.release_type == type %>"
-                    data-release-upload-target="typeBtn"
-                    data-action="click->release-upload#selectType"
-                    data-type="<%= type %>">
-              <%= type.titleize %>
-            </button>
-          <% end %>
-          <%= form.hidden_field :release_type, id: "release_type", value: @release.release_type %>
+  <div class="min-h-screen bg-music-background">
+    <div class="bg-music-surface rounded-genre shadow-genre border border-music-border p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4 font-display text-music-text">Edit Release</h2>
+      
+      <%= form_with(model: @release, local: true, class: "upload-form", data: { controller: "release-upload" }) do |form| %>
+        <!-- Release Type Selector -->
+        <div class="mb-6">
+          <label class="block text-music-text text-sm font-medium mb-2">Release Type</label>
+          <div class="grid grid-cols-4 gap-2">
+            <% Release.release_types.each_key do |type| %>
+              <button type="button" 
+                      class="release-type-btn py-2 px-4 border border-music-border rounded-genre text-sm font-medium bg-music-background text-music-text hover:bg-music-surface transition-all duration-200 <%= 'bg-music-primary border-music-primary text-music-text' if @release.release_type == type %>"
+                      data-release-upload-target="typeBtn"
+                      data-action="click->release-upload#selectType"
+                      data-type="<%= type %>">
+                <%= type.titleize %>
+              </button>
+            <% end %>
+            <%= form.hidden_field :release_type, id: "release_type", value: @release.release_type %>
+          </div>
         </div>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Left Column -->
-        <div>
-          <!-- Cover Art Upload -->
-          <div class="mb-4">
-            <%= form.label :cover_art, "Cover Art", class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
-                 data-controller="file-upload"
-                 data-action="dragover->file-upload#highlight dragleave->file-upload#unhighlight drop->file-upload#drop">
-              <div data-file-upload-target="container" 
-                   class="cursor-pointer <%= 'hidden' if @release.cover_art.attached? %>">
-                <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
-                <p class="text-gray-500 text-sm">Drag & drop your cover art here</p>
-                <p class="text-gray-400 text-xs mt-1">or click to browse (1200x1200px recommended)</p>
-              </div>
-              <div data-file-upload-target="preview" class="<%= 'hidden' unless @release.cover_art.attached? %>">
-                <% if @release.cover_art.attached? %>
-                  <div class="flex flex-col items-center">
-                    <div class="relative">
-                      <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-md mb-2" %>
-                      <button type="button" 
-                              class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                              data-action="click->file-upload#clearFile">
-                        ×
-                      </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left Column -->
+          <div>
+            <!-- Cover Art Upload -->
+            <div class="mb-4">
+              <%= form.label :cover_art, "Cover Art", class: "block text-music-text text-sm font-medium mb-2" %>
+              <div class="border-2 border-dashed border-music-border bg-music-background rounded-genre p-8 text-center cursor-pointer hover:border-music-primary transition-colors duration-200"
+                   data-controller="image-upload-base"
+                   data-action="dragover->image-upload-base#highlight dragleave->image-upload-base#unhighlight drop->image-upload-base#drop">
+                <div data-image-upload-base-target="container" 
+                     class="cursor-pointer <%= 'hidden' if @release.cover_art.attached? %>">
+                  <i class="fas fa-image text-music-text-secondary text-4xl mb-2"></i>
+                  <p class="text-music-text-secondary text-sm">Drag & drop your cover art here</p>
+                  <p class="text-music-text-secondary text-xs mt-1 opacity-70">or click to browse (1200x1200px recommended)</p>
+                </div>
+                <div data-image-upload-base-target="preview" class="<%= 'hidden' unless @release.cover_art.attached? %>">
+                  <% if @release.cover_art.attached? %>
+                    <div class="flex flex-col items-center">
+                      <div class="relative">
+                        <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-genre mb-2" %>
+                        <button type="button" 
+                                class="absolute top-0 right-0 bg-music-primary text-music-text rounded-full w-6 h-6 flex items-center justify-center hover:bg-opacity-80 transition-all duration-200"
+                                data-action="click->image-upload-base#clearFile">
+                          ×
+                        </button>
+                      </div>
+                      <p class="text-sm text-music-text-secondary mt-2"><%= @release.cover_art.filename %></p>
                     </div>
-                    <p class="text-sm text-gray-600 mt-2"><%= @release.cover_art.filename %></p>
-                  </div>
-                <% end %>
+                  <% end %>
+                </div>
+                <%= form.file_field :cover_art, 
+                                  direct_upload: true,
+                                  accept: "image/*",
+                                  class: "hidden",
+                                  data: { image_upload_base_target: "input", action: "change->image-upload-base#inputChange" } %>
               </div>
-              <%= form.file_field :cover_art, 
-                                direct_upload: true,
-                                accept: "image/*",
-                                class: "hidden",
-                                data: { file_upload_target: "input", action: "change->file-upload#inputChange" } %>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div>
-          <!-- Release Info -->
-          <div class="mb-4">
-            <%= form.label :title, class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
-          </div>
-
-          <div class="mb-4">
-            <%= form.label :artist, class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <%= form.text_field :artist, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
-          </div>
-
-          <div class="mb-4">
-            <%= form.label :release_date, class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <%= form.date_field :release_date, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
-          </div>
-
-          <div class="mb-4">
-            <%= form.label :price, class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-              <%= form.number_field :price, min: 0, step: 0.01, class: "w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
             </div>
           </div>
 
-          <div class="mb-4">
-            <%= form.label :description, class: "block text-gray-700 text-sm font-medium mb-2" %>
-            <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" %>
-          </div>
+          <!-- Right Column -->
+          <div>
+            <!-- Release Info -->
+            <div class="mb-4">
+              <%= form.label :title, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= form.text_field :title, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary placeholder-music-text-secondary" %>
+            </div>
 
-          <div class="flex justify-end mt-6">
-            <%= link_to "Cancel", @release, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 mr-2 hover:bg-gray-50" %>
-            <%= form.submit "Update Release", class: "px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+            <div class="mb-4">
+              <%= form.label :artist, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= form.text_field :artist, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary placeholder-music-text-secondary" %>
+            </div>
+
+            <div class="mb-4">
+              <%= form.label :release_date, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= form.date_field :release_date, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
+            </div>
+
+            <div class="mb-4">
+              <%= form.label :price, class: "block text-music-text text-sm font-medium mb-2" %>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-music-accent">$</span>
+                <%= form.number_field :price, min: 0, step: 0.01, class: "w-full pl-8 pr-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" %>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <%= form.label :genre, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= form.select :genre, options_for_select([['Select a genre', '']] + Release::GENRES.map { |genre| [genre, genre] }, @release.genre), 
+                             {}, 
+                             { class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary" } %>
+            </div>
+
+            <div class="mb-4">
+              <%= form.label :description, class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary placeholder-music-text-secondary" %>
+            </div>
+
+            <div class="flex justify-end mt-6 space-x-4">
+              <%= link_to "Cancel", @release, class: "px-4 py-2 border border-music-border bg-music-surface text-music-text rounded-button hover:bg-opacity-80 transition-all duration-200" %>
+              <%= form.submit "Update Release", class: "px-4 py-2 bg-music-primary text-music-text rounded-button hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-music-primary shadow-button transition-all duration-200" %>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 <% end %>

@@ -2,6 +2,31 @@ class Users::RegistrationsController < Devise::RegistrationsController
   before_action :configure_permitted_parameters
   before_action :ensure_profile_exists, only: [:edit, :update]
 
+  def create
+    Rails.logger.info "👤 [USER_REG] Attempting user registration with role: #{params.dig(:user, :role)}"
+    
+    super do |resource|
+      if resource.persisted?
+        Rails.logger.info "✅ [USER_REG] Successfully created user #{resource.id} (#{resource.email}) with role: #{resource.role}"
+        Rails.logger.info "📝 [PROFILE] Created #{resource.profile.class.name} profile (ID: #{resource.profile.id}) for user #{resource.id}"
+      else
+        Rails.logger.warn "❌ [USER_REG] Failed to create user: #{resource.errors.full_messages.join(', ')}"
+      end
+    end
+  end
+
+  def update
+    Rails.logger.info "📝 [USER_UPDATE] Updating user #{resource.id} profile"
+    
+    super do |resource|
+      if resource.errors.empty?
+        Rails.logger.info "✅ [USER_UPDATE] Successfully updated user #{resource.id} and profile"
+      else
+        Rails.logger.warn "❌ [USER_UPDATE] Failed to update user #{resource.id}: #{resource.errors.full_messages.join(', ')}"
+      end
+    end
+  end
+
   protected
 
   def configure_permitted_parameters
@@ -52,18 +77,23 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def update_resource(resource, params)
+    Rails.logger.info "🔄 [PROFILE_UPDATE] Updating profile for user #{resource.id}"
+    
     # First, ensure the profile exists and is saved
     if resource.profile.new_record?
+      Rails.logger.info "📝 [PROFILE] Creating new profile record for user #{resource.id}"
       resource.profile.save!
     end
 
     # Handle avatar separately
     if params[:profile_attributes].present? && params[:profile_attributes][:avatar].present?
+      Rails.logger.info "🖼️ [AVATAR] Uploading new avatar for user #{resource.id}"
       resource.profile.avatar.attach(params[:profile_attributes][:avatar])
     end
 
     # Handle avatar removal
     if params[:remove_avatar] == "1"
+      Rails.logger.info "🗑️ [AVATAR] Removing avatar for user #{resource.id}"
       resource.profile.avatar.purge if resource.profile.avatar.attached?
     end
 
@@ -82,6 +112,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def after_sign_up_path_for(resource)
+    Rails.logger.info "🏠 [REDIRECT] Redirecting newly registered #{resource.role} user #{resource.id} to #{resource.artist? ? 'dashboard' : 'root'}"
     if resource.artist?
       dashboard_path
     else
