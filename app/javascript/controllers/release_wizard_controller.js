@@ -10,7 +10,9 @@ export default class extends Controller {
     selectedType: String,
     trackRequirements: Object,
     uploadedTracks: Array,
-    createUrl: String
+    createUrl: String,
+    baseUrl: String,
+    updateUrl: String
   }
 
   initialize() {

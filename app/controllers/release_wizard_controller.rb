@@ -1,7 +1,8 @@
 class ReleaseWizardController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_artist_user!
-  before_action :set_release_draft, except: [:step1, :create_draft]
+  before_action :set_release_draft, except: [:step1, :create_draft, :success]
+  before_action :set_published_release, only: [:success]
   
   def step1
     # Step 1: Release Type Selection - Entry point
@@ -102,11 +103,15 @@ class ReleaseWizardController < ApplicationController
     if @release_draft.save
       # Clear the draft session
       session.delete(:release_draft_id)
-      redirect_to release_path(@release_draft), notice: "Release was successfully created and published!"
+      redirect_to success_release_wizard_path(@release_draft.id), notice: "Release was successfully created and published!"
     else
       @release_draft.status = 'draft' # Reset back to draft on error
       redirect_to release_wizard_path(@release_draft.id), alert: "There was an error publishing your release. Please fix the issues and try again."
     end
+  end
+
+  def success
+    # Success page after publishing - @release is already set by set_published_release
   end
 
   private
@@ -159,7 +164,8 @@ class ReleaseWizardController < ApplicationController
     
     if params[:tracks].present?
       # Validate track count based on release type
-      track_count = params[:tracks].length
+      tracks_hash = track_params
+      track_count = tracks_hash.size
       requirements = get_track_requirements(@release_draft.release_type)
       
       if track_count < requirements[:min]
@@ -172,19 +178,19 @@ class ReleaseWizardController < ApplicationController
       if track_errors.empty?
         @release_draft.tracks.destroy_all # Clear existing tracks
         
-        params[:tracks].each_with_index do |track_data, index|
+        tracks_hash.each do |index, track_data|
           track = @release_draft.tracks.build(
-            title: track_data[:title],
-            duration: track_data[:duration],
-            position: index + 1
+            title: track_data['title'],
+            duration: track_data['duration'],
+            position: track_data['position']&.to_i || (index.to_i + 1)
           )
           
           # Handle audio file upload if present
-          if track_data[:audio_file].present?
-            track.audio_file.attach(track_data[:audio_file])
-          elsif track_data[:audio_file_blob_id].present?
+          if track_data['audio_file'].present?
+            track.audio_file.attach(track_data['audio_file'])
+          elsif track_data['audio_file_blob_id'].present?
             # Handle DirectUpload blob ID
-            track.audio_file.attach(track_data[:audio_file_blob_id])
+            track.audio_file.attach(track_data['audio_file_blob_id'])
           end
           
           unless track.save
@@ -262,8 +268,32 @@ class ReleaseWizardController < ApplicationController
     params.require(:release).permit(:title, :artist, :release_date, :price, :description, :genre, :cover_art, :release_type)
   end
 
+  def track_params
+    if params[:tracks].present?
+      params.require(:tracks).permit!.to_h
+    else
+      {}
+    end
+  end
+
   def track_upload_params
     params.permit(audio_files: [])
+  end
+
+  def set_published_release
+    @release = Release.find(params[:id])
+    
+    # Ensure the release belongs to the current user
+    unless @release.user == current_user
+      redirect_to root_path, alert: "Access denied."
+      return
+    end
+    
+    # Ensure the release is published
+    unless @release.published?
+      redirect_to root_path, alert: "Release not found."
+      return
+    end
   end
 
   def authorize_artist_user!

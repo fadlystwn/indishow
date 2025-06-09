@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     member do
       get :step2
       get :step3
+      get :success
       post :update_step
     end
   end

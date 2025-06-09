@@ -66,7 +66,7 @@ export class Navigation {
   submitStep3() {
     const form = document.createElement('form')
     form.method = 'POST'
-    form.action = this.controller.data.get('updateUrl')
+    form.action = this.controller.updateUrlValue
     
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content
     const csrfInput = document.createElement('input')
@@ -111,7 +111,7 @@ export class Navigation {
   }
 
   getStepUrl(step) {
-    const baseUrl = this.controller.data.get('baseUrl')
+    const baseUrl = this.controller.baseUrlValue
     return `${baseUrl}/step${step}`
   }
 }
