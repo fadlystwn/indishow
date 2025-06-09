@@ -122,7 +122,7 @@ export class TrackUI {
     
     const trackCount = this.trackUpload.controller.uploadedTracksValue.length
     const requirements = this.trackUpload.controller.trackRequirementsValue
-    const allUploaded = this.trackUpload.controller.uploadedTracksValue.every(track => track.uploadProgress === 100)
+    const allUploaded = this.trackUpload.controller.uploadedTracksValue.every(track => track.uploadProgress >= 100)
     const allHaveTitles = this.trackUpload.controller.uploadedTracksValue.every(track => track.title && track.title.trim().length > 0)
     const validCount = trackCount >= requirements.min && (!requirements.max || trackCount <= requirements.max)
     

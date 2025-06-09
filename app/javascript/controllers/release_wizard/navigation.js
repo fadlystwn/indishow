@@ -33,8 +33,6 @@ export class Navigation {
       return
     }
     
-    console.log('📝 Submitting step 1 with type:', this.controller.selectedTypeValue)
-    
     const form = document.createElement('form')
     form.method = 'POST'
     form.action = this.controller.createUrlValue

@@ -15,6 +15,12 @@ export class TrackUpload {
   initialize() {
     // Start with existing tracks or empty array
     this.controller.uploadedTracksValue = this.controller.uploadedTracksValue || []
+    
+    // Ensure track requirements value is initialized
+    if (!this.controller.trackRequirementsValue) {
+      this.controller.trackRequirementsValue = { min: 1, max: null, description: 'at least 1 track' }
+    }
+    
     this.ui.updateUI()
     this.ui.updateContinueButton()
   }
@@ -34,18 +40,19 @@ export class TrackUpload {
       return
     }
 
+    const trackIndex = this.controller.uploadedTracksValue.length
     const trackData = {
       file: file,
       title: this.utils.extractTitleFromFilename(file.name),
       duration: null,
-      position: this.controller.uploadedTracksValue.length + 1,
+      position: trackIndex + 1,
       uploadProgress: 0
     }
 
     this.controller.uploadedTracksValue = [...this.controller.uploadedTracksValue, trackData]
-    this.ui.addTrackToUI(trackData, index)
+    this.ui.addTrackToUI(trackData, trackIndex)
     
-    this.uploader.uploadFileToServer(file, index)
+    this.uploader.uploadFileToServer(file, trackIndex)
     this.validator.validateTrackCount()
     this.ui.updateContinueButton()
   }
@@ -63,7 +70,7 @@ export class TrackUpload {
 
   updateTrackTitle(event) {
     const trackIndex = parseInt(event.currentTarget.dataset.trackIndex)
-    this.controller.uploadedTracksValue[trackIndex].title = event.currentTarget.value
+    this.controller.uploadedTracksValue[trackIndex].title = event.currentTarget.value.trim()
     this.ui.updateContinueButton()
   }
 

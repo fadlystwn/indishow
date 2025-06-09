@@ -20,13 +20,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log('🔌 Release wizard controller connected - Step:', this.stepValue)
-    console.log('📊 Available targets:', {
-      typeCards: this.typeCardTargets.length,
-      hasContinueBtn: this.hasContinueBtnTarget,
-      hasProgressBar: this.hasProgressBarTarget
-    })
-    
     this.uiUtils.updateProgressBar()
     this.uiUtils.updateStepIndicator()
     this.uiUtils.updateNavigationButtons()
@@ -45,8 +38,6 @@ export default class extends Controller {
           this.continueBtnTarget.classList.add('opacity-50', 'cursor-not-allowed')
           this.continueBtnTarget.classList.remove('hover:bg-teal-700')
         }
-        
-        console.log('🔘 Continue button initial state:', hasSelectedType ? 'enabled' : 'disabled')
       }
     }
     
@@ -59,7 +50,6 @@ export default class extends Controller {
   selectType(event) {
     event.preventDefault()
     const type = event.currentTarget.dataset.type
-    console.log('🎯 Release type selected:', type)
     
     // Remove active class from all cards
     this.typeCardTargets.forEach(card => {
@@ -82,16 +72,12 @@ export default class extends Controller {
         this.continueBtnTarget.disabled = false
         this.continueBtnTarget.classList.remove('opacity-50', 'cursor-not-allowed')
         this.continueBtnTarget.classList.add('hover:bg-teal-700')
-        console.log('✅ Continue button enabled for type:', type)
       } else {
         // Disable the button if no type is selected
         this.continueBtnTarget.disabled = true
         this.continueBtnTarget.classList.add('opacity-50', 'cursor-not-allowed')
         this.continueBtnTarget.classList.remove('hover:bg-teal-700')
-        console.log('⚠️ Continue button disabled: no type selected')
       }
-    } else {
-      console.error('❌ Continue button target not found')
     }
   }
 
