@@ -4,6 +4,7 @@ class ReleaseWizardController < ApplicationController
   before_action :authorize_artist_user!
   before_action :set_release_draft, except: [ :step1, :create_draft, :success ]
   before_action :set_published_release, only: [ :success ]
+  before_action :set_release_for_debug, only: [ :debug ]
 
   def step1
     # Step 1: Release Type Selection - Entry point
@@ -62,6 +63,23 @@ class ReleaseWizardController < ApplicationController
     end
   end
 
+  def publish
+    Rails.logger.info "🚀 [RELEASE_WIZARD] Attempting to publish release #{@release_draft.id}"
+
+    if @service.publish_release(@release_draft)
+      # Clear the draft from session since it's now published
+      session.delete(:release_draft_id)
+      Rails.logger.info "✅ [RELEASE_WIZARD] Successfully published release #{@release_draft.id}"
+
+      redirect_to success_release_wizard_path(@release_draft.id), notice: "Release was successfully published!"
+    else
+      Rails.logger.error "❌ [RELEASE_WIZARD] Failed to publish release #{@release_draft.id}"
+      @release_draft.status = "draft" # Reset back to draft on error
+      redirect_to release_wizard_path(@release_draft.id),
+                  alert: "There was an error publishing your release. Please check all required fields and try again."
+    end
+  end
+
   def show
     # Final review before publishing
     return redirect_to step1_release_wizard_index_path unless @release_draft.release_type.present?
@@ -74,19 +92,39 @@ class ReleaseWizardController < ApplicationController
     @release_draft.status = "draft" # Reset back to draft
   end
 
-  def create
-    # Publish the release
-    if @service.publish_release(@release_draft)
-      session.delete(:release_draft_id)
-      redirect_to success_release_wizard_path(@release_draft.id), notice: "Release was successfully created and published!"
-    else
-      @release_draft.status = "draft" # Reset back to draft on error
-      redirect_to release_wizard_path(@release_draft.id), alert: "There was an error publishing your release. Please fix the issues and try again."
+  def success
+    # Success page after publishing
+    unless @release.published?
+      redirect_to releases_path, alert: "Release not found or not published."
+      return
     end
+
+    # Track the successful publication
+    Rails.logger.info "🎉 [RELEASE_WIZARD] Showing success page for published release #{@release.id}"
   end
 
-  def success
-    # Success page after publishing - @release is already set by set_published_release
+  def debug
+    @release_draft = Release.find(params[:id])
+
+    # Security check
+    unless @release_draft.user == current_user
+      redirect_to root_path, alert: "Access denied"
+      return
+    end
+
+    @validation_errors = @service.validate_release_for_publishing(@release_draft)
+    @track_requirements = @service.get_track_requirements(@release_draft.release_type)
+    @tracks = @release_draft.tracks.order(:position)
+
+    # Log detailed debug information
+    Rails.logger.info "🔍 [DEBUG] Release #{@release_draft.id} Status:"
+    Rails.logger.info "  - Type: #{@release_draft.release_type}"
+    Rails.logger.info "  - Status: #{@release_draft.status}"
+    Rails.logger.info "  - Track count: #{@tracks.count}"
+    Rails.logger.info "  - Cover art? #{@release_draft.cover_art.attached?}"
+    Rails.logger.info "  - Validation errors: #{@validation_errors.join(', ')}"
+
+    render :debug
   end
 
   private
@@ -106,29 +144,30 @@ class ReleaseWizardController < ApplicationController
     if @release_draft.update(release_type: params[:release_type])
       redirect_to step2_release_wizard_path(@release_draft.id)
     else
-      render :step1, status: :unprocessable_entity
+      redirect_to step1_release_wizard_index_path, alert: @release_draft.errors.full_messages.join(", ")
     end
   end
 
   def update_step2
-    Rails.logger.info "📝 [RELEASE_UPDATE] Updating step 2 data for release #{@release_draft.id}: #{step2_params.except(:cover_art).to_h}"
+    Rails.logger.info "📝 [RELEASE_UPDATE] Updating step 2 data for release #{@release_draft.id}: #{step2_params}"
 
     if @service.update_step2(@release_draft, step2_params)
-      Rails.logger.info "✅ [RELEASE_UPDATE] Successfully updated release #{@release_draft.id} step 2 data"
       redirect_to step3_release_wizard_path(@release_draft.id)
     else
-      Rails.logger.warn "❌ [RELEASE_UPDATE] Failed to update release #{@release_draft.id}: #{@release_draft.errors.full_messages.join(', ')}"
       render :step2, status: :unprocessable_entity
     end
   end
 
   def update_step3
-    track_errors = @service.update_step3(@release_draft, track_params, params[:audio_files])
+    # Permit track parameters properly
+    permitted_tracks = params[:tracks]&.permit! if params[:tracks].present?
+
+    track_errors = @service.update_step3(@release_draft, permitted_tracks, params[:audio_files])
 
     if track_errors.empty?
       redirect_to release_wizard_path(@release_draft.id)
     else
-      flash.now[:alert] = track_errors.join(" ")
+      flash.now[:alert] = track_errors.join(", ")
       @track_requirements = @service.get_track_requirements(@release_draft.release_type)
       @tracks = @release_draft.tracks.order(:position)
       render :step3, status: :unprocessable_entity
@@ -141,7 +180,7 @@ class ReleaseWizardController < ApplicationController
 
   def track_params
     if params[:tracks].present?
-      params.require(:tracks).permit!.to_h
+      params.require(:tracks).permit!
     else
       {}
     end
@@ -159,6 +198,16 @@ class ReleaseWizardController < ApplicationController
     # Ensure the release is published
     unless @release.published?
       redirect_to root_path, alert: "Release not found."
+      nil
+    end
+  end
+
+  def set_release_for_debug
+    @release_draft = Release.find(params[:id])
+
+    # Ensure the release belongs to the current user
+    unless @release_draft.user == current_user
+      redirect_to root_path, alert: "Access denied."
       nil
     end
   end

@@ -46,6 +46,10 @@ class ReleaseWizardService
   end
 
   def update_step3(release_draft, tracks_params, audio_files_params)
+    Rails.logger.info "📝 [RELEASE_WIZARD] Updating step 3 for release #{release_draft.id}"
+    Rails.logger.info "  - Tracks params: #{tracks_params.inspect}"
+    Rails.logger.info "  - Audio files params: #{audio_files_params.inspect}"
+
     track_errors = []
 
     if tracks_params.present?
@@ -56,12 +60,32 @@ class ReleaseWizardService
       track_errors << "Please upload at least one track."
     end
 
+    Rails.logger.info "  - Track errors: #{track_errors.join(', ')}" if track_errors.any?
     track_errors
   end
 
   def publish_release(release_draft)
+    Rails.logger.info "🚀 [RELEASE_WIZARD] Starting publish process for release #{release_draft.id}"
+
+    # Run validation checks
+    validation_errors = validate_release_for_publishing(release_draft)
+
+    if validation_errors.any?
+      Rails.logger.error "❌ [RELEASE_WIZARD] Release #{release_draft.id} failed validation"
+      release_draft.errors.add(:base, validation_errors)
+      return false
+    end
+
+    # All validation passed, attempt to publish
     release_draft.status = "published"
-    release_draft.save
+
+    if release_draft.save
+      Rails.logger.info "✅ [RELEASE_WIZARD] Successfully published release #{release_draft.id}"
+      true
+    else
+      Rails.logger.error "❌ [RELEASE_WIZARD] Failed to save release #{release_draft.id}: #{release_draft.errors.full_messages.join(', ')}"
+      false
+    end
   end
 
   def valid_for_step2?(release_draft)
@@ -92,9 +116,54 @@ class ReleaseWizardService
     end
   end
 
+  def validate_release_for_publishing(release_draft)
+    Rails.logger.info "🔍 [RELEASE_WIZARD] Validating release #{release_draft.id} for publishing"
+
+    errors = []
+
+    # Basic info validation
+    errors << "Release type is required" unless release_draft.release_type.present?
+    errors << "Title is required" unless release_draft.title.present?
+    errors << "Artist name is required" unless release_draft.artist.present?
+    errors << "Release date is required" unless release_draft.release_date.present?
+
+    # Cover art validation
+    unless release_draft.cover_art.attached?
+      errors << "Cover art is required"
+    end
+
+    # Track validation
+    track_count = release_draft.tracks.count
+    requirements = get_track_requirements(release_draft.release_type)
+
+    if track_count < requirements[:min]
+      errors << "#{release_draft.release_type.titleize} requires at least #{requirements[:min]} track(s). You have #{track_count}"
+    elsif requirements[:max] && track_count > requirements[:max]
+      errors << "#{release_draft.release_type.titleize} can have at most #{requirements[:max]} track(s). You have #{track_count}"
+    end
+
+    # Check if all tracks have audio files
+    release_draft.tracks.each do |track|
+      unless track.audio_file.attached?
+        errors << "Track '#{track.title}' is missing an audio file"
+      end
+    end
+
+    if errors.any?
+      Rails.logger.warn "⚠️ [RELEASE_WIZARD] Release #{release_draft.id} validation failed: #{errors.join(', ')}"
+    else
+      Rails.logger.info "✅ [RELEASE_WIZARD] Release #{release_draft.id} passed all validation checks"
+    end
+
+    errors
+  end
+
   private
 
   def process_track_params(release_draft, tracks_hash, track_errors)
+    # Convert ActionController::Parameters to hash if needed
+    tracks_hash = tracks_hash.to_h if tracks_hash.respond_to?(:to_h)
+
     track_count = tracks_hash.size
     requirements = get_track_requirements(release_draft.release_type)
 
@@ -134,6 +203,8 @@ class ReleaseWizardService
   end
 
   def create_track_from_params(release_draft, track_data, index, track_errors)
+    Rails.logger.info "🎵 [TRACK_CREATE] Creating track from params: #{track_data.inspect}"
+
     track = release_draft.tracks.build(
       title: track_data["title"],
       duration: track_data["duration"],
@@ -141,12 +212,21 @@ class ReleaseWizardService
     )
 
     if track_data["audio_file"].present?
+      Rails.logger.info "  - Attaching audio file directly"
       track.audio_file.attach(track_data["audio_file"])
     elsif track_data["audio_file_blob_id"].present?
+      Rails.logger.info "  - Attaching audio file from blob ID: #{track_data['audio_file_blob_id']}"
       track.audio_file.attach(track_data["audio_file_blob_id"])
+    else
+      Rails.logger.warn "  - No audio file found for track"
     end
 
-    track_errors.concat(track.errors.full_messages) unless track.save
+    if track.save
+      Rails.logger.info "✅ [TRACK_CREATE] Successfully created track: #{track.title}"
+    else
+      Rails.logger.error "❌ [TRACK_CREATE] Failed to create track: #{track.errors.full_messages.join(', ')}"
+      track_errors.concat(track.errors.full_messages)
+    end
   end
 
   def create_track_from_file(release_draft, audio_file, position, track_errors)
