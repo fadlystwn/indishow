@@ -1,0 +1,82 @@
+<%# Title %>
+<div class="min-h-screen bg-music-background text-music-text">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold font-display text-music-text mb-8">Edit Profile</h1>
+
+    <%= form_with(model: @artist_profile, local: true, class: "space-y-8") do |f| %>
+      <% if @artist_profile.errors.any? %>
+        <div class="bg-music-primary bg-opacity-20 border border-music-primary text-music-text px-4 py-3 rounded-genre relative" role="alert">
+          <strong class="font-bold">Please fix the following errors:</strong>
+          <ul class="mt-2 list-disc list-inside">
+            <% @artist_profile.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%# Cover Image %>
+      <div class="bg-music-surface p-6 rounded-genre border border-music-border">
+        <label class="block text-sm font-medium text-music-text mb-2">Cover Image</label>
+        <div class="mt-2 flex items-center">
+          <% if @artist_profile.cover_image.attached? %>
+            <div class="relative w-full h-48">
+              <%= image_tag @artist_profile.cover_image, class: "w-full h-full object-cover rounded-genre" %>
+            </div>
+          <% end %>
+        </div>
+        <div class="mt-4">
+          <%= f.file_field :cover_image, class: "block w-full text-sm text-music-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-button file:border-0 file:text-sm file:font-semibold file:bg-music-primary file:text-music-text hover:file:bg-opacity-80 file:transition-all file:duration-200" %>
+        </div>
+      </div>
+
+      <%# Avatar %>
+      <div class="bg-music-surface p-6 rounded-genre border border-music-border">
+        <label class="block text-sm font-medium text-music-text mb-2">Profile Picture</label>
+        <div class="mt-2 flex items-center">
+          <% if @artist_profile.avatar.attached? %>
+            <%= image_tag @artist_profile.avatar, class: "h-24 w-24 rounded-full object-cover border-2 border-music-accent" %>
+          <% end %>
+        </div>
+        <div class="mt-4">
+          <%= f.file_field :avatar, class: "block w-full text-sm text-music-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-button file:border-0 file:text-sm file:font-semibold file:bg-music-primary file:text-music-text hover:file:bg-opacity-80 file:transition-all file:duration-200" %>
+        </div>
+      </div>
+
+      <%# Name %>
+      <div class="bg-music-surface p-6 rounded-genre border border-music-border">
+        <%= f.label :name, class: "block text-sm font-medium text-music-text mb-2" %>
+        <%= f.text_field :name, class: "mt-1 block w-full rounded-genre border-music-border bg-music-background text-music-text shadow-sm focus:border-music-primary focus:ring-music-primary sm:text-sm placeholder-music-text-secondary" %>
+      </div>
+
+      <%# Bio %>
+      <div class="bg-music-surface p-6 rounded-genre border border-music-border">
+        <%= f.label :bio, class: "block text-sm font-medium text-music-text mb-2" %>
+        <div class="mt-1">
+          <%= f.text_area :bio, rows: 5, class: "block w-full rounded-genre border-music-border bg-music-background text-music-text shadow-sm focus:border-music-primary focus:ring-music-primary sm:text-sm placeholder-music-text-secondary" %>
+        </div>
+        <p class="mt-2 text-sm text-music-text-secondary">Write a brief description about yourself.</p>
+      </div>
+
+      <%# Location %>
+      <div class="bg-music-surface p-6 rounded-genre border border-music-border">
+        <%= f.label :location, class: "block text-sm font-medium text-music-text mb-2" %>
+        <%= f.text_field :location, class: "mt-1 block w-full rounded-genre border-music-border bg-music-background text-music-text shadow-sm focus:border-music-primary focus:ring-music-primary sm:text-sm placeholder-music-text-secondary" %>
+      </div>
+
+      <%# Website URL %>
+      <div class="bg-music-surface p-6 rounded-genre border border-music-border">
+        <%= f.label :website_url, "Website URL", class: "block text-sm font-medium text-music-text mb-2" %>
+        <%= f.url_field :website_url, class: "mt-1 block w-full rounded-genre border-music-border bg-music-background text-music-text shadow-sm focus:border-music-primary focus:ring-music-primary sm:text-sm placeholder-music-text-secondary" %>
+      </div>
+
+      <%# Submit Button %>
+      <div class="pt-5">
+        <div class="flex justify-end space-x-4">
+          <%= link_to "Cancel", artist_profile_path(@artist_profile), class: "bg-music-surface py-2 px-6 border border-music-border rounded-button text-sm font-medium text-music-text hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-music-secondary transition-all duration-200" %>
+          <%= f.submit "Save Changes", class: "inline-flex justify-center py-2 px-6 border border-transparent shadow-button text-sm font-medium rounded-button text-music-text bg-music-primary hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-music-primary transition-all duration-200" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

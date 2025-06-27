@@ -1,0 +1,5 @@
+web: bundle exec puma -C config/puma.rb
+worker: bundle exec sidekiq -C config/sidekiq.yml
+scheduler: bundle exec sidekiq-cron
+release: bundle exec rails db:migrate && bundle exec rails assets:precompile
+console: bundle exec rails console

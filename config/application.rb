@@ -6,7 +6,7 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Indishow
+module Skenaria
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
@@ -25,10 +25,14 @@ module Indishow
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.middleware.use OmniAuth::Builder do
-      provider :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET']
+      provider :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_CLIENT_SECRET"]
     end
-    
     OmniAuth.config.allowed_request_methods = %i[post]
+
+    # Configure Active Storage to use ImageMagick
+    config.active_storage.variant_processor = :mini_magick
+
+    # Configure Sidekiq as the Active Job queue adapter
+    config.active_job.queue_adapter = :sidekiq
   end
-  
 end

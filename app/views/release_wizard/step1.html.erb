@@ -1,0 +1,112 @@
+<div class="min-h-screen bg-music-background py-8">
+  <div class="max-w-4xl mx-auto px-4"
+       data-controller="release-wizard" 
+       data-release-wizard-step-value="1"
+       data-release-wizard-selected-type-value="<%= @release&.release_type %>"
+       data-release-wizard-create-url-value="<%= create_release_release_wizard_index_path %>">
+    <!-- Progress Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-center mb-4">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+            <span class="ml-2 text-sm font-medium text-music-text">Select Type</span>
+          </div>
+          <div class="w-16 h-1 bg-gray-300 rounded"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+            <span class="ml-2 text-sm font-medium text-gray-500">Release Info</span>
+          </div>
+          <div class="w-16 h-1 bg-gray-300 rounded"></div>
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">3</div>
+            <span class="ml-2 text-sm font-medium text-gray-500">Upload Tracks</span>
+          </div>
+        </div>
+      </div>
+      <div class="w-full bg-gray-300 rounded-full h-2">
+        <div class="bg-teal-600 h-2 rounded-full transition-all duration-300" style="width: 33.33%" data-release-wizard-target="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-music-surface rounded-lg shadow-lg border border-music-border p-8">
+      
+      
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-music-text mb-4">What do you want to release?</h1>
+        <p class="text-music-text-secondary text-lg">Choose the type of release you're creating</p>
+      </div>
+
+      <!-- Release Type Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Single -->
+        <div class="release-type-card bg-white border-2 border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:border-teal-300 hover:shadow-md text-center"
+             data-release-wizard-target="typeCard"
+             data-action="click->release-wizard#selectType"
+             data-type="single">
+          <div class="text-4xl mb-4">🎵</div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Single</h3>
+          <p class="text-sm text-gray-600 mb-4">1 track only</p>
+          <div class="text-xs text-gray-500">
+            Perfect for standalone songs, promotional releases, or testing the waters with new music.
+          </div>
+        </div>
+
+        <!-- EP -->
+        <div class="release-type-card bg-white border-2 border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:border-teal-300 hover:shadow-md text-center"
+             data-release-wizard-target="typeCard"
+             data-action="click->release-wizard#selectType"
+             data-type="ep">
+          <div class="text-4xl mb-4">🎧</div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">EP (Mini Album)</h3>
+          <p class="text-sm text-gray-600 mb-4">2 to 6 tracks</p>
+          <div class="text-xs text-gray-500">
+            Extended Play releases are great for showcasing variety while keeping it concise.
+          </div>
+        </div>
+
+        <!-- Album -->
+        <div class="release-type-card bg-white border-2 border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:border-teal-300 hover:shadow-md text-center"
+             data-release-wizard-target="typeCard"
+             data-action="click->release-wizard#selectType"
+             data-type="album">
+          <div class="text-4xl mb-4">💿</div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Album</h3>
+          <p class="text-sm text-gray-600 mb-4">7+ tracks</p>
+          <div class="text-xs text-gray-500">
+            Full-length albums tell a complete story and showcase your artistic range.
+          </div>
+        </div>
+
+        <!-- Compilation -->
+        <div class="release-type-card bg-white border-2 border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:border-teal-300 hover:shadow-md text-center"
+             data-release-wizard-target="typeCard"
+             data-action="click->release-wizard#selectType"
+             data-type="compilation">
+          <div class="text-4xl mb-4">📀</div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Compilation</h3>
+          <p class="text-sm text-gray-600 mb-4">2+ tracks from various projects</p>
+          <div class="text-xs text-gray-500">
+            Collections of previously released or unreleased tracks, remixes, or collaborations.
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="flex justify-between items-center">
+        <div>
+          <!-- Back button hidden on step 1 -->
+        </div>
+        
+        <button type="button" 
+                class="px-6 py-3 bg-teal-600 text-white rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                data-release-wizard-target="continueBtn"
+                data-action="click->release-wizard#goNext"
+                disabled>
+          Continue to Release Info
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

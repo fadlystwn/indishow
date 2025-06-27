@@ -1,0 +1,130 @@
+<div class="min-h-screen bg-music-background py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="bg-music-surface rounded-lg shadow-lg border border-music-border p-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-music-text mb-2">Release Debug Info</h1>
+        <p class="text-music-text-secondary">
+          Detailed information about release #<%= @release.id %>
+        </p>
+      </div>
+
+      <!-- Basic Info -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-music-text mb-4">Basic Information</h2>
+        <div class="bg-white rounded-lg p-6 border border-gray-200">
+          <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Status</dt>
+              <dd class="mt-1">
+                <span class="px-2 py-1 text-sm rounded-full
+                  <%= @release.published? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                  <%= @release.status.titleize %>
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Release Type</dt>
+              <dd class="mt-1 text-gray-900"><%= @release.release_type.titleize %></dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Title</dt>
+              <dd class="mt-1 text-gray-900"><%= @release.title.presence || '(not set)' %></dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Artist</dt>
+              <dd class="mt-1 text-gray-900"><%= @release.artist.presence || '(not set)' %></dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Release Date</dt>
+              <dd class="mt-1 text-gray-900">
+                <%= @release.release_date&.strftime("%B %d, %Y") || '(not set)' %>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Cover Art</dt>
+              <dd class="mt-1">
+                <% if @release.cover_art.attached? %>
+                  <span class="text-green-600">✓ Attached</span>
+                <% else %>
+                  <span class="text-red-600">✗ Missing</span>
+                <% end %>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Track Requirements -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-music-text mb-4">Track Requirements</h2>
+        <div class="bg-white rounded-lg p-6 border border-gray-200">
+          <div class="mb-4">
+            <p class="text-gray-600">
+              Required: <%= @track_requirements[:min] %> - 
+              <%= @track_requirements[:max] || '∞' %> tracks
+            </p>
+            <p class="text-gray-600">
+              Current: <%= @tracks.count %> tracks
+            </p>
+          </div>
+
+          <% if @tracks.any? %>
+            <div class="mt-4">
+              <h3 class="text-lg font-medium text-gray-900 mb-3">Track List</h3>
+              <div class="space-y-2">
+                <% @tracks.each do |track| %>
+                  <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                    <div>
+                      <span class="text-sm font-medium text-gray-900">
+                        <%= track.title %>
+                      </span>
+                      <span class="text-sm text-gray-500 ml-2">
+                        (Position: <%= track.position %>)
+                      </span>
+                    </div>
+                    <div>
+                      <% if track.audio_file.attached? %>
+                        <span class="text-green-600 text-sm">✓ Audio attached</span>
+                      <% else %>
+                        <span class="text-red-600 text-sm">✗ No audio</span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Validation Errors -->
+      <% if @validation_errors.any? %>
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold text-music-text mb-4">Validation Errors</h2>
+          <div class="bg-red-50 rounded-lg p-6 border border-red-200">
+            <ul class="list-disc list-inside space-y-2">
+              <% @validation_errors.each do |error| %>
+                <li class="text-red-700"><%= error %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Actions -->
+      <div class="flex justify-between items-center">
+        <%= link_to "Return to Edit", 
+            release_wizard_path(@release),
+            class: "bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200" %>
+        
+        <% if @validation_errors.empty? && !@release.published? %>
+          <%= form_tag publish_release_wizard_path(@release), method: :post, class: "inline" do %>
+            <%= submit_tag "Attempt Publish", 
+                class: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200",
+                data: { turbo_confirm: "Are you sure you want to attempt publishing this release?" } %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

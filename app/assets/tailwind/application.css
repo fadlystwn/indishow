@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+/* Add this to your application.css or equivalent */
+.border-dashed {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.border-dashed:hover {
+  border-color: #FF4D4D; /* music-primary */
+}
+
+.release-type-btn {
+  transition: all 0.2s ease;
+}
+
+.release-type-btn:hover:not(.bg-music-primary\/20) {
+  background-color: rgba(255, 77, 77, 0.1); /* music-primary/10 */
+  border-color: #FF4D4D; /* music-primary */
+}

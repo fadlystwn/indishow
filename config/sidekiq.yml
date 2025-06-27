@@ -1,0 +1,12 @@
+---
+:concurrency: 5
+:queues:
+  - default
+  - mailers
+  - active_storage_analysis
+  - active_storage_purge
+:environment: <%= ENV.fetch("RAILS_ENV", "development") %>
+:timeout: 30
+:retry: 3
+:max_retries: 3
+:dead_timeout: 180

@@ -1,16 +1,37 @@
-<h2>Resend confirmation instructions</h2>
+<div class="flex items-center justify-center min-h-screen bg-music-background">
+  <div class="w-full max-w-md p-8 bg-music-surface rounded-genre shadow-genre">
+    <div class="text-center mb-8">
+      <i class="fas fa-envelope-open text-4xl text-music-secondary mb-4"></i>
+      <h2 class="text-3xl font-display font-bold text-music-text">Resend Confirmation</h2>
+      <p class="text-music-text-secondary mt-2">We'll send you a new confirmation email</p>
+    </div>
 
-<%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: "space-y-6" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) %>
+      <div>
+        <%= f.label :email, class: "block text-sm font-medium text-music-text mb-2" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-envelope text-music-text-secondary"></i>
+          </div>
+          <%= f.email_field :email, 
+                autofocus: true, 
+                autocomplete: "email", 
+                value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email),
+                class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-secondary focus:border-music-secondary transition-colors duration-200",
+                placeholder: "your@email.com" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.submit "Resend Confirmation", 
+              class: "w-full py-3 px-4 bg-music-secondary text-white font-semibold rounded-button shadow-button hover:bg-music-secondary/90 focus:outline-none focus:ring-2 focus:ring-music-secondary focus:ring-opacity-50 transition-all duration-200 transform hover:scale-[1.02]" %>
+      </div>
+    <% end %>
+
+    <div class="mt-6 text-center">
+      <%= render "devise/shared/links" %>
+    </div>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Resend confirmation instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

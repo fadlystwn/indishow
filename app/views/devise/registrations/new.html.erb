@@ -1,35 +1,194 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
-  <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Sign up</h2>
+<div class="flex items-center justify-center min-h-screen bg-music-background py-12">
+  <div class="w-full max-w-md p-8 bg-music-surface rounded-genre shadow-genre">
+    <div class="text-center mb-8">
+      <i class="fas fa-user-plus text-4xl text-music-primary mb-4"></i>
+      <h2 class="text-3xl font-display font-bold text-music-text">Join Skenaria</h2>
+      <p class="text-music-text-secondary mt-2">Create your music account</p>
+    </div>
 
-    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
+      <!-- Email -->
       <div>
-        <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <%= f.label :email, class: "block text-sm font-medium text-music-text mb-2" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-envelope text-music-text-secondary"></i>
+          </div>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", 
+                class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200", 
+                placeholder: "you@example.com" %>
+        </div>
       </div>
 
+      <!-- Role Selection -->
       <div>
-        <%= f.label :password, class: "block text-sm font-medium text-gray-700" %>
-        <% if @minimum_password_length %>
-          <em class="text-xs text-gray-500">(<%= @minimum_password_length %> characters minimum)</em>
-        <% end %>
-        <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <%= f.label :role, "Account Type", class: "block text-sm font-medium text-music-text mb-2" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-users text-music-text-secondary"></i>
+          </div>
+          <%= f.select :role,
+              User.roles.keys.map { |r| [r.humanize, r] },
+              { prompt: "Select your account type" },
+              class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button appearance-none text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200" %>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i class="fas fa-chevron-down text-music-text-secondary"></i>
+          </div>
+        </div>
       </div>
 
+      <!-- Profile Fields -->
+      <%= f.fields_for :profile do |pf| %>
+        <!-- Name -->
+        <div>
+          <%= pf.label :name, "Display Name", class: "block text-sm font-medium text-music-text mb-2" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-music-text-secondary"></i>
+            </div>
+            <%= pf.text_field :name, 
+                  class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                  placeholder: "Your public display name" %>
+          </div>
+        </div>
+
+        <!-- Dynamic Fields Based on Role -->
+        <div id="role-specific-fields" class="hidden">
+          <!-- Artist Fields (hidden by default) -->
+          <div id="artist-fields" class="space-y-4">
+            <div>
+              <%= pf.label :bio, "Artist Bio", class: "block text-sm font-medium text-music-text mb-2" %>
+              <%= pf.text_area :bio, rows: 3,
+                    class: "block w-full px-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                    placeholder: "Tell us about your music..." %>
+            </div>
+
+            <div>
+              <%= pf.label :website_url, "Website", class: "block text-sm font-medium text-music-text mb-2" %>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-link text-music-text-secondary"></i>
+                </div>
+                <%= pf.text_field :website_url,
+                      class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                      placeholder: "https://yourwebsite.com" %>
+              </div>
+            </div>
+
+            <div>
+              <%= pf.label :location, class: "block text-sm font-medium text-music-text mb-2" %>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-map-marker-alt text-music-text-secondary"></i>
+                </div>
+                <%= pf.text_field :location,
+                      class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                      placeholder: "Your city or region" %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fan Fields (hidden by default) -->
+          <div id="fan-fields" class="space-y-4">
+            <div>
+              <%= pf.label :favorite_genres, "Favorite Genres", class: "block text-sm font-medium text-music-text mb-2" %>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-music text-music-text-secondary"></i>
+                </div>
+                <%= pf.text_field :favorite_genres,
+                  class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                  placeholder: "Rock, Jazz, Hip Hop, etc." %>
+              </div>
+              <p class="mt-1 text-xs text-music-text-secondary">Separate multiple genres with commas</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Password -->
       <div>
-        <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700" %>
-        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <div class="flex justify-between items-center">
+          <%= f.label :password, class: "block text-sm font-medium text-music-text" %>
+          <% if @minimum_password_length %>
+            <span class="text-xs text-music-text-secondary"><%= @minimum_password_length %> characters minimum</span>
+          <% end %>
+        </div>
+        <div class="relative mt-2">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-lock text-music-text-secondary"></i>
+          </div>
+          <%= f.password_field :password, autocomplete: "new-password", 
+                class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                placeholder: "••••••••" %>
+        </div>
       </div>
 
+      <!-- Password Confirmation -->
       <div>
-        <%= f.submit "Sign up", class: "w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition" %>
+        <%= f.label :password_confirmation, class: "block text-sm font-medium text-music-text mb-2" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-lock text-music-text-secondary"></i>
+          </div>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", 
+                class: "block w-full pl-10 pr-3 py-3 bg-music-background border border-music-text-secondary/30 rounded-button text-music-text placeholder-music-text-secondary focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors duration-200",
+                placeholder: "••••••••" %>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div>
+        <%= f.submit "Create Account", 
+              class: "w-full py-3 px-4 bg-music-primary text-white font-semibold rounded-button shadow-button hover:bg-music-primary/90 focus:outline-none focus:ring-2 focus:ring-music-primary focus:ring-opacity-50 transition-all duration-200 transform hover:scale-[1.02]" %>
       </div>
     <% end %>
 
-    <div class="text-center mt-4">
-      <%= render "devise/shared/links" %>
+    <!-- Devise Links -->
+    <div class="mt-6">
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-music-text-secondary/30"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-music-surface text-music-text-secondary">Already have an account?</span>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <%= render "devise/shared/links" %>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.querySelector('#user_role');
+    const roleSpecificFields = document.getElementById('role-specific-fields');
+    const artistFields = document.getElementById('artist-fields');
+    const fanFields = document.getElementById('fan-fields');
+
+    function toggleFields() {
+      if (roleSelect.value === 'artist') {
+        roleSpecificFields.classList.remove('hidden');
+        artistFields.classList.remove('hidden');
+        fanFields.classList.add('hidden');
+      } else if (roleSelect.value === 'fan') {
+        roleSpecificFields.classList.remove('hidden');
+        artistFields.classList.add('hidden');
+        fanFields.classList.remove('hidden');
+      } else {
+        roleSpecificFields.classList.add('hidden');
+      }
+    }
+
+    // Initialize on page load
+    toggleFields();
+
+    // Add event listener for changes
+    roleSelect.addEventListener('change', toggleFields);
+  });
+</script>

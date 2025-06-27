@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html class="bg-music-background">
   <head>
-    <title><%= content_for(:title) || "Indishow" %></title>
+    <title><%= content_for(:title) || "Skenaria" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
@@ -14,10 +14,29 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter and Bebas Neue -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
   </head>
 
-  <body class="bg-gray-100">
-    <%= yield %>
+  <body class="min-h-screen bg-music-background text-music-text font-sans antialiased">
+    <div class="flex flex-col min-h-screen">
+      <%= render 'shared/header' %>
+      
+      <% if flash.any? %>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+          <%= render 'shared/flash_messages' %>
+        </div>
+      <% end %>
+
+      <main class="flex-grow">
+        <%= yield %>
+      </main>
+
+      <%= render 'shared/footer' %>
+    </div>
   </body>
 </html>
