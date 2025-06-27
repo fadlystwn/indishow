@@ -29,15 +29,15 @@
     <div class="bg-music-surface rounded-lg shadow-lg border border-music-border p-8"
          data-controller="release-wizard" 
          data-release-wizard-step-value="3"
-         data-release-wizard-selected-type-value="<%= @release_draft.release_type %>"
+         data-release-wizard-selected-type-value="<%= @release.release_type %>"
          data-release-wizard-track-requirements-value="<%= @track_requirements.to_json %>"
-         data-release-wizard-base-url-value="<%= release_wizard_path(@release_draft.id) %>"
-         data-release-wizard-update-url-value="<%= update_step_release_wizard_path(@release_draft.id) %>">
+         data-release-wizard-base-url-value="<%= release_wizard_path(@release.id) %>"
+         data-release-wizard-update-url-value="<%= update_step_release_wizard_path(@release.id) %>">
       
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-music-text mb-2">Upload Your Tracks</h1>
         <p class="text-music-text-secondary text-lg mb-4">
-          Add tracks to your <%= @release_draft.release_type.titleize.downcase %>
+          Add tracks to your <%= @release.release_type.titleize.downcase %>
         </p>
         <div class="inline-flex items-center px-4 py-2 bg-teal-50 border border-teal-200 rounded-md">
           <i class="fas fa-info-circle text-teal-600 mr-2"></i>
@@ -110,7 +110,7 @@
       <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-medium text-music-text">Uploaded Tracks</h3>
-          <% if @release_draft.release_type == 'single' %>
+          <% if @release.release_type == 'single' %>
             <span class="text-sm text-gray-500">Max 1 track</span>
           <% else %>
             <span class="text-sm text-gray-500">
@@ -135,7 +135,7 @@
                       <% end %>
                     </div>
                   </div>
-                  <%= link_to release_track_path(@release_draft, track), 
+                  <%= link_to release_track_path(@release, track), 
                             method: :delete,
                             data: { turbo_confirm: "Are you sure?" },
                             class: "text-red-500 hover:text-red-700" do %>
@@ -165,7 +165,7 @@
 
       <!-- Navigation -->
       <div class="flex justify-between items-center pt-6 border-t border-music-border">
-        <%= link_to "Back", step2_release_wizard_path(@release_draft), 
+        <%= link_to "Back", step2_release_wizard_path(@release), 
                     class: "px-6 py-3 border border-music-border rounded-md text-music-text hover:bg-music-background transition-colors" %>
         
         <button type="button" 

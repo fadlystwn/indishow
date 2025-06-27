@@ -14,7 +14,7 @@
 
       <!-- Success Message -->
       <h1 class="text-3xl font-bold text-music-text mb-4">
-        🎉 Release Published Successfully!
+        🎉 Release Created Successfully!
       </h1>
       
       <div class="mb-6">
@@ -22,7 +22,7 @@
           "<%= @release.title %>" by <%= @release.artist %>
         </h2>
         <p class="text-music-text-secondary">
-          Your <%= @release.release_type.titleize %> is now live and available for purchase!
+          Your <%= @release.release_type.titleize %> has been created successfully!
         </p>
       </div>
 
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Social sharing functions
   window.shareOnTwitter = function() {
-    const text = `🎵 Just released my new ${releaseData.type}: "${releaseData.title}" by ${releaseData.artist}! Check it out:`;
+    const text = `🎵 Just created my new ${releaseData.type}: "${releaseData.title}" by ${releaseData.artist}! Check it out:`;
     const url = releaseData.url;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
   };

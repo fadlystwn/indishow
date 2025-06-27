@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   resources :release_wizard, only: [ :show, :create ] do
     collection do
       get :step1
-      post :create_draft
+      post :create_release
     end
     member do
       get :step2
@@ -27,7 +27,6 @@ Rails.application.routes.draw do
       get :success
       get :debug
       post :update_step
-      post :publish  # Add this line for publishing action
     end
   end
 
