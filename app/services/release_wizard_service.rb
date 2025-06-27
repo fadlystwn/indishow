@@ -22,7 +22,16 @@ class ReleaseWizardService
       Rails.logger.info "🖼️ [COVER_ART] Uploading cover art for release #{release.id}"
     end
 
-    release.update(params)
+    # Skip track validation during step 2
+    release.skip_track_validation!
+    result = release.update(params)
+
+    Rails.logger.info "📝 [STEP2] Updated release #{release.id}: #{result ? 'success' : 'failed'}"
+    if !result
+      Rails.logger.warn "📝 [STEP2] Errors: #{release.errors.full_messages.join(', ')}"
+    end
+
+    result
   end
 
   def update_step3(release, tracks_params, audio_files_params)
@@ -74,6 +83,9 @@ class ReleaseWizardService
 
   def validate_release_for_publishing(release)
     Rails.logger.info "🔍 [RELEASE_WIZARD] Validating release #{release.id} for publishing"
+
+    # Require track validation for final validation
+    release.require_track_validation!
 
     errors = []
 
