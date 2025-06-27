@@ -4,7 +4,7 @@
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-music-text mb-2">Release Debug Info</h1>
         <p class="text-music-text-secondary">
-          Detailed information about release #<%= @release_draft.id %>
+          Detailed information about release #<%= @release.id %>
         </p>
       </div>
 
@@ -17,33 +17,33 @@
               <dt class="text-sm font-medium text-gray-600">Status</dt>
               <dd class="mt-1">
                 <span class="px-2 py-1 text-sm rounded-full
-                  <%= @release_draft.published? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
-                  <%= @release_draft.status.titleize %>
+                  <%= @release.published? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                  <%= @release.status.titleize %>
                 </span>
               </dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-600">Release Type</dt>
-              <dd class="mt-1 text-gray-900"><%= @release_draft.release_type.titleize %></dd>
+              <dd class="mt-1 text-gray-900"><%= @release.release_type.titleize %></dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-600">Title</dt>
-              <dd class="mt-1 text-gray-900"><%= @release_draft.title.presence || '(not set)' %></dd>
+              <dd class="mt-1 text-gray-900"><%= @release.title.presence || '(not set)' %></dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-600">Artist</dt>
-              <dd class="mt-1 text-gray-900"><%= @release_draft.artist.presence || '(not set)' %></dd>
+              <dd class="mt-1 text-gray-900"><%= @release.artist.presence || '(not set)' %></dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-600">Release Date</dt>
               <dd class="mt-1 text-gray-900">
-                <%= @release_draft.release_date&.strftime("%B %d, %Y") || '(not set)' %>
+                <%= @release.release_date&.strftime("%B %d, %Y") || '(not set)' %>
               </dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-600">Cover Art</dt>
               <dd class="mt-1">
-                <% if @release_draft.cover_art.attached? %>
+                <% if @release.cover_art.attached? %>
                   <span class="text-green-600">✓ Attached</span>
                 <% else %>
                   <span class="text-red-600">✗ Missing</span>
@@ -114,11 +114,11 @@
       <!-- Actions -->
       <div class="flex justify-between items-center">
         <%= link_to "Return to Edit", 
-            release_wizard_path(@release_draft),
+            release_wizard_path(@release),
             class: "bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200" %>
         
-        <% if @validation_errors.empty? && !@release_draft.published? %>
-          <%= form_tag publish_release_wizard_path(@release_draft), method: :post, class: "inline" do %>
+        <% if @validation_errors.empty? && !@release.published? %>
+          <%= form_tag publish_release_wizard_path(@release), method: :post, class: "inline" do %>
             <%= submit_tag "Attempt Publish", 
                 class: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200",
                 data: { turbo_confirm: "Are you sure you want to attempt publishing this release?" } %>
