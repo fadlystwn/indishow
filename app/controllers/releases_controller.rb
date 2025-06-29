@@ -6,12 +6,10 @@ class ReleasesController < ApplicationController
   before_action :prevent_modifying_published_release!, only: [ :edit, :update, :destroy ]
 
   def index
-    @releases = current_user.releases.published.order(release_date: :desc)
+    @releases = current_user.releases.order(release_date: :desc)
   end
 
-  def show
-    # Publicly accessible show page
-  end
+  def show; end
 
   def edit
     respond_to do |format|
@@ -21,43 +19,40 @@ class ReleasesController < ApplicationController
   end
 
   def update
-    Rails.logger.info "📝 Updating release: #{@release.title} (ID: #{@release.id})"
-
     if @release.update(release_params)
-      Rails.logger.info "✅ Release updated successfully: #{@release.title}"
-      redirect_to release_path(@release), notice: "Release was successfully updated."
+      redirect_to dashboard_path, notice: "Release was successfully updated."
     else
-      Rails.logger.warn "❌ Release update failed: #{@release.errors.full_messages.join(', ')}"
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @release_title = @release.title
+    title = @release.title
     @release.destroy
-
     respond_to do |format|
-      format.html { redirect_to dashboard_path, notice: "Release \"#{@release_title}\" was successfully deleted." }
-      format.turbo_stream { flash.now[:notice] = "Release \"#{@release_title}\" was successfully deleted." }
+      format.html { redirect_to dashboard_path, notice: "Release \"#{title}\" was successfully deleted." }
+      format.turbo_stream { flash.now[:notice] = "Release \"#{title}\" was successfully deleted." }
     end
   end
 
   private
 
   def set_release
+    numeric = params[:id].match?(/\A\d+\z/)
+
     if action_name == "show"
-      @release = if params[:id].match?(/\A\d+\z/)
-                   Release.published.find(params[:id])
-      else
-                   Release.published.find_by!(slug: params[:id])
+      scope = Release.published
+      @release = numeric ? scope.find_by(id: params[:id]) : scope.find_by(slug: params[:id])
+      if @release.nil? && user_signed_in?
+        owner_scope = current_user.releases
+        @release = numeric ? owner_scope.find_by(id: params[:id]) : owner_scope.find_by(slug: params[:id])
       end
     else
-      @release = if params[:id].match?(/\A\d+\z/)
-                   Release.find(params[:id])
-      else
-                   Release.find_by!(slug: params[:id])
-      end
+      scope = Release
+      @release = numeric ? scope.find_by(id: params[:id]) : scope.find_by(slug: params[:id])
     end
+
+    raise ActiveRecord::RecordNotFound unless @release
   end
 
   def authorize_release_owner!
