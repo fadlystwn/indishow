@@ -1,47 +1,28 @@
 class ReleasesController < ApplicationController
-  before_action :authenticate_user!, except: [:show] # Allow public access to show
-  before_action :authorize_artist_user!, except: [:show] # Restrict fan users from all actions except show
-  before_action :set_release, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_release_owner!, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!, except: [ :show ]
+  before_action :authorize_artist_user!, except: [ :show ]
+  before_action :set_release, only: [ :show, :edit, :update, :destroy ]
+  before_action :authorize_release_owner!, only: [ :edit, :update, :destroy ]
+  before_action :prevent_modifying_published_release!, only: [ :edit, :update, :destroy ]
 
   def index
     @releases = current_user.releases.published.order(release_date: :desc)
   end
 
   def show
-    # @release is already set by set_release
-    # Show page is accessible by everyone (fans can view and buy)
-  end
-
-  def new
-    @release = current_user.releases.new
-  end
-
-  def create
-    Rails.logger.info "📀 Creating release: #{release_params[:title]} by #{release_params[:artist]}"
-    
-    @release = current_user.releases.new(release_params)
-
-    if @release.save
-      Rails.logger.info "✅ Release created successfully: #{@release.title}"
-      redirect_to release_path(@release), notice: "Release was successfully created."
-    else
-      Rails.logger.warn "❌ Release creation failed: #{@release.errors.full_messages.join(', ')}"
-      render :new, status: :unprocessable_entity
-    end
+    # Publicly accessible show page
   end
 
   def edit
-    # @release is already set by the before_action :set_release
     respond_to do |format|
-      format.html # Renders the edit template
-      format.turbo_stream # For Turbo Frame responses
+      format.html
+      format.turbo_stream
     end
   end
 
   def update
     Rails.logger.info "📝 Updating release: #{@release.title} (ID: #{@release.id})"
-    
+
     if @release.update(release_params)
       Rails.logger.info "✅ Release updated successfully: #{@release.title}"
       redirect_to release_path(@release), notice: "Release was successfully updated."
@@ -64,20 +45,18 @@ class ReleasesController < ApplicationController
   private
 
   def set_release
-    if action_name == 'show'
-      # For show action, only find published releases (public access)
+    if action_name == "show"
       @release = if params[:id].match?(/\A\d+\z/)
                    Release.published.find(params[:id])
-                 else
+      else
                    Release.published.find_by!(slug: params[:id])
-                 end
+      end
     else
-      # For edit/update/destroy, find the release first, then authorize ownership
       @release = if params[:id].match?(/\A\d+\z/)
                    Release.find(params[:id])
-                 else
+      else
                    Release.find_by!(slug: params[:id])
-                 end
+      end
     end
   end
 
@@ -94,11 +73,18 @@ class ReleasesController < ApplicationController
       redirect_to root_path
     end
   end
+
+  def prevent_modifying_published_release!
+    if @release.published?
+      flash[:alert] = "This release is already published and cannot be modified."
+      redirect_to release_path(@release)
+    end
+  end
+
   def release_params
     params.require(:release).permit(
       :title,
       :artist,
-      :release_type,
       :release_date,
       :price,
       :description,
