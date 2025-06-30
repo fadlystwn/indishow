@@ -1,9 +1,9 @@
 class ReleasesController < ApplicationController
-  before_action :authenticate_user!, except: [ :show ]
-  before_action :authorize_artist_user!, except: [ :show ]
-  before_action :set_release, only: [ :show, :edit, :update, :destroy ]
-  before_action :authorize_release_owner!, only: [ :edit, :update, :destroy ]
-  before_action :prevent_modifying_published_release!, only: [ :edit, :update, :destroy ]
+  before_action :authenticate_user!,              except: [ :show ]
+  before_action :authorize_artist_user!,          except: [ :show ]
+  before_action :set_release,                     only: [ :show, :edit, :update, :destroy, :publish ]
+  before_action :authorize_release_owner!,        only: [ :edit, :update, :destroy, :publish ]
+  before_action :prevent_modifying_published_release!, only: [ :edit, :update, :destroy, :publish ]
 
   def index
     @releases = current_user.releases.order(release_date: :desc)
@@ -32,6 +32,18 @@ class ReleasesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to dashboard_path, notice: "Release \"#{title}\" was successfully deleted." }
       format.turbo_stream { flash.now[:notice] = "Release \"#{title}\" was successfully deleted." }
+    end
+  end
+
+  def publish
+    service = ReleaseWizardService.new(current_user)
+    errors  = service.validate_release_for_publishing(@release)
+
+    if errors.empty?
+      @release.update!(status: "published")
+      redirect_to dashboard_path, notice: "Release published!"
+    else
+      redirect_to edit_release_path(@release), alert: errors.join(", ")
     end
   end
 

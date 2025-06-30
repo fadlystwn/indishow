@@ -1,28 +1,22 @@
 <div class="min-h-screen bg-music-background">
-  <!-- Page Header -->
-  <div class="bg-music-surface shadow-genre border-b border-music-border">
-    <div class="container mx-auto px-4 py-6">
-      <h1 class="text-3xl font-bold font-display text-music-text">Browse Music</h1>
-      <p class="text-music-text-secondary mt-2">Discover amazing independent music from talented artists</p>
-    </div>
-  </div>
+
 
   <div class="container mx-auto px-4 py-8">
-    <!-- Filters and Sort Controls -->
-    <div class="bg-music-surface rounded-genre shadow-genre border border-music-border p-6 mb-8">
-      <%= form_with url: music_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4 items-end" do |form| %>
+    <!-- Enhanced Filters with Bandcamp-style layout -->
+    <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre border border-music-border/50 p-6 mb-8">
+      <%= form_with url: music_path, method: :get, local: true, class: "space-y-4 md:space-y-0 md:grid md:grid-cols-4 md:gap-4 items-end" do |form| %>
         <!-- Genre Filter -->
         <div>
-          <%= form.label :genre, "Genre", class: "block text-sm font-medium text-music-text mb-2" %>
+          <%= form.label :genre, "GENRE", class: "block text-xs font-medium text-music-text-secondary uppercase tracking-wider mb-2" %>
           <%= form.select :genre, 
                 options_for_select([['All Genres', '']] + @available_genres.map { |g| [g, g] }, @current_genre),
                 {},
-                class: "w-full px-3 py-2 bg-music-background border border-music-border rounded-button text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors" %>
+                class: "w-full px-4 py-2 bg-music-background/20 border border-music-border/50 rounded-genre text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all appearance-none" %>
         </div>
 
         <!-- Release Type Filter -->
         <div>
-          <%= form.label :type, "Type", class: "block text-sm font-medium text-music-text mb-2" %>
+          <%= form.label :type, "TYPE", class: "block text-xs font-medium text-music-text-secondary uppercase tracking-wider mb-2" %>
           <%= form.select :type,
                 options_for_select([
                   ['All Types', ''],
@@ -32,12 +26,12 @@
                   ['Compilation', 'compilation']
                 ], @current_type),
                 {},
-                class: "w-full px-3 py-2 bg-music-background border border-music-border rounded-button text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors" %>
+                class: "w-full px-4 py-2 bg-music-background/20 border border-music-border/50 rounded-genre text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all appearance-none" %>
         </div>
 
         <!-- Sort Options -->
         <div>
-          <%= form.label :sort, "Sort by", class: "block text-sm font-medium text-music-text mb-2" %>
+          <%= form.label :sort, "SORT BY", class: "block text-xs font-medium text-music-text-secondary uppercase tracking-wider mb-2" %>
           <%= form.select :sort,
                 options_for_select([
                   ['Newest First', 'newest'],
@@ -47,13 +41,13 @@
                   ['Title A-Z', 'title']
                 ], @current_sort),
                 {},
-                class: "w-full px-3 py-2 bg-music-background border border-music-border rounded-button text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-colors" %>
+                class: "w-full px-4 py-2 bg-music-background/20 border border-music-border/50 rounded-genre text-music-text focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all appearance-none" %>
         </div>
 
         <!-- Filter Button -->
-        <div>
-          <%= form.submit "Apply Filters", 
-                class: "w-full px-4 py-2 bg-music-primary hover:bg-music-primary/90 text-music-text font-medium rounded-button transition-colors shadow-button" %>
+        <div class="flex items-end h-full">
+          <%= form.submit "APPLY FILTERS", 
+                class: "w-full px-4 py-3 bg-music-primary hover:bg-music-primary/90 text-music-background rounded-button font-display tracking-wider transition-colors shadow-button hover:shadow-genre-hover" %>
         </div>
       <% end %>
 
@@ -61,79 +55,83 @@
       <% if params[:genre].present? || params[:type].present? || (params[:sort].present? && params[:sort] != 'newest') %>
         <div class="mt-4 text-center">
           <%= link_to "Clear All Filters", music_path, 
-                class: "text-music-text-secondary hover:text-music-text transition-colors text-sm" %>
+                class: "text-music-text-secondary hover:text-music-primary transition-colors text-sm flex items-center justify-center" do %>
+            <i class="fas fa-times mr-1"></i>
+            <span>Reset Filters</span>
+          <% end %>
         </div>
       <% end %>
     </div>
 
-    <!-- Results Summary -->
-    <div class="flex justify-between items-center mb-6">
-      <div class="text-music-text-secondary">
+    <!-- Results Summary - Bandcamp-style -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 p-4 bg-music-surface/50 rounded-genre border border-music-border/30">
+      <div class="text-music-text-secondary mb-2 md:mb-0">
         <% if @releases.total_count > 0 %>
-          Showing <%= @releases.offset_value + 1 %>-<%= [@releases.offset_value + @releases.limit_value, @releases.total_count].min %> 
-          of <%= @releases.total_count %> releases
+          Showing <span class="font-medium text-music-text"><%= @releases.offset_value + 1 %>-<%= [@releases.offset_value + @releases.limit_value, @releases.total_count].min %></span> 
+          of <span class="font-medium text-music-text"><%= @releases.total_count %></span> releases
         <% else %>
-          No releases found
+          <span class="text-music-text-secondary">No releases found</span>
         <% end %>
       </div>
       
       <div class="text-music-text-secondary text-sm">
-        Page <%= @releases.current_page %> of <%= @releases.total_pages %>
+        Page <span class="font-medium text-music-text"><%= @releases.current_page %></span> of <span class="font-medium text-music-text"><%= @releases.total_pages %></span>
       </div>
     </div>
 
-    <!-- Music Grid (4 columns) -->
+    <!-- Music Grid (4 columns) with Bandcamp styling -->
     <% if @releases.any? %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
         <% @releases.each do |release| %>
-          <div class="bg-music-surface rounded-genre shadow-genre hover:shadow-genre-hover border border-music-border overflow-hidden transition-all duration-200 group">
-            <!-- Cover Art -->
-            <div class="aspect-square relative bg-music-background">
+          <div class="bg-gradient-to-br from-music-surface to-music-background/50 rounded-genre shadow-genre hover:shadow-genre-hover overflow-hidden transition-all duration-300 group relative">
+            <!-- Cover Art with Glow Effect -->
+            <div class="aspect-square relative overflow-hidden">
               <% if release.cover_art.attached? %>
                 <%= image_tag release.cover_art.variant(:medium), 
                       alt: release.title, 
-                      class: "w-full h-full object-cover group-hover:opacity-75 transition-opacity duration-200" %>
+                      class: "w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" %>
               <% else %>
-                <div class="w-full h-full bg-gradient-to-br from-music-primary to-music-secondary flex items-center justify-center">
-                  <i class="fas fa-music text-music-text text-4xl opacity-50"></i>
+                <div class="w-full h-full bg-gradient-to-br from-music-primary/10 to-music-secondary/10 flex items-center justify-center">
+                  <div class="relative">
+                    <i class="fas fa-compact-disc text-5xl text-music-text-secondary/30 animate-spin-slow"></i>
+                    <div class="absolute inset-0 rounded-full border-8 border-transparent border-t-music-primary/30 border-r-music-secondary/30 animate-spin-slow"></div>
+                  </div>
                 </div>
               <% end %>
               
-              <!-- Play Button Overlay -->
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <button class="bg-music-primary/90 hover:bg-music-primary text-music-text rounded-full p-4 shadow-button transform hover:scale-105 transition-all duration-200">
-                  <i class="fas fa-play text-xl"></i>
-                </button>
-              </div>
-
+              <!-- Gradient Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              <!-- Play Button -->
+              <button class="absolute bottom-4 right-4 w-12 h-12 bg-music-accent text-music-background rounded-full flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
+                <i class="fas fa-play"></i>
+              </button>
+              
               <!-- Release Type Badge -->
-              <div class="absolute top-2 left-2">
-                <span class="px-2 py-1 bg-music-surface/90 text-music-text text-xs font-medium rounded-button backdrop-blur-sm">
+              <div class="absolute top-4 left-4">
+                <span class="px-3 py-1 bg-music-surface/90 text-music-text text-xs font-bold rounded-full backdrop-blur-sm shadow-sm">
                   <%= release.release_type.titleize %>
                 </span>
               </div>
-
-              <!-- Genre Badge -->
-              <% if release.genre.present? %>
-                <div class="absolute top-2 right-2">
-                  <span class="px-2 py-1 bg-music-primary/90 text-music-text text-xs font-medium rounded-button backdrop-blur-sm">
-                    <%= release.genre %>
-                  </span>
-                </div>
-              <% end %>
             </div>
 
             <!-- Release Info -->
-            <div class="p-4">
-              <div class="mb-2">
+            <div class="p-5 relative z-10">
+              <!-- Floating Price Tag -->
+              <div class="absolute -top-5 right-4 bg-music-accent text-music-background px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                <%= number_to_currency(release.price) %>
+              </div>
+              
+              <!-- Title & Artist -->
+              <div class="mb-4">
                 <% if release.slug.present? %>
-                  <%= link_to release_path(release), class: "block" do %>
-                    <h3 class="text-lg font-semibold text-music-text hover:text-music-primary transition-colors line-clamp-1">
+                  <%= link_to release_path(release), class: "block group" do %>
+                    <h3 class="text-xl font-bold text-music-text hover:text-music-primary transition-colors line-clamp-1">
                       <%= release.title %>
                     </h3>
                   <% end %>
                 <% else %>
-                  <h3 class="text-lg font-semibold text-music-text line-clamp-1">
+                  <h3 class="text-xl font-bold text-music-text line-clamp-1">
                     <%= release.title %>
                   </h3>
                 <% end %>
@@ -150,47 +148,64 @@
                 <% end %>
               </div>
 
-              <!-- Release Details -->
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-music-text-secondary text-sm">
-                  <%= release.release_date.strftime("%Y") %>
-                </span>
-                <span class="text-music-accent font-semibold">
-                  <%= number_to_currency(release.price) %>
+              <!-- Metadata -->
+              <div class="flex justify-between items-center text-sm text-music-text-secondary mb-5">
+                <% if release.genre.present? %>
+                  <span class="inline-flex items-center">
+                    <i class="fas fa-tag text-xs mr-1"></i>
+                    <%= release.genre %>
+                  </span>
+                <% end %>
+                <span>
+                  <%= release.release_date.strftime("%b %Y") %>
                 </span>
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex gap-2">
+              <div class="flex gap-3">
                 <% if release.slug.present? %>
                   <%= link_to release_path(release), 
-                        class: "flex-1 flex items-center justify-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-text px-3 py-2 rounded-button text-sm font-medium transition-colors shadow-button" do %>
+                        class: "flex-1 flex items-center justify-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-background px-3 py-2 rounded-full text-sm font-medium transition-colors shadow-button hover:shadow-md" do %>
                     <i class="fas fa-eye"></i>
                     <span>View</span>
                   <% end %>
                 <% end %>
                 
-                <button class="flex items-center justify-center gap-2 bg-music-surface hover:bg-music-border text-music-text border border-music-border px-3 py-2 rounded-button text-sm font-medium transition-colors">
+                <button class="flex-1 flex items-center justify-center gap-2 bg-music-surface hover:bg-music-primary/10 text-music-text px-3 py-2 rounded-full text-sm font-medium transition-colors shadow-sm hover:shadow-md">
                   <i class="fas fa-cart-plus"></i>
                   <span>Add</span>
                 </button>
               </div>
             </div>
+            
+            <!-- Hover Glow Effect -->
+            <div class="absolute inset-0 rounded-genre overflow-hidden pointer-events-none">
+              <div class="absolute -inset-1 bg-music-primary/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
           </div>
         <% end %>
       </div>
 
-      <!-- Pagination -->
-      <div class="flex justify-center">
-        <%= paginate @releases %>
+      <!-- Pagination - Bandcamp-style -->
+      <div class="flex justify-center mt-8">
+        <div class="inline-flex rounded-genre border border-music-border/50 overflow-hidden">
+          <%= paginate @releases, 
+                window: 2,
+                left: 1,
+                right: 1,
+                class: "flex",
+                previous_label: raw('<i class="fas fa-chevron-left"></i>'),
+                next_label: raw('<i class="fas fa-chevron-right"></i>'),
+                page_links: false %>
+        </div>
       </div>
     <% else %>
-      <!-- Empty State -->
+      <!-- Empty State - Bandcamp-style -->
       <div class="text-center py-16">
-        <div class="bg-music-surface rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 border border-music-border">
-          <i class="fas fa-music text-4xl text-music-text-secondary"></i>
+        <div class="bg-music-surface/50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 border border-music-border/50">
+          <i class="fas fa-music text-4xl text-music-text-secondary/50"></i>
         </div>
-        <h3 class="text-2xl font-semibold text-music-text mb-2">No music found</h3>
+        <h3 class="text-2xl font-display tracking-tight text-music-text mb-2">No music found</h3>
         <p class="text-music-text-secondary mb-6 max-w-md mx-auto">
           <% if params[:genre].present? || params[:type].present? %>
             Try adjusting your filters to see more results.
@@ -200,10 +215,10 @@
         </p>
         
         <% if params[:genre].present? || params[:type].present? %>
-          <%= link_to "Clear Filters", music_path, 
-                class: "inline-flex items-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-text px-6 py-3 rounded-button font-medium transition-colors shadow-button" do %>
+          <%= link_to music_path, 
+                class: "inline-flex items-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-background px-6 py-3 rounded-button font-display tracking-wider transition-colors shadow-button hover:shadow-genre-hover" do %>
             <i class="fas fa-filter"></i>
-            <span>Clear All Filters</span>
+            <span>CLEAR FILTERS</span>
           <% end %>
         <% end %>
       </div>
@@ -211,12 +226,58 @@
   </div>
 </div>
 
-<!-- Utility Styles -->
+<!-- Custom Styles -->
 <style>
   .line-clamp-1 {
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+  .pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .pagination a, .pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: theme('colors.music.surface');
+    color: theme('colors.music.text');
+    border-right: 1px solid theme('colors.music.border/0.5');
+    transition: all 0.2s ease;
+  }
+  
+  .pagination a:hover {
+    background: theme('colors.music.background/0.2');
+    color: theme('colors.music.primary');
+  }
+  
+  .pagination .current {
+    background: theme('colors.music.primary');
+    color: theme('colors.music.background');
+    font-weight: bold;
+  }
+  
+  .pagination .first, .pagination .last {
+    display: none;
+  }
+  
+  .pagination .gap {
+    pointer-events: none;
   }
 </style>

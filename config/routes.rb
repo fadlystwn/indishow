@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   end
 
   resources :releases do
+    member { patch :publish }
     resources :tracks, only: [ :new, :create, :edit, :update, :destroy ]
   end
   get "home/index"
