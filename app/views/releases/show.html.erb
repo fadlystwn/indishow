@@ -23,7 +23,9 @@
             </div>
           <% end %>
           <!-- Play button overlay -->
-          <button class="absolute bottom-4 right-4 w-12 h-12 bg-music-accent rounded-full flex items-center justify-center text-music-background shadow-lg hover:scale-105 transition-transform">
+          <button data-action="click->releases#playAll"
+                  data-release-id="<%= @release.id %>"
+                  class="absolute bottom-4 right-4 w-12 h-12 bg-music-accent rounded-full flex items-center justify-center text-music-background shadow-lg hover:scale-105 transition-transform">
             <i class="fas fa-play text-lg"></i>
           </button>
         </div>
@@ -71,18 +73,25 @@
           <p>Album description would go here. This is where artists typically share information about the release, credits, or story behind the music.</p>
         </div>
       </div>
-    </div>
-
-    <!-- Track listing (Bandcamp style) -->
-    <div class="border-t border-music-border pt-8">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold">Tracks</h3>
-        <% if user_signed_in? && current_user == @release.user %>
-          <%= link_to new_release_track_path(@release), class: "text-sm bg-music-surface hover:bg-music-border border border-music-border px-4 py-2 rounded transition-colors" do %>
-            <i class="fas fa-plus mr-2"></i>Add Track
-          <% end %>
-        <% end %>
-      </div>
+    </div>      <!-- Track listing (Bandcamp style) -->
+      <div class="border-t border-music-border pt-8" data-controller="releases">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold">Tracks</h3>
+          <div class="flex items-center space-x-4">
+            <% if @release.tracks.any?(&:streamable?) %>
+              <button data-action="click->releases#playAll"
+                      data-release-id="<%= @release.id %>"
+                      class="bg-music-accent hover:bg-music-accent/90 text-music-background px-4 py-2 rounded transition-colors font-medium">
+                <i class="fas fa-play mr-2"></i>Play All
+              </button>
+            <% end %>
+            <% if user_signed_in? && current_user == @release.user %>
+              <%= link_to new_release_track_path(@release), class: "text-sm bg-music-surface hover:bg-music-border border border-music-border px-4 py-2 rounded transition-colors" do %>
+                <i class="fas fa-plus mr-2"></i>Add Track
+              <% end %>
+            <% end %>
+          </div>
+        </div>
 
       <% if @release.tracks.any? %>
         <div class="space-y-1">
@@ -107,9 +116,25 @@
                       </button>
                     <% end %>
                   <% end %>
-                  <button class="w-8 h-8 flex items-center justify-center bg-music-surface rounded-full text-music-accent hover:bg-music-accent hover:text-music-background transition-colors">
-                    <i class="fas fa-play text-xs"></i>
-                  </button>
+                  <% if track.streamable? %>
+                    <button data-action="click->releases#playTrack"
+                            data-track-id="<%= track.id %>"
+                            data-release-id="<%= @release.id %>"
+                            data-track-title="<%= track.title %>"
+                            data-track-artist="<%= @release.artist %>"
+                            data-track-position="<%= track.position %>"
+                            data-track-duration="<%= track.duration %>"
+                            <% if @release.cover_art.attached? %>
+                              data-track-cover-art="<%= rails_blob_path(@release.cover_art.variant(:thumb), only_path: true) %>"
+                            <% end %>
+                            class="w-8 h-8 flex items-center justify-center bg-music-surface rounded-full text-music-accent hover:bg-music-accent hover:text-music-background transition-colors">
+                      <i class="fas fa-play text-xs"></i>
+                    </button>
+                  <% else %>
+                    <div class="w-8 h-8 flex items-center justify-center bg-music-surface rounded-full text-music-text-secondary cursor-not-allowed">
+                      <i class="fas fa-music text-xs opacity-50"></i>
+                    </div>
+                  <% end %>
                 </div>
               </div>
             </div>

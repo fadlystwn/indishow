@@ -32,7 +32,9 @@ Rails.application.routes.draw do
 
   resources :releases do
     member { patch :publish }
-    resources :tracks, only: [ :new, :create, :edit, :update, :destroy ]
+    resources :tracks, only: [ :new, :create, :edit, :update, :destroy ] do
+      member { get :stream }
+    end
   end
   get "home/index"
   root to: "home#index"
