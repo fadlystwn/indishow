@@ -54,8 +54,8 @@
       <!-- Clear Filters -->
       <% if params[:genre].present? || params[:type].present? || (params[:sort].present? && params[:sort] != 'newest') %>
         <div class="mt-4 text-center">
-          <%= link_to "Clear All Filters", music_path, 
-                class: "text-music-text-secondary hover:text-music-primary transition-colors text-sm flex items-center justify-center" do %>
+          <%= link_to music_path, 
+                { class: "text-music-text-secondary hover:text-music-primary transition-colors text-sm flex items-center justify-center" } do %>
             <i class="fas fa-times mr-1"></i>
             <span>Reset Filters</span>
           <% end %>
