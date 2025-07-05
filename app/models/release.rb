@@ -33,7 +33,7 @@ class Release < ApplicationRecord
   end
 
   def to_param
-    slug
+    slug.present? ? slug : id.to_s
   end
 
   def should_validate_tracks?

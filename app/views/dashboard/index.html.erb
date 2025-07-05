@@ -48,10 +48,14 @@
                         <% end %>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-music-text"><%= release.title %></div>
+                        <div class="text-sm font-medium text-music-text">
+                          <%= release.title.present? ? release.title : content_tag(:em, "Untitled Release", class: "text-gray-500") %>
+                        </div>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-music-text-secondary"><%= release.artist %></div>
+                        <div class="text-sm text-music-text-secondary">
+                          <%= release.artist.present? ? release.artist : content_tag(:em, "Unknown Artist", class: "text-gray-500") %>
+                        </div>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-music-secondary bg-opacity-20 text-music-secondary border border-music-secondary border-opacity-30">
@@ -77,7 +81,9 @@
                      
                       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <% if release.persisted? %>
-                        <%= link_to "View", release_path(release), class: "text-blue-600 hover:text-blue-900 mr-3" %>
+                        <% if release.title.present? %>
+                          <%= link_to "View", release_path(release), class: "text-blue-600 hover:text-blue-900 mr-3" %>
+                        <% end %>
                         <%= link_to "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" unless release.published? %>
                         <% unless release.published? %>
                           <%= button_to "Publish",
