@@ -12,8 +12,10 @@ module Audio
         end
 
         # Generate signed URL with 1 hour expiration
-        # Use Rails.application.routes.url_helpers to get proper URL generation
-        url_options = Rails.application.config.action_mailer.default_url_options || { host: "localhost:3000" }
+        # Use proper URL options including host and port
+        url_options = Rails.application.config.action_mailer.default_url_options || { host: "localhost", port: 5000 }
+        url_options = url_options.merge(protocol: "http") unless url_options[:protocol]
+
         Rails.application.routes.url_helpers.rails_blob_url(
           track.audio_file,
           expires_in: 1.hour,
@@ -41,6 +43,9 @@ module Audio
       def track_data_for_player(track, user = nil)
         return nil unless authorized_to_stream?(track, user)
 
+        url_options = Rails.application.config.action_mailer.default_url_options || { host: "localhost", port: 5000 }
+        url_options = url_options.merge(protocol: "http") unless url_options[:protocol]
+
         {
           id: track.id,
           title: track.title,
@@ -49,7 +54,7 @@ module Audio
           position: track.position,
           stream_url: stream_url_for(track, user),
           cover_art_url: track.release.cover_art.attached? ?
-            Rails.application.routes.url_helpers.rails_blob_path(track.release.cover_art.variant(:thumb), only_path: true) :
+            Rails.application.routes.url_helpers.rails_blob_url(track.release.cover_art.variant(:thumb), **url_options) :
             nil
         }
       rescue UnauthorizedError

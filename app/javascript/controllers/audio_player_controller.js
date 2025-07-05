@@ -14,9 +14,9 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("🎵 Audio player connected")
-    
     this.isLoadingTrack = false
+    this.isPlayPending = false
+    this.playbackRetryCount = 0
     
     this.initializePlayer()
     this.loadPlayerState()
@@ -32,7 +32,7 @@ export default class extends Controller {
       try {
         this.plyr.destroy()
       } catch (error) {
-        console.warn("🎵 Error destroying Plyr player:", error)
+        console.warn("Error destroying Plyr player:", error)
       }
       this.plyr = null
     }
@@ -41,8 +41,6 @@ export default class extends Controller {
   initializePlayer() {
     if (this.hasPlayerTarget && !this.plyr) {
       try {
-        console.log("🎵 Initializing Plyr player...")
-        
         this.plyr = new Plyr(this.playerTarget, {
           controls: [],
           hideControls: true,
@@ -54,10 +52,10 @@ export default class extends Controller {
         this.plyr.on('ended', this.handleTrackEnd.bind(this))
         this.plyr.on('error', this.handleError.bind(this))
         this.plyr.on('loadedmetadata', this.handleMetadataLoaded.bind(this))
-        
-        console.log("🎵 Plyr player initialized successfully")
+        this.plyr.on('canplay', this.handleCanPlay.bind(this))
+        this.plyr.on('loadstart', this.handleLoadStart.bind(this))
       } catch (error) {
-        console.error("🎵 Failed to initialize Plyr player:", error)
+        console.error("Failed to initialize Plyr player:", error)
         this.plyr = null
       }
     }
@@ -75,8 +73,6 @@ export default class extends Controller {
 
   async handlePlayRequest(event) {
     const { trackId, releaseId } = event.detail
-    
-    console.log(`🎵 Attempting to play track ${trackId} from release ${releaseId}`)
     
     try {
       const streamUrl = `/releases/${releaseId}/tracks/${trackId}/stream.json`
@@ -109,7 +105,7 @@ export default class extends Controller {
         throw new Error('No stream URL in response')
       }
     } catch (error) {
-      console.error("🎵 Failed to play track:", error)
+      console.error("Failed to play track:", error)
       if (error.message && !error.message.includes('Stream request failed')) {
         this.showError("Unable to load track. Please try again.")
       }
@@ -126,7 +122,11 @@ export default class extends Controller {
   }
 
   async playTrack(trackData) {
+    if (this.isLoadingTrack) return
+    
     this.isLoadingTrack = true
+    this.isPlayPending = false
+    this.playbackRetryCount = 0
     this.currentTrackValue = trackData
     
     try {
@@ -136,6 +136,10 @@ export default class extends Controller {
       
       if (!this.plyr) {
         throw new Error("Failed to initialize audio player")
+      }
+      
+      if (this.plyr.playing) {
+        this.plyr.pause()
       }
       
       this.updateTrackInfo(trackData)
@@ -153,36 +157,57 @@ export default class extends Controller {
         this.plyr.currentTime = savedState.position
       }
 
-      await this.playWithRetry()
+      this.isPlayPending = true
       
     } catch (error) {
-      console.error("🎵 Error in playTrack:", error)
+      console.error("Error in playTrack:", error)
       this.showError("Unable to load this track. Please try again.")
       this.updatePlayButton(false)
-    } finally {
       this.isLoadingTrack = false
+      this.isPlayPending = false
     }
   }
 
   async playWithRetry(retryCount = 0) {
     const maxRetries = 3
     
-    if (!this.plyr) return
+    if (!this.plyr || this.isLoadingTrack) return
+    
+    if (this.playbackRetryCount > 0) return
+    
+    this.playbackRetryCount = retryCount + 1
     
     try {
+      if (this.plyr.readyState < 3) {
+        if (retryCount < maxRetries) {
+          setTimeout(() => {
+            this.playbackRetryCount = 0
+            this.playWithRetry(retryCount + 1)
+          }, 500)
+        }
+        return
+      }
+      
       await this.plyr.play()
       this.updatePlayButton(true)
+      this.playbackRetryCount = 0
+      
     } catch (error) {
-      console.error(`🎵 Play attempt ${retryCount + 1} failed:`, error)
+      if (error.name === 'AbortError') {
+        this.playbackRetryCount = 0
+        return
+      }
       
       if (retryCount < maxRetries) {
         const delay = Math.pow(2, retryCount) * 1000
         setTimeout(() => {
+          this.playbackRetryCount = 0
           this.playWithRetry(retryCount + 1)
         }, delay)
       } else {
         this.showError("Unable to play track. Please check your connection.")
         this.updatePlayButton(false)
+        this.playbackRetryCount = 0
       }
     }
   }
@@ -218,14 +243,17 @@ export default class extends Controller {
   }
 
   togglePlay() {
-    if (!this.plyr) return
+    if (!this.plyr || this.isLoadingTrack) return
     
     if (this.plyr.playing) {
       this.plyr.pause()
       this.updatePlayButton(false)
     } else {
-      this.plyr.play()
-      this.updatePlayButton(true)
+      if (this.plyr.readyState >= 3) {
+        this.playWithRetry()
+      } else {
+        this.isPlayPending = true
+      }
     }
   }
 
@@ -294,7 +322,7 @@ export default class extends Controller {
   }
 
   handleError(error) {
-    console.error("🎵 Plyr error:", error)
+    console.error("Plyr error:", error)
     if (this.isCriticalError(error)) {
       this.handleStreamError(error)
     }
@@ -316,9 +344,20 @@ export default class extends Controller {
     }
   }
 
-  handleStreamError(error) {
-    console.error("🎵 Stream error details:", error)
+  handleLoadStart() {
+    this.updatePlayButton(false)
+  }
+
+  handleCanPlay() {
+    this.isLoadingTrack = false
     
+    if (this.isPlayPending) {
+      this.isPlayPending = false
+      this.playWithRetry()
+    }
+  }
+
+  handleStreamError(error) {
     if (this.currentTrackValue && this.currentTrackValue.stream_url) {
       this.showError("Unable to play this track. Please try another.")
     }

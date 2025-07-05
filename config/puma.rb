@@ -25,14 +25,10 @@ threads threads_count, threads_count
 
 # Bind to all interfaces in production, localhost in development
 bind_to = ENV.fetch("RAILS_ENV", "development") == "production" ? "0.0.0.0" : "127.0.0.1"
-bind "tcp://#{bind_to}:#{ENV.fetch('PORT', 3000)}"
+bind "tcp://#{bind_to}:#{ENV.fetch('PORT', 5000)}"
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
-
-# Bind to all interfaces in production, localhost in development
-bind_to = ENV.fetch("RAILS_ENV", "development") == "production" ? "0.0.0.0" : "127.0.0.1"
-bind "tcp://#{bind_to}:#{ENV.fetch('PORT', 3000)}"
 
 # Specifies the number of `workers` to boot in clustered mode.
 # Workers are forked web server processes. If using threads and workers together
@@ -58,10 +54,10 @@ environment ENV.fetch("RAILS_ENV", "development")
 quiet ENV.fetch("RAILS_ENV", "development") == "production"
 
 # Configure SSL (optional)
-ssl_bind '0.0.0.0', ENV.fetch("SSL_PORT", 3001), {
+ssl_bind "0.0.0.0", ENV.fetch("SSL_PORT", 3001), {
   key: ENV["SSL_KEY_PATH"],
   cert: ENV["SSL_CERT_PATH"],
-  verify_mode: 'none'
+  verify_mode: "none"
 } if ENV["SSL_KEY_PATH"] && ENV["SSL_CERT_PATH"]
 
 # Worker and master process callbacks
