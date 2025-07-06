@@ -6,10 +6,16 @@
         <div class="flex items-center space-x-2 md:space-x-4">
           <!-- Step 1 -->
           <div class="flex flex-col items-center">
-            <div class="w-10 h-10 bg-music-primary text-music-background rounded-full flex items-center justify-center text-sm font-bold border-2 border-music-primary">
-              <i class="fas fa-check text-xs"></i>
+            <div class="w-10 h-10 <%= @edit_mode ? 'bg-music-surface text-music-text-secondary border-2 border-music-border' : 'bg-music-primary text-music-background border-2 border-music-primary' %> rounded-full flex items-center justify-center text-sm font-bold">
+              <% if @edit_mode %>
+                <i class="fas fa-lock text-xs"></i>
+              <% else %>
+                <i class="fas fa-check text-xs"></i>
+              <% end %>
             </div>
-            <span class="mt-2 text-sm font-medium text-music-primary">Select Type</span>
+            <span class="mt-2 text-sm font-medium <%= @edit_mode ? 'text-music-text-secondary' : 'text-music-primary' %>">
+              <%= @edit_mode ? "Type Locked" : "Select Type" %>
+            </span>
           </div>
           
           <div class="w-16 h-1 bg-music-primary rounded-full"></div>
@@ -29,7 +35,9 @@
             <div class="w-10 h-10 bg-music-primary text-music-background rounded-full flex items-center justify-center text-sm font-bold border-2 border-music-primary">
               3
             </div>
-            <span class="mt-2 text-sm font-medium text-music-text">Upload Tracks</span>
+            <span class="mt-2 text-sm font-medium text-music-text">
+              <%= @edit_mode ? "Edit Tracks" : "Upload Tracks" %>
+            </span>
           </div>
         </div>
       </div>
@@ -42,14 +50,17 @@
          data-release-wizard-selected-type-value="<%= @release.release_type %>"
          data-release-wizard-track-requirements-value="<%= @track_requirements.to_json %>"
          data-release-wizard-base-url-value="<%= release_wizard_path(@release.id) %>"
-         data-release-wizard-update-url-value="<%= update_step_release_wizard_path(@release.id) %>">
+         data-release-wizard-update-url-value="<%= update_step_release_wizard_path(@release.id) %>"
+         data-release-wizard-edit-mode-value="<%= @edit_mode || false %>">
       
       <!-- Header -->
       <div class="text-center mb-10">
-        <h1 class="text-3xl font-display tracking-tight text-music-text mb-3">Upload Your Tracks</h1>
+        <h1 class="text-3xl font-display tracking-tight text-music-text mb-3">
+          <%= @edit_mode ? "Edit Your Tracks" : "Upload Your Tracks" %>
+        </h1>
         <div class="w-20 h-1 bg-music-primary mx-auto mb-4"></div>
         <p class="text-music-text-secondary text-lg mb-6">
-          Add tracks to your <%= @release.release_type.titleize.downcase %>
+          <%= @edit_mode ? "Manage tracks in your" : "Add tracks to your" %> <%= @release.release_type.titleize.downcase %>
         </p>
         <div class="inline-flex items-center px-4 py-2 bg-music-primary/10 border border-music-primary/20 rounded-genre text-music-primary">
           <i class="fas fa-info-circle mr-2"></i>
@@ -183,10 +194,18 @@
 
       <!-- Navigation -->
       <div class="flex justify-between items-center pt-8 border-t border-music-border/30">
-        <%= link_to step2_release_wizard_path(@release), 
-                    class: "px-6 py-3 border border-music-border/50 rounded-genre text-music-text hover:bg-music-background/20 hover:border-music-primary transition-all flex items-center" do %>
-          <i class="fas fa-arrow-left mr-2"></i>
-          Back
+        <% if @edit_mode %>
+          <%= link_to edit_step2_release_wizard_path(@release), 
+                      class: "px-6 py-3 border border-music-border/50 rounded-genre text-music-text hover:bg-music-background/20 hover:border-music-primary transition-all flex items-center" do %>
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Release Info
+          <% end %>
+        <% else %>
+          <%= link_to step2_release_wizard_path(@release), 
+                      class: "px-6 py-3 border border-music-border/50 rounded-genre text-music-text hover:bg-music-background/20 hover:border-music-primary transition-all flex items-center" do %>
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back
+          <% end %>
         <% end %>
         
         <button type="button" 
@@ -194,7 +213,7 @@
                 data-action="click->release-wizard#goNext"
                 class="px-8 py-3 bg-music-primary hover:bg-music-primary/90 text-music-background rounded-button font-display tracking-wider text-lg transition-all duration-300 shadow-button hover:shadow-genre-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-button"
                 disabled>
-          UPLOAD & CONTINUE
+          <%= @edit_mode ? "SAVE CHANGES" : "UPLOAD & CONTINUE" %>
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@ class ReleaseWizardController < ApplicationController
   before_action :authorize_artist_user!
   before_action :set_release, except: [ :step1, :create_release, :success ]
   before_action :set_release_for_success, only: [ :success ]
+  before_action :set_edit_release, only: [ :edit_step2, :edit_step3 ]
 
   def step1
     # Entry: choose release type
@@ -32,6 +33,13 @@ class ReleaseWizardController < ApplicationController
 
   def step2
     @service.auto_fill_artist_name(@release)
+    @edit_mode = false
+  end
+
+  def edit_step2
+    @service.auto_fill_artist_name(@release)
+    @edit_mode = true
+    render :step2
   end
 
   def step3
@@ -39,8 +47,20 @@ class ReleaseWizardController < ApplicationController
 
     @track_requirements = @service.get_track_requirements(@release.release_type)
     @tracks = @release.tracks.order(:position)
+    @edit_mode = false
 
     Rails.logger.info "📊 Track requirement: #{@track_requirements[:min]}-#{@track_requirements[:max] || '∞'} (have #{@tracks.count})"
+  end
+
+  def edit_step3
+    return redirect_to edit_step2_release_wizard_path(@release.id) unless @service.valid_for_step2?(@release)
+
+    @track_requirements = @service.get_track_requirements(@release.release_type)
+    @tracks = @release.tracks.order(:position)
+    @edit_mode = true
+
+    Rails.logger.info "📊 Track requirement: #{@track_requirements[:min]}-#{@track_requirements[:max] || '∞'} (have #{@tracks.count})"
+    render :step3
   end
 
   def update_step
@@ -88,6 +108,11 @@ class ReleaseWizardController < ApplicationController
     redirect_to step1_release_wizard_index_path unless @release
   end
 
+  def set_edit_release
+    @release = current_user.releases.find(params[:id])
+    redirect_to root_path, alert: "Access denied." unless @release.user == current_user
+  end
+
   def set_release_for_success
     @release = Release.find(params[:id])
     redirect_to root_path, alert: "Access denied." unless @release.user == current_user
@@ -105,8 +130,14 @@ class ReleaseWizardController < ApplicationController
     Rails.logger.info "📝 Updating step 2 for release #{@release.id}: #{step2_params}"
 
     if @service.update_step2(@release, step2_params)
-      redirect_to step3_release_wizard_path(@release.id)
+      # Check if we're in edit mode by looking at the referer or a parameter
+      if params[:edit_mode] == "true" || request.referer&.include?("edit_step2")
+        redirect_to edit_step3_release_wizard_path(@release.id)
+      else
+        redirect_to step3_release_wizard_path(@release.id)
+      end
     else
+      @edit_mode = params[:edit_mode] == "true" || request.referer&.include?("edit_step2")
       render :step2, status: :unprocessable_entity
     end
   end
@@ -116,11 +147,17 @@ class ReleaseWizardController < ApplicationController
     track_errors = @service.update_step3(@release, permitted_tracks, params[:audio_files])
 
     if track_errors.empty?
-      redirect_to release_wizard_path(@release.id)
+      # Check if we're in edit mode
+      if params[:edit_mode] == "true" || request.referer&.include?("edit_step3")
+        redirect_to release_path(@release), notice: "Release was successfully updated."
+      else
+        redirect_to release_wizard_path(@release.id)
+      end
     else
       flash.now[:alert] = track_errors.join(", ")
       @track_requirements = @service.get_track_requirements(@release.release_type)
       @tracks = @release.tracks.order(:position)
+      @edit_mode = params[:edit_mode] == "true" || request.referer&.include?("edit_step3")
       render :step3, status: :unprocessable_entity
     end
   end

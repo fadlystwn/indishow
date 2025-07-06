@@ -12,7 +12,8 @@ export default class extends Controller {
     uploadedTracks: Array,
     createUrl: String,
     baseUrl: String,
-    updateUrl: String
+    updateUrl: String,
+    editMode: Boolean
   }
 
   initialize() {

@@ -12,10 +12,8 @@ class ReleasesController < ApplicationController
   def show; end
 
   def edit
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
+    # Redirect to the multi-step wizard edit flow
+    redirect_to edit_step2_release_wizard_path(@release.id)
   end
 
   def update
