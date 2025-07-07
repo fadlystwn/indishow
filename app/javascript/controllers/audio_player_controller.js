@@ -28,6 +28,7 @@ export default class extends Controller {
 
   disconnect() {
     this.savePlayerState()
+    this.removeEventListeners()
     if (this.plyr) {
       try {
         this.plyr.destroy()
@@ -62,17 +63,54 @@ export default class extends Controller {
   }
 
   setupEventListeners() {
+    // Clear any existing interval
+    if (this.saveStateInterval) {
+      clearInterval(this.saveStateInterval)
+    }
+    
     this.saveStateInterval = setInterval(() => {
       this.savePlayerState()
     }, 5000)
 
-    document.addEventListener('beforeunload', this.savePlayerState.bind(this))
-    document.addEventListener('audio:play', this.handlePlayRequest.bind(this))
-    document.addEventListener('audio:queue', this.handleQueueRequest.bind(this))
+    // Store bound methods to ensure we can remove them later
+    this.boundSavePlayerState = this.savePlayerState.bind(this)
+    this.boundHandlePlayRequest = this.handlePlayRequest.bind(this)
+    this.boundHandleQueueRequest = this.handleQueueRequest.bind(this)
+
+    // Remove existing listeners first to prevent duplicates
+    this.removeEventListeners()
+
+    document.addEventListener('beforeunload', this.boundSavePlayerState)
+    document.addEventListener('audio:play', this.boundHandlePlayRequest)
+    document.addEventListener('audio:queue', this.boundHandleQueueRequest)
+  }
+
+  removeEventListeners() {
+    if (this.saveStateInterval) {
+      clearInterval(this.saveStateInterval)
+      this.saveStateInterval = null
+    }
+
+    if (this.boundSavePlayerState) {
+      document.removeEventListener('beforeunload', this.boundSavePlayerState)
+    }
+    if (this.boundHandlePlayRequest) {
+      document.removeEventListener('audio:play', this.boundHandlePlayRequest)
+    }
+    if (this.boundHandleQueueRequest) {
+      document.removeEventListener('audio:queue', this.boundHandleQueueRequest)
+    }
   }
 
   async handlePlayRequest(event) {
+    // Prevent duplicate handling of the same event
+    if (this._handlingPlayRequest) return
+    this._handlingPlayRequest = true
+
     const { trackId, releaseId } = event.detail
+    
+    // Stop any currently playing audio and prevent multiple simultaneous plays
+    this.stopAllAudio()
     
     try {
       const streamUrl = `/releases/${releaseId}/tracks/${trackId}/stream.json`
@@ -109,15 +147,31 @@ export default class extends Controller {
       if (error.message && !error.message.includes('Stream request failed')) {
         this.showError("Unable to load track. Please try again.")
       }
+    } finally {
+      this._handlingPlayRequest = false
     }
   }
 
   handleQueueRequest(event) {
+    // Prevent duplicate handling of the same event
+    if (this._handlingQueueRequest) return
+    this._handlingQueueRequest = true
+
     const { tracks } = event.detail
+    
+    // Stop any currently playing audio before queuing new tracks
+    this.stopAllAudio()
+    
     this.queueValue = tracks
     
     if (tracks.length > 0) {
-      this.handlePlayRequest({ detail: tracks[0] })
+      // Use setTimeout to prevent immediate re-triggering and allow proper cleanup
+      setTimeout(() => {
+        this.handlePlayRequest({ detail: tracks[0] })
+        this._handlingQueueRequest = false
+      }, 50)
+    } else {
+      this._handlingQueueRequest = false
     }
   }
 
@@ -409,6 +463,31 @@ export default class extends Controller {
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  stopAllAudio() {
+    // Stop the main Plyr player
+    if (this.plyr && this.plyr.playing) {
+      this.plyr.pause()
+      this.plyr.currentTime = 0
+    }
+    
+    // Stop any other audio elements that might be playing
+    const audioElements = document.querySelectorAll('audio')
+    audioElements.forEach(audio => {
+      if (!audio.paused) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+    })
+    
+    // Reset loading states
+    this.isLoadingTrack = false
+    this.isPlayPending = false
+    this.playbackRetryCount = 0
+    
+    // Update UI
+    this.updatePlayButton(false)
   }
 
   beforeCache() {
