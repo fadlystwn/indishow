@@ -11,16 +11,7 @@ class ReleaseWizardController < ApplicationController
   end
 
   def create_release
-    # Reuse existing release in session if it exists and belongs to current_user
-    if session[:release_id] && current_user.releases.exists?(id: session[:release_id])
-      @release = current_user.releases.find(session[:release_id])
-      @release.update(release_type: params[:release_type]) if params[:release_type].present?
-      redirect_to step2_release_wizard_path(@release.id)
-      return
-    end
-
-    # Otherwise create a new release
-    @release = @service.create_release(params[:release_type])
+    @release = @service.find_or_create_release(session[:release_id], params[:release_type])
 
     if @release.persisted?
       session[:release_id] = @release.id
@@ -85,7 +76,8 @@ class ReleaseWizardController < ApplicationController
   end
 
   def debug
-    @release = Release.find(params[:id])
+    @release = @service.find_release_for_success(params[:id])
+    return redirect_to root_path, alert: "Release not found" unless @release
     return redirect_to root_path, alert: "Access denied" unless @release.user == current_user
 
     @validation_errors = @service.validate_release_for_publishing(@release)
@@ -109,17 +101,29 @@ class ReleaseWizardController < ApplicationController
   end
 
   def set_edit_release
-    @release = current_user.releases.find(params[:id])
+    @release = @service.find_release_for_edit(current_user, params[:id])
+
+    unless @release
+      redirect_to root_path, alert: "Release not found."
+      return
+    end
+
     redirect_to root_path, alert: "Access denied." unless @release.user == current_user
   end
 
   def set_release_for_success
-    @release = Release.find(params[:id])
+    @release = @service.find_release_for_success(params[:id])
+
+    unless @release
+      redirect_to root_path, alert: "Release not found."
+      return
+    end
+
     redirect_to root_path, alert: "Access denied." unless @release.user == current_user
   end
 
   def update_step1
-    if @release.update(release_type: params[:release_type])
+    if @service.update_step1(@release, params[:release_type])
       redirect_to step2_release_wizard_path(@release.id)
     else
       redirect_to step1_release_wizard_index_path, alert: @release.errors.full_messages.join(", ")

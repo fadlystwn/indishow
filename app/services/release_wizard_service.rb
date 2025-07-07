@@ -91,6 +91,44 @@ class ReleaseWizardService
 
 
   # ──────────────────────────────────────────────────────────────
+  # CONTROLLER HELPERS - Business Logic
+  # ──────────────────────────────────────────────────────────────
+
+  def find_or_create_release(session_release_id, release_type)
+    # Check for existing release in session
+    if session_release_id && @user.releases.exists?(id: session_release_id)
+      release = @user.releases.find(session_release_id)
+      release.update(release_type: release_type) if release_type.present?
+      return release
+    end
+
+    # Create new release
+    create_release(release_type)
+  end
+
+  def update_step1(release, release_type)
+    release.update(release_type: release_type)
+  end
+
+  def find_release_for_edit(user, id_or_slug)
+    numeric = id_or_slug.match?(/\A\d+\z/)
+    if numeric
+      user.releases.find_by(id: id_or_slug)
+    else
+      user.releases.find_by(slug: id_or_slug)
+    end
+  end
+
+  def find_release_for_success(id_or_slug)
+    numeric = id_or_slug.match?(/\A\d+\z/)
+    if numeric
+      Release.find_by(id: id_or_slug)
+    else
+      Release.find_by(slug: id_or_slug)
+    end
+  end
+
+  # ──────────────────────────────────────────────────────────────
   private
   # ──────────────────────────────────────────────────────────────
 
