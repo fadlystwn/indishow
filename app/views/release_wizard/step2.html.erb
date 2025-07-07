@@ -1,47 +1,75 @@
 <div class="min-h-screen bg-music-background py-8">
-  <div class="max-w-4xl mx-auto px-4">
-    <!-- Progress Bar -->
-    <div class="mb-8">
+  <div class="max-w-5xl mx-auto px-4">
+    <!-- Enhanced Progress Bar -->
+    <div class="mb-12">
       <div class="flex items-center justify-center mb-4">
-        <div class="flex items-center space-x-4">
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-medium">✓</div>
-            <span class="ml-2 text-sm font-medium text-green-600">Select Type</span>
+        <div class="flex items-center space-x-2 md:space-x-4">
+          <!-- Step 1 -->
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 <%= @edit_mode ? 'bg-music-surface text-music-text-secondary border-2 border-music-border' : 'bg-music-primary text-music-background border-2 border-music-primary' %> rounded-full flex items-center justify-center text-sm font-bold">
+              <% if @edit_mode %>
+                <i class="fas fa-lock text-xs"></i>
+              <% else %>
+                <i class="fas fa-check text-xs"></i>
+              <% end %>
+            </div>
+            <span class="mt-2 text-sm font-medium <%= @edit_mode ? 'text-music-text-secondary' : 'text-music-primary' %>">
+              <%= @edit_mode ? "Type Locked" : "Select Type" %>
+            </span>
           </div>
-          <div class="w-16 h-1 bg-green-600 rounded"></div>
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center text-sm font-medium">2</div>
-            <span class="ml-2 text-sm font-medium text-music-text">Release Info</span>
+          
+          <div class="w-16 h-1 bg-music-primary rounded-full"></div>
+
+          <!-- Step 2 -->
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 bg-music-primary text-music-background rounded-full flex items-center justify-center text-sm font-bold border-2 border-music-primary">
+              2
+            </div>
+            <span class="mt-2 text-sm font-medium text-music-text">Release Info</span>
           </div>
-          <div class="w-16 h-1 bg-gray-300 rounded"></div>
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">3</div>
-            <span class="ml-2 text-sm font-medium text-gray-500">Upload Tracks</span>
+          
+          <div class="w-16 h-1 bg-music-border rounded-full"></div>
+
+          <!-- Step 3 -->
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 bg-music-surface text-music-text-secondary rounded-full flex items-center justify-center text-sm font-bold border-2 border-music-border">
+              3
+            </div>
+            <span class="mt-2 text-sm font-medium text-music-text-secondary">Upload Tracks</span>
           </div>
         </div>
       </div>
-      <div class="w-full bg-gray-300 rounded-full h-2">
-        <div class="bg-teal-600 h-2 rounded-full transition-all duration-300" style="width: 66.66%" data-release-wizard-target="progressBar"></div>
-      </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="bg-music-surface rounded-lg shadow-lg border border-music-border p-8">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-music-text mb-2">Release Information</h1>
+    <!-- Main Content Card -->
+    <div class="bg-music-surface rounded-genre shadow-genre border border-music-border/50 p-8 backdrop-blur-sm bg-opacity-90">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <h1 class="text-3xl font-display tracking-tight text-music-text mb-3">
+          <%= @edit_mode ? "Edit Release Information" : "Release Information" %>
+        </h1>
+        <div class="w-20 h-1 bg-music-primary mx-auto mb-4"></div>
         <p class="text-music-text-secondary text-lg">
-          Tell us about your <%= @release.release_type&.titleize || 'release' %>
+          <% if @edit_mode %>
+            Update your <%= @release.release_type&.titleize || 'release' %> details
+          <% else %>
+            Tell us about your <%= @release.release_type&.titleize || 'release' %>
+          <% end %>
         </p>
       </div>
 
-      <%= form_tag update_step_release_wizard_path(@release.id), method: :post, local: true, authenticity_token: true, class: "space-y-6" do %>
+      <%= form_tag update_step_release_wizard_path(@release.id), method: :post, local: true, authenticity_token: true, class: "space-y-8" do %>
         <%= hidden_field_tag 'release[release_type]', @release.release_type %>
+        <%= hidden_field_tag 'edit_mode', @edit_mode %>
         <input type="hidden" name="step" value="2">
 
         <% if @release.errors.any? %>
-          <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-            <h3 class="font-semibold mb-2 text-red-800">Please correct the following errors:</h3>
-            <ul class="list-disc list-inside text-sm text-red-700">
+          <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-genre">
+            <h3 class="font-semibold mb-2 text-red-500 flex items-center">
+              <i class="fas fa-exclamation-circle mr-2"></i>
+              Please correct the following errors:
+            </h3>
+            <ul class="list-disc list-inside text-sm text-red-400">
               <% @release.errors.full_messages.each do |msg| %>
                 <li><%= msg %></li>
               <% end %>
@@ -52,24 +80,50 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Left Column: Cover Art -->
           <div>
+            <% if @edit_mode %>
+              <!-- Release Type Display (Read-only in edit mode) -->
+              <div class="mb-6">
+                <label class="block text-music-text text-sm font-medium mb-3 uppercase tracking-wider">Release Type</label>
+                <div class="p-4 bg-music-background/50 border border-music-border/50 rounded-genre">
+                  <div class="flex items-center space-x-3">
+                    <span class="text-2xl">
+                      <%= case @release.release_type
+                          when 'single' then '🎵'
+                          when 'ep' then '🎧'
+                          when 'album' then '💿'
+                          when 'compilation' then '📀'
+                          else '🎵'
+                          end %>
+                    </span>
+                    <div>
+                      <p class="text-music-text font-medium"><%= @release.release_type&.titleize %></p>
+                      <p class="text-sm text-music-text-secondary/70">
+                        <i class="fas fa-lock mr-1"></i>Cannot be changed after creation
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
             <div class="mb-6">
-              <%= label_tag 'release[cover_art]', "Cover Art", class: "block text-music-text text-sm font-medium mb-2" %>
-              <div class="border-2 border-dashed border-music-border rounded-lg p-8 text-center cursor-pointer bg-music-background/50 hover:border-teal-500 hover:bg-teal-50 transition-all duration-200"
+              <%= label_tag 'release[cover_art]', "Cover Art", class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
+              <div class="border-2 border-dashed border-music-border/50 rounded-genre p-8 text-center cursor-pointer bg-music-background/20 hover:border-music-primary hover:bg-music-primary/10 transition-all duration-300 group"
                    data-controller="image-upload-base"
                    data-action="dragover->image-upload-base#highlight dragleave->image-upload-base#unhighlight drop->image-upload-base#drop">
                 <div data-image-upload-base-target="container" 
                      class="cursor-pointer <%= 'hidden' if @release.cover_art.attached? %>">
-                  <i class="fas fa-image text-music-text-secondary text-4xl mb-4"></i>
+                  <i class="fas fa-image text-music-text-secondary/50 text-4xl mb-4 group-hover:text-music-primary transition-colors"></i>
                   <p class="text-music-text-secondary text-sm mb-2">Drag & drop your cover art here</p>
-                  <p class="text-music-text-secondary/70 text-xs">or click to browse (1200x1200px recommended)</p>
+                  <p class="text-music-text-secondary/50 text-xs">(1200×1200px recommended)</p>
                 </div>
                 <div data-image-upload-base-target="preview" class="<%= 'hidden' unless @release.cover_art.attached? %>">
                   <% if @release.cover_art.attached? %>
                     <div class="flex flex-col items-center">
                       <div class="relative">
-                        <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-md mb-2" %>
+                        <%= image_tag @release.cover_art.variant(:medium), class: "max-w-full max-h-64 rounded-genre mb-2 shadow-genre" %>
                         <button type="button" 
-                                class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 shadow-lg"
+                                class="absolute top-0 right-0 bg-music-primary text-music-background rounded-full w-6 h-6 flex items-center justify-center hover:bg-music-primary/90 shadow-lg transform hover:scale-110 transition-all"
                                 data-action="click->image-upload-base#clearFile">
                           ×
                         </button>
@@ -85,7 +139,10 @@
                                   data: { image_upload_base_target: "input", action: "change->image-upload-base#inputChange" } %>
               </div>
               <% if @release.errors[:cover_art].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:cover_art).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:cover_art).first %>
+                </p>
               <% end %>
             </div>
           </div>
@@ -94,85 +151,114 @@
           <div class="space-y-6">
             <!-- Title -->
             <div>
-              <%= label_tag 'release[title]', 'Title', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[title]', 'Title', class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
               <%= text_field_tag 'release[title]', @release.title,
-                                class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text placeholder-music-text-secondary #{'border-red-500' if @release.errors[:title].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
+                                class: "w-full px-4 py-3 border border-music-border/50 rounded-genre bg-music-background/20 text-music-text placeholder-music-text-secondary/50 #{'border-red-500' if @release.errors[:title].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all",
                                 placeholder: "Enter your #{@release.release_type&.titleize&.downcase || 'release'} title" %>
               <% if @release.errors[:title].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:title).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:title).first %>
+                </p>
               <% end %>
             </div>
 
             <!-- Artist -->
             <div>
-              <%= label_tag 'release[artist]', 'Artist', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[artist]', 'Artist', class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
               <%= text_field_tag 'release[artist]', @release.artist,
-                                class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text placeholder-music-text-secondary #{'border-red-500' if @release.errors[:artist].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
+                                class: "w-full px-4 py-3 border border-music-border/50 rounded-genre bg-music-background/20 text-music-text placeholder-music-text-secondary/50 #{'border-red-500' if @release.errors[:artist].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all",
                                 placeholder: "Artist or band name" %>
               <% if @release.errors[:artist].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:artist).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:artist).first %>
+                </p>
               <% end %>
             </div>
 
             <!-- Release Date -->
             <div>
-              <%= label_tag 'release[release_date]', 'Release Date', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[release_date]', 'Release Date', class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
               <%= date_field_tag 'release[release_date]', @release.release_date,
-                                class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release.errors[:release_date].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" %>
+                                class: "w-full px-4 py-3 border border-music-border/50 rounded-genre bg-music-background/20 text-music-text #{'border-red-500' if @release.errors[:release_date].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all" %>
               <% if @release.errors[:release_date].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:release_date).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:release_date).first %>
+                </p>
               <% end %>
             </div>
 
             <!-- Price -->
             <div>
-              <%= label_tag 'release[price]', 'Price', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[price]', 'Price', class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-music-text-secondary">$</span>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-music-text-secondary">$</span>
                 <%= number_field_tag 'release[price]', @release.price,
                                     min: 0, 
                                     step: 0.01, 
-                                    class: "w-full pl-8 pr-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release.errors[:price].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
+                                    class: "w-full pl-10 pr-4 py-3 border border-music-border/50 rounded-genre bg-music-background/20 text-music-text #{'border-red-500' if @release.errors[:price].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all",
                                     placeholder: "0.00" %>
               </div>
               <% if @release.errors[:price].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:price).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:price).first %>
+                </p>
               <% end %>
-              <p class="text-xs text-music-text-secondary mt-1">Set to $0.00 for free releases</p>
+              <p class="text-xs text-music-text-secondary/50 mt-2">Set to $0.00 for free releases</p>
             </div>
 
             <!-- Genre -->
             <div>
-              <%= label_tag 'release[genre]', 'Genre', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[genre]', 'Genre', class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
               <%= select_tag 'release[genre]', 
                             options_for_select([['Select a genre', '']] + Release::GENRES.map { |genre| [genre, genre] }, @release.genre), 
-                            class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text #{'border-red-500' if @release.errors[:genre].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" %>
+                            class: "w-full px-4 py-3 border border-music-border/50 rounded-genre bg-music-background/20 text-music-text #{'border-red-500' if @release.errors[:genre].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all appearance-none" %>
               <% if @release.errors[:genre].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:genre).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:genre).first %>
+                </p>
               <% end %>
             </div>
 
             <!-- Description -->
             <div>
-              <%= label_tag 'release[description]', 'Description', class: "block text-music-text text-sm font-medium mb-2" %>
+              <%= label_tag 'release[description]', 'Description', class: "block text-music-text text-sm font-medium mb-3 uppercase tracking-wider" %>
               <%= text_area_tag 'release[description]', @release.description,
                                 rows: 4, 
-                                class: "w-full px-3 py-2 border border-music-border rounded-md bg-music-background text-music-text placeholder-music-text-secondary #{'border-red-500' if @release.errors[:description].any?} focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500",
+                                class: "w-full px-4 py-3 border border-music-border/50 rounded-genre bg-music-background/20 text-music-text placeholder-music-text-secondary/50 #{'border-red-500' if @release.errors[:description].any?} focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary transition-all",
                                 placeholder: "Tell your fans about this #{@release.release_type&.titleize&.downcase || 'release'}..." %>
               <% if @release.errors[:description].any? %>
-                <p class="text-sm text-red-500 mt-1"><%= @release.errors.full_messages_for(:description).first %></p>
+                <p class="text-sm text-red-400 mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  <%= @release.errors.full_messages_for(:description).first %>
+                </p>
               <% end %>
             </div>
           </div>
         </div>
 
         <!-- Navigation -->
-        <div class="flex justify-between items-center pt-6 border-t border-music-border">
-          <%= link_to "Back", step1_release_wizard_index_path, 
-                      class: "px-6 py-3 border border-music-border rounded-md text-music-text hover:bg-music-background transition-colors" %>
+        <div class="flex justify-between items-center pt-8 border-t border-music-border/30">
+          <% if @edit_mode %>
+            <%= link_to release_path(@release), 
+                        class: "px-6 py-3 border border-music-border/50 rounded-genre text-music-text hover:bg-music-background/20 hover:border-music-primary transition-all flex items-center" do %>
+              <i class="fas fa-arrow-left mr-2"></i>
+              Back to Release
+            <% end %>
+          <% else %>
+            <%= link_to step1_release_wizard_index_path, 
+                        class: "px-6 py-3 border border-music-border/50 rounded-genre text-music-text hover:bg-music-background/20 hover:border-music-primary transition-all flex items-center" do %>
+              <i class="fas fa-arrow-left mr-2"></i>
+              Back
+            <% end %>
+          <% end %>
           
-          <%= submit_tag "Continue to Upload Tracks", 
-                        class: "px-6 py-3 bg-teal-600 text-white rounded-md font-medium hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors" %>
+          <%= submit_tag (@edit_mode ? "Continue to Edit Tracks" : "Continue to Upload Tracks"), 
+                        class: "px-8 py-3 bg-music-primary hover:bg-music-primary/90 text-music-background rounded-button font-display tracking-wider text-lg transition-all duration-300 shadow-button hover:shadow-genre-hover" %>
         </div>
       <% end %>
     </div>

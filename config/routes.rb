@@ -27,11 +27,16 @@ Rails.application.routes.draw do
       get :success
       get :debug
       post :update_step
+      get :edit_step2  # For edit mode
+      get :edit_step3  # For edit mode
     end
   end
 
   resources :releases do
-    resources :tracks, only: [ :new, :create, :edit, :update, :destroy ]
+    member { patch :publish }
+    resources :tracks, only: [ :new, :create, :edit, :update, :destroy ] do
+      member { get :stream }
+    end
   end
   get "home/index"
   root to: "home#index"

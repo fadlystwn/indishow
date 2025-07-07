@@ -1,116 +1,95 @@
-<%# Add required styles %>
-<% content_for :head do %>
-  <style>
-    .album-cover {
-      transition: transform 0.2s;
-      border-radius: 12px;
-      box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.3);
-    }
-    .album-cover:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.4);
-    }
-    .play-button {
-      transition: all 0.2s;
-      border-radius: 20px;
-      box-shadow: 0 2px 10px 0 rgba(255, 77, 77, 0.4);
-    }
-    .play-button:hover {
-      transform: scale(1.1);
-      background-color: #FF4D4D;
-    }
-  </style>
-<% end %>
-
-
-<%# Artist Header with Cover Image %>
+<!-- Artist Header Section -->
 <div class="bg-gradient-to-b from-music-background to-music-surface text-music-text">
-  <%# Cover Image Section - moved inside the header div %>
   <% if @artist_profile.cover_image.attached? %>
-    <div class="w-full h-64 md:h-80 lg:h-96 overflow-hidden">
+    <div class="w-full h-64 md:h-80 lg:h-96 overflow-hidden relative">
       <%= image_tag @artist_profile.cover_image, class: "w-full h-full object-cover" %>
+      <div class="absolute inset-0 bg-gradient-to-t from-music-background via-transparent to-transparent"></div>
     </div>
   <% end %>
 
-  <div class="container mx-auto px-4 py-12">
-    <div class="flex flex-col md:flex-row items-center">
-      <div class="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-music-accent shadow-lg mb-6 md:mb-0 md:mr-12">
-        <% if @artist_profile.avatar.attached? %>
-          <%= image_tag @artist_profile.avatar, class: "w-full h-full object-cover" %>
-        <% else %>
-          <div class="w-full h-full bg-music-surface flex items-center justify-center">
-            <svg class="w-16 h-16 text-music-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-        <% end %>
+  <div class="container mx-auto px-4 py-8 md:py-12">
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-8">
+      <!-- Avatar with Glow Effect -->
+      <div class="relative">
+        <div class="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-music-accent shadow-lg relative z-10">
+          <% if @artist_profile.avatar.attached? %>
+            <%= image_tag @artist_profile.avatar, class: "w-full h-full object-cover" %>
+          <% else %>
+            <div class="w-full h-full bg-music-surface flex items-center justify-center">
+              <svg class="w-16 h-16 text-music-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          <% end %>
+        </div>
+        <div class="absolute -inset-2 bg-music-accent/30 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
 
-      <%# Profile details %>
+      <!-- Profile Details -->
       <div class="flex-1">
-        <h1 class="text-4xl md:text-5xl font-bold mb-2 font-display"><%= @artist_profile.name %></h1>
+        <h1 class="text-3xl md:text-5xl font-bold mb-2 font-display tracking-tight"><%= @artist_profile.name %></h1>
+        
         <% if @artist_profile.location.present? %>
-          <p class="text-music-text-secondary mb-4"><%= @artist_profile.bio&.split('.')&.first %> • <%= @artist_profile.location %></p>
+          <div class="flex items-center text-music-text-secondary mb-4">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span><%= @artist_profile.location %></span>
+          </div>
         <% end %>
-        <div class="flex flex-wrap gap-3 mb-6">
-          <span class="bg-music-surface border border-music-border px-3 py-1 rounded-genre text-sm">Music</span>
-          <span class="bg-music-surface border border-music-border px-3 py-1 rounded-genre text-sm">Artist</span>
-          <% if @artist_profile.location.present? %>
-            <span class="bg-music-surface border border-music-border px-3 py-1 rounded-genre text-sm"><%= @artist_profile.location %></span>
-          <% end %>
-          <span class="bg-music-primary bg-opacity-20 border border-music-primary px-3 py-1 rounded-genre text-sm text-music-primary">
+
+        <!-- Stats and Tags -->
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+          <span class="bg-music-surface/80 border border-music-border/50 px-3 py-1 rounded-full text-sm backdrop-blur-sm">
             <%= pluralize(@artist_profile.user.followers.count, 'follower') %>
           </span>
+       
         </div>
-        <div class="flex space-x-4">
-          <button class="bg-music-primary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center shadow-button transition-all duration-200">
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-3">
+          <button class="px-6 py-3 bg-music-primary hover:bg-music-primary/90 text-music-background rounded-button font-display tracking-wider flex items-center shadow-button hover:shadow-genre-hover transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
             </svg>
-            Play All
+            PLAY ALL
           </button>
           
           <% if user_signed_in? && @artist_profile.user == current_user %>
-            <%# Show Edit button for the artist %>
-            <%= link_to edit_artist_profile_path(@artist_profile), class: "bg-music-surface hover:bg-opacity-80 border border-music-border text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200" do %>
+            <%= link_to edit_artist_profile_path(@artist_profile), 
+                  class: "px-6 py-3 bg-music-surface hover:bg-music-border border border-music-border text-music-text rounded-button font-display tracking-wider flex items-center transition-all" do %>
               <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              Edit Profile
+              EDIT PROFILE
             <% end %>
           <% elsif user_signed_in? && current_user.fan? %>
-            <%# Show Follow/Unfollow button for fans %>
             <% if current_user.following?(@artist_profile.user) %>
               <%= button_to unfollow_artist_profile_path(@artist_profile), method: :delete, 
-                            class: "bg-music-background hover:bg-opacity-80 border border-music-border text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200",
-                            data: { confirm: "Are you sure you want to unfollow #{@artist_profile.name}?" } do %>
+                        class: "px-6 py-3 bg-music-surface hover:bg-music-border border border-music-border text-music-text rounded-button font-display tracking-wider flex items-center transition-all",
+                        data: { confirm: "Unfollow #{@artist_profile.name}?" } do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
-                Following
+                FOLLOWING
               <% end %>
             <% else %>
               <%= button_to follow_artist_profile_path(@artist_profile), method: :post,
-                            class: "bg-music-secondary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200" do %>
+                        class: "px-6 py-3 bg-music-secondary hover:bg-music-secondary/90 text-music-background rounded-button font-display tracking-wider flex items-center transition-all" do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
                 </svg>
-                Follow
+                FOLLOW
               <% end %>
             <% end %>
-          <% elsif user_signed_in? && current_user.artist? %>
-            <%# Show message for artists %>
-            <div class="text-music-text-secondary italic">
-              Sign up as a fan to follow artists
-            </div>
-          <% else %>
-            <%# Show sign up button for non-logged in users %>
+          <% elsif !user_signed_in? %>
             <%= link_to new_user_registration_path, 
-                        class: "bg-music-secondary hover:bg-opacity-80 text-music-text px-6 py-3 rounded-button font-medium flex items-center transition-all duration-200" do %>
+                  class: "px-6 py-3 bg-music-secondary hover:bg-music-secondary/90 text-music-background rounded-button font-display tracking-wider flex items-center transition-all" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
               </svg>
-              Follow
+              FOLLOW
             <% end %>
           <% end %>
         </div>
@@ -119,55 +98,81 @@
   </div>
 </div>
 
-<%# Main Content %>
+<!-- Main Content -->
 <main class="bg-music-background text-music-text min-h-screen">
   <div class="container mx-auto px-4 py-8" data-controller="tabs">
-    <%# Artist Navigation %>
-    <nav class="flex border-b border-music-border mb-8">
-      <a href="#" data-tabs-target="tab" data-tab="music" data-action="click->tabs#switchTab" class="px-4 py-3 font-medium text-music-primary border-b-2 border-music-primary">Music</a>
-      <a href="#" data-tabs-target="tab" data-tab="about" data-action="click->tabs#switchTab" class="px-4 py-3 font-medium text-music-text-secondary hover:text-music-primary transition-colors">About</a>
-      <a href="#" data-tabs-target="tab" data-tab="shows" data-action="click->tabs#switchTab" class="px-4 py-3 font-medium text-music-text-secondary hover:text-music-primary transition-colors">Shows</a>
-      <a href="#" data-tabs-target="tab" data-tab="merch" data-action="click->tabs#switchTab" class="px-4 py-3 font-medium text-music-text-secondary hover:text-music-primary transition-colors">Merch</a>
+    <!-- Artist Navigation Tabs -->
+    <nav class="flex border-b border-music-border/50 mb-8">
+      <button data-tabs-target="tab" data-tab="music" data-action="click->tabs#switchTab" 
+              class="px-6 py-3 font-display tracking-wider text-music-primary border-b-2 border-music-primary">
+        MUSIC
+      </button>
+      <button data-tabs-target="tab" data-tab="about" data-action="click->tabs#switchTab" 
+              class="px-6 py-3 font-display tracking-wider text-music-text-secondary hover:text-music-primary transition-colors">
+        ABOUT
+      </button>
+      <button data-tabs-target="tab" data-tab="shows" data-action="click->tabs#switchTab" 
+              class="px-6 py-3 font-display tracking-wider text-music-text-secondary hover:text-music-primary transition-colors">
+        SHOWS
+      </button>
+      <button data-tabs-target="tab" data-tab="merch" data-action="click->tabs#switchTab" 
+              class="px-6 py-3 font-display tracking-wider text-music-text-secondary hover:text-music-primary transition-colors">
+        MERCH
+      </button>
     </nav>
 
-    <%# Discography %>
+    <!-- Music Tab -->
     <section data-tabs-target="content" data-content="music" class="mb-12">
-      <h2 class="text-2xl font-bold mb-6 font-display">Discography</h2>
+      <h2 class="text-2xl font-display tracking-tight mb-6">DISCOGRAPHY</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <% @releases.each do |release| %>
-          <div class="bg-music-surface rounded-genre shadow-genre overflow-hidden hover:shadow-genre-hover transition-all duration-200 border border-music-border">
-            <div class="relative">
+          <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre hover:shadow-genre-hover overflow-hidden transition-all duration-300 group">
+            <!-- Cover Art -->
+            <div class="aspect-square relative bg-music-background/20">
               <% if release.cover_art.attached? %>
-                <%= image_tag release.cover_art.variant(:medium), class: "w-full h-48 object-cover album-cover" %>
+                <%= image_tag release.cover_art.variant(:medium), 
+                      class: "w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" %>
               <% else %>
-                <div class="w-full h-48 bg-music-background flex items-center justify-center">
-                  <svg class="w-12 h-12 text-music-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                  </svg>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-music-primary/10 to-music-secondary/10">
+                  <div class="relative">
+                    <i class="fas fa-compact-disc text-5xl text-music-text-secondary/30 animate-spin-slow"></i>
+                    <div class="absolute inset-0 rounded-full border-8 border-transparent border-t-music-primary/30 border-r-music-secondary/30 animate-spin-slow"></div>
+                  </div>
                 </div>
               <% end %>
-              <button class="absolute bottom-4 right-4 bg-music-primary text-music-text rounded-full w-12 h-12 flex items-center justify-center shadow-lg play-button">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              
+              <!-- Play Button -->
+              <button class="absolute bottom-4 right-4 w-12 h-12 bg-music-accent text-music-background rounded-full flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
+                <i class="fas fa-play"></i>
               </button>
+              
+              <!-- Release Type Badge -->
+              <div class="absolute top-3 left-3">
+                <span class="px-2 py-1 bg-music-surface/90 text-music-text text-xs font-medium rounded-full backdrop-blur-sm border border-music-border/30">
+                  <%= release.release_type.titleize %>
+                </span>
+              </div>
             </div>
+
+            <!-- Release Info -->
             <div class="p-4">
-              <% if release.slug.present? && release.persisted? %>
-                <%= link_to release_path(release), class: "block hover:text-music-primary transition-colors" do %>
-                  <h3 class="font-bold text-lg mb-1 text-music-text"><%= release.title %></h3>
-                <% end %>
-              <% else %>
-                <h3 class="font-bold text-lg mb-1 text-music-text"><%= release.title %></h3>
-              <% end %>
-              <p class="text-music-text-secondary text-sm mb-3"><%= release.release_type_human %> • <%= release.release_date.strftime("%Y") %></p>
+              <h3 class="font-bold text-music-text mb-1 line-clamp-1">
+                <%= release.title %>
+              </h3>
+              <p class="text-music-text-secondary text-sm mb-3">
+                <%= release.release_date.strftime("%Y") %>
+              </p>
+              
+              <!-- Price and Buy Button -->
               <div class="flex justify-between items-center">
-                <span class="text-music-accent font-medium">$<%= release.price %></span>
-                <% if release.slug.present? && release.persisted? %>
-                  <%= link_to "Buy Now", release_path(release), class: "bg-music-secondary hover:bg-opacity-80 text-music-text px-4 py-1 rounded-button text-sm transition-all duration-200" %>
-                <% else %>
-                  <span class="text-music-text-secondary text-sm">Not Available</span>
+                <span class="text-music-accent font-bold">
+                  <%= number_to_currency(release.price) %>
+                </span>
+                <% if release.slug.present? %>
+                  <%= link_to release_path(release), 
+                        class: "px-4 py-1 bg-music-secondary hover:bg-music-secondary/90 text-music-background rounded-button text-sm font-medium transition-colors" do %>
+                    BUY NOW
+                  <% end %>
                 <% end %>
               </div>
             </div>
@@ -176,63 +181,53 @@
       </div>
     </section>
 
-    <%# About Section %>
+    <!-- About Tab -->
     <section data-tabs-target="content" data-content="about" class="mb-12 hidden">
-      <h2 class="text-2xl font-bold mb-6 font-display">About</h2>
-      <div class="bg-music-surface rounded-genre shadow-genre p-6 border border-music-border">
+      <h2 class="text-2xl font-display tracking-tight mb-6">ABOUT</h2>
+      <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre p-6">
         <% if @artist_profile.bio.present? %>
-          <div class="text-music-text mb-4">
+          <div class="prose prose-invert max-w-none text-music-text">
             <%= simple_format @artist_profile.bio %>
           </div>
+        <% else %>
+          <p class="text-music-text-secondary italic">No bio available</p>
         <% end %>
 
         <% if @artist_profile.website_url.present? %>
-          <div class="mt-4">
-            <%= link_to @artist_profile.website_url, class: "text-music-secondary hover:text-music-primary flex items-center transition-colors", target: "_blank", rel: "noopener noreferrer" do %>
+          <div class="mt-6">
+            <%= link_to @artist_profile.website_url, 
+                  class: "inline-flex items-center text-music-secondary hover:text-music-primary transition-colors", 
+                  target: "_blank", rel: "noopener noreferrer" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
               </svg>
-              Visit Website
+              Official Website
             <% end %>
           </div>
         <% end %>
-
-        <div class="flex flex-wrap gap-2 mt-6">
-          <span class="bg-music-background border border-music-border px-3 py-1 rounded-genre text-sm text-music-text-secondary">#music</span>
-          <span class="bg-music-background border border-music-border px-3 py-1 rounded-genre text-sm text-music-text-secondary">#artist</span>
-          <% if @artist_profile.location.present? %>
-            <span class="bg-music-background border border-music-border px-3 py-1 rounded-genre text-sm text-music-text-secondary">#<%= @artist_profile.location.downcase.gsub(/\s+/, '') %></span>
-          <% end %>
-        </div>
       </div>
     </section>
 
-    <%# Shows Section %>
+    <!-- Shows Tab -->
     <section data-tabs-target="content" data-content="shows" class="mb-12 hidden">
-      <h2 class="text-2xl font-bold mb-6 font-display">Upcoming Shows</h2>
-      <div class="bg-music-surface rounded-genre shadow-genre p-6 border border-music-border">
-        <div class="text-center py-8 text-music-text-secondary">
-          <svg class="mx-auto h-12 w-12 text-music-text-secondary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p>No upcoming shows scheduled.</p>
-        </div>
+      <h2 class="text-2xl font-display tracking-tight mb-6">UPCOMING SHOWS</h2>
+      <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre p-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-music-text-secondary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <p class="text-music-text-secondary">No upcoming shows scheduled.</p>
       </div>
     </section>
 
-    <%# Merch Section %>
+    <!-- Merch Tab -->
     <section data-tabs-target="content" data-content="merch" class="mb-12 hidden">
-      <h2 class="text-2xl font-bold mb-6 font-display">Merchandise</h2>
-      <div class="bg-music-surface rounded-genre shadow-genre p-6 border border-music-border">
-        <div class="text-center py-8 text-music-text-secondary">
-          <svg class="mx-auto h-12 w-12 text-music-text-secondary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-          <p>No merchandise available at this time.</p>
-        </div>
+      <h2 class="text-2xl font-display tracking-tight mb-6">MERCHANDISE</h2>
+      <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre p-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-music-text-secondary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <p class="text-music-text-secondary">No merchandise available at this time.</p>
       </div>
     </section>
   </div>
 </main>
-<%# Footer %>
-

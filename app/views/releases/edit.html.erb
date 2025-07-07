@@ -4,22 +4,14 @@
       <h2 class="text-xl font-semibold mb-4 font-display text-music-text">Edit Release</h2>
       
       <%= form_with(model: @release, local: true, class: "upload-form", data: { controller: "release-upload" }) do |form| %>
-        <!-- Release Type Selector -->
+      <!-- Release Type (read‑only) -->
         <div class="mb-6">
           <label class="block text-music-text text-sm font-medium mb-2">Release Type</label>
-          <div class="grid grid-cols-4 gap-2">
-            <% Release.release_types.each_key do |type| %>
-              <button type="button" 
-                      class="release-type-btn py-2 px-4 border border-music-border rounded-genre text-sm font-medium bg-music-background text-music-text hover:bg-music-surface transition-all duration-200 <%= 'bg-music-primary border-music-primary text-music-text' if @release.release_type == type %>"
-                      data-release-upload-target="typeBtn"
-                      data-action="click->release-upload#selectType"
-                      data-type="<%= type %>">
-                <%= type.titleize %>
-              </button>
-            <% end %>
-            <%= form.hidden_field :release_type, id: "release_type", value: @release.release_type %>
-          </div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-music-surface text-music-text border border-music-border">
+            <%= @release.release_type_human %>
+          </span>
         </div>
+
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left Column -->

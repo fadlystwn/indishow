@@ -1,50 +1,36 @@
 class TracksController < ApplicationController
-  before_action :authenticate_user!
-  before_action :authorize_artist_user!
-  before_action :set_release
-  before_action :authorize_release_owner!
-  before_action :set_track, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!,              except: [ :stream ]
+  before_action :set_service
+  before_action :authorize_artist_user!,          except: [ :stream ]
+  before_action :set_release,                     except: [ :stream ]
+  before_action :set_release_and_track,           only: [ :stream ]
+  before_action :authorize_release_owner!,        only: [ :edit, :update, :destroy ]
+  before_action :set_track,                       only: [ :edit, :update, :destroy ]
 
   def new
     @track = @release.tracks.build
-    @next_track_number = (@release.tracks.maximum(:position) || 0) + 1
+    @next_track_number = @service.get_next_track_number(@release)
   end
 
   def create
     if params[:tracks].present?
-      tracks = []
-      params[:tracks].each do |track_data|
-        track = @release.tracks.build(
-          title: track_data[:title],
-          duration: track_data[:duration],
-          position: track_data[:position]
-        )
-        tracks << track
-      end
+      result = @service.create_multiple_tracks(@release, params[:tracks])
 
-      success = true
-      Track.transaction do
-        tracks.each do |track|
-          unless track.save
-            success = false
-            @track = track # for showing errors
-            raise ActiveRecord::Rollback
-          end
-        end
-      end
-
-      if success
-        redirect_to @release, notice: "#{tracks.size} #{'track'.pluralize(tracks.size)} successfully created."
+      if result[:success]
+        redirect_to @release, notice: result[:message]
       else
-        @next_track_number = (@release.tracks.maximum(:position) || 0) + 1
+        @track = result[:tracks].first # for showing errors
+        @next_track_number = @service.get_next_track_number(@release)
         render :new, status: :unprocessable_entity
       end
     else
-      @track = @release.tracks.build(track_params)
-      if @track.save
-        redirect_to @release, notice: 'Track was successfully created.'
+      result = @service.create_single_track(@release, track_params)
+
+      if result[:success]
+        redirect_to @release, notice: result[:message]
       else
-        @next_track_number = (@release.tracks.maximum(:position) || 0) + 1
+        @track = result[:track]
+        @next_track_number = @service.get_next_track_number(@release)
         render :new, status: :unprocessable_entity
       end
     end
@@ -54,23 +40,48 @@ class TracksController < ApplicationController
   end
 
   def update
-    if @track.update(track_params)
-      redirect_to @release, notice: 'Track was successfully updated.'
+    result = @service.update_track(@track, track_params)
+
+    if result[:success]
+      redirect_to @release, notice: result[:message]
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    track_title = @track.title
-    @track.destroy
-    redirect_to @release, success: "Track \"#{track_title}\" was successfully deleted."
+    result = @service.delete_track(@track)
+    redirect_to @release, success: result[:message]
+  end
+
+  def stream
+    Rails.logger.info "🎵 Stream request for track #{@track.id} (release #{@release.id}) by user #{current_user&.id || 'anonymous'}"
+
+    result = @service.generate_stream_response(@track, current_user)
+
+    if result[:success]
+      Rails.logger.info result[:log_message]
+      render json: { stream_url: result[:stream_url] }
+    else
+      Rails.logger.warn result[:log_message]
+      Rails.logger.error result[:backtrace].join("\n") if result[:backtrace]
+      render json: { error: result[:error] }, status: result[:status]
+    end
   end
 
   private
 
+  def set_service
+    @service = TrackService.new(current_user)
+  end
+
   def set_release
     @release = Release.find(params[:release_id])
+  end
+
+  def set_release_and_track
+    set_release
+    set_track
   end
 
   def set_track
@@ -82,17 +93,16 @@ class TracksController < ApplicationController
   end
 
   def authorize_artist_user!
-    unless current_user&.artist?
+    unless @service.can_manage_tracks?
       flash[:alert] = "Access denied. Only artists can manage tracks."
       redirect_to root_path
     end
   end
 
   def authorize_release_owner!
-    unless @release.user == current_user
+    unless @service.can_manage_release?(@release)
       flash[:alert] = "You are not authorized to perform this action."
       redirect_to release_path(@release)
     end
   end
-end
 end
