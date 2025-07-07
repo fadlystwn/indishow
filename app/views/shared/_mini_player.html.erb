@@ -1,120 +1,194 @@
-<!-- Mini Player - Fixed at bottom of viewport -->
+<!-- Mini Player - Clean Style with Theme Colors -->
 <div data-controller="audio-player"
+     data-audio-player-current-track-value="{}"
+     data-audio-player-queue-value="[]"
      data-audio-player-volume-value="1.0"
      data-audio-player-position-value="0"
      data-turbo-permanent
-     class="fixed bottom-0 left-0 right-0 z-50 bg-music-surface border-t border-music-border shadow-lg transform translate-y-full transition-transform duration-300 ease-out">
+     class="fixed bottom-0 left-0 right-0 z-50 bg-music-surface border-t border-music-border shadow-2xl backdrop-blur-lg transform translate-y-full transition-transform duration-300 ease-out">
   
   <!-- Hidden audio element for Plyr -->
   <audio data-audio-player-target="player" preload="none"></audio>
   
-  <div class="max-w-7xl mx-auto px-4 py-3">
-    <div class="flex items-center justify-between">
+  <div class="px-4 py-2">
+    <!-- 3-Column Layout -->
+    <div class="grid grid-cols-3 items-center h-16">
       
-      <!-- Track Info -->
-      <div class="flex items-center space-x-4 min-w-0 flex-1">
+      <!-- Left: Track Info (33%) -->
+      <div class="flex items-center space-x-3 min-w-0">
         <div class="flex-shrink-0">
           <img data-audio-player-target="artwork" 
-               class="w-12 h-12 rounded object-cover bg-music-background"
+               class="w-14 h-14 rounded-lg object-cover bg-music-background shadow-lg"
                style="display: none"
                alt="Album artwork">
           <div data-audio-player-target="artworkFallback"
-               class="w-12 h-12 bg-music-background rounded flex items-center justify-center">
-            <i class="fas fa-music text-music-text-secondary"></i>
+               class="w-14 h-14 bg-gradient-to-br from-music-background to-music-border rounded-lg flex items-center justify-center shadow-lg">
+            <i class="fas fa-music text-music-text-secondary text-lg"></i>
           </div>
         </div>
         
         <div class="min-w-0 flex-1">
           <h4 data-audio-player-target="title" 
-              class="text-sm font-medium text-music-text truncate">
+              class="text-sm font-semibold text-music-text truncate hover:text-music-accent cursor-pointer transition-colors">
             No track selected
           </h4>
           <p data-audio-player-target="artist" 
-             class="text-xs text-music-text-secondary truncate">
+             class="text-xs text-music-text-secondary truncate hover:text-music-text cursor-pointer transition-colors">
             Select a track to play
           </p>
         </div>
       </div>
 
-      <!-- Player Controls -->
-      <div class="flex items-center space-x-6 flex-shrink-0">
-        
-        <!-- Previous/Next buttons -->
-        <div class="flex items-center space-x-2">
+      <!-- Center: Player Controls (33%) -->
+      <div class="flex flex-col items-center space-y-2">
+        <!-- Control Buttons -->
+        <div class="flex items-center space-x-4">
           <button data-audio-player-target="prevButton"
                   data-action="click->audio-player#playPrevious"
-                  class="w-8 h-8 flex items-center justify-center text-music-text-secondary hover:text-music-text transition-colors">
-            <i class="fas fa-step-backward"></i>
+                  class="text-music-text-secondary hover:text-music-text transition-colors p-1">
+            <i class="fas fa-step-backward text-lg"></i>
           </button>
           
           <button data-audio-player-target="playButton"
                   data-action="click->audio-player#togglePlay"
-                  class="w-10 h-10 flex items-center justify-center bg-music-accent text-music-background rounded-full hover:bg-music-accent/90 transition-colors">
-            <i class="fas fa-play"></i>
+                  class="w-8 h-8 flex items-center justify-center bg-music-accent text-music-background rounded-full hover:scale-105 transition-transform shadow-lg">
+            <i class="fas fa-play text-sm ml-0.5"></i>
           </button>
           
           <button data-audio-player-target="nextButton"
                   data-action="click->audio-player#playNext"
-                  class="w-8 h-8 flex items-center justify-center text-music-text-secondary hover:text-music-text transition-colors">
-            <i class="fas fa-step-forward"></i>
+                  class="text-music-text-secondary hover:text-music-text transition-colors p-1">
+            <i class="fas fa-step-forward text-lg"></i>
           </button>
         </div>
-
-        <!-- Seek Bar and Time -->
-        <div class="flex items-center space-x-3 min-w-0 flex-1 max-w-md">
+        
+        <!-- Progress Bar -->
+        <div class="hidden md:flex items-center space-x-2 w-full max-w-lg">
           <span data-audio-player-target="currentTime" 
-                class="text-xs text-music-text-secondary whitespace-nowrap">
+                class="text-xs text-music-text-secondary font-mono w-10 text-right">
             0:00
           </span>
           
-          <div class="flex-1 h-2 bg-music-background rounded-full cursor-pointer relative"
-               data-action="click->audio-player#seek">
-            <div data-audio-player-target="seekBar"
-                 class="h-full bg-music-accent rounded-full transition-all"
-                 style="width: 0%"></div>
+          <div class="flex-1 group">
+            <div class="h-1 bg-music-border rounded-full cursor-pointer relative overflow-hidden"
+                 data-action="click->audio-player#seek">
+              <div data-audio-player-target="seekBar"
+                   class="h-full bg-music-accent rounded-full transition-all duration-200 relative"
+                   style="width: 0%">
+                <!-- Hover dot -->
+                <div class="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-music-accent rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"></div>
+              </div>
+            </div>
           </div>
           
           <span data-audio-player-target="duration" 
-                class="text-xs text-music-text-secondary whitespace-nowrap">
+                class="text-xs text-music-text-secondary font-mono w-10">
             0:00
           </span>
         </div>
+      </div>
 
+      <!-- Right: Volume & Close (33%) -->
+      <div class="flex items-center justify-end space-x-4">
         <!-- Volume Control -->
-        <div class="flex items-center space-x-2">
-          <i class="fas fa-volume-down text-music-text-secondary text-sm"></i>
-          <input data-audio-player-target="volume"
-                 data-action="input->audio-player#setVolume"
-                 type="range"
-                 min="0"
-                 max="1"
-                 step="0.1"
-                 value="1"
-                 class="w-20 h-2 bg-music-background rounded-lg appearance-none cursor-pointer slider">
-          <i class="fas fa-volume-up text-music-text-secondary text-sm"></i>
+        <div class="hidden lg:flex items-center space-x-2 group">
+          <button class="text-music-text-secondary hover:text-music-text transition-colors">
+            <i class="fas fa-volume-down text-sm"></i>
+          </button>
+          
+          <div class="w-24">
+            <input data-audio-player-target="volume"
+                   data-action="input->audio-player#setVolume"
+                   type="range"
+                   min="0"
+                   max="1"
+                   step="0.01"
+                   value="1"
+                   class="w-full h-1 bg-music-border rounded-lg appearance-none cursor-pointer theme-slider">
+          </div>
         </div>
+        
+        <!-- Close Button -->
+        <button data-action="click->audio-player#hidePlayer" 
+                class="text-music-text-secondary hover:text-music-text transition-colors p-1">
+          <i class="fas fa-chevron-down text-sm"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Progress Bar -->
+    <div class="md:hidden">
+      <div class="flex items-center justify-between text-xs text-music-text-secondary mb-1">
+        <span data-audio-player-target="currentTime">0:00</span>
+        <span data-audio-player-target="duration">0:00</span>
+      </div>
+      <div class="h-1 bg-music-border rounded-full cursor-pointer"
+           data-action="click->audio-player#seek">
+        <div data-audio-player-target="seekBar"
+             class="h-full bg-music-accent rounded-full transition-all"
+             style="width: 0%"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Custom styles for volume slider -->
+<!-- Theme-based Custom CSS -->
 <style>
-  .slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #06b6d4; /* music-accent */
-    cursor: pointer;
+  /* Theme Volume Slider */
+  .theme-slider {
+    outline: none;
   }
   
-  .slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+  .theme-slider::-webkit-slider-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #333333;
+    border-radius: 2px;
+    border: none;
+  }
+  
+  .theme-slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 12px;
+    width: 12px;
     border-radius: 50%;
-    background: #06b6d4; /* music-accent */
+    background: #FFD700;
     cursor: pointer;
     border: none;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  
+  .theme-slider:hover::-webkit-slider-thumb {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  
+  .group:hover .theme-slider::-webkit-slider-thumb {
+    opacity: 1;
+  }
+  
+  .theme-slider::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #333333;
+    border-radius: 2px;
+    border: none;
+  }
+  
+  .theme-slider::-moz-range-thumb {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+    border: none;
+  }
+  
+  /* Smooth animations */
+  .mini-player-transition {
+    transition: all 0.2s ease;
   }
 </style>

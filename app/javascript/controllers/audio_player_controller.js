@@ -22,6 +22,9 @@ export default class extends Controller {
     this.loadPlayerState()
     this.setupEventListeners()
     
+    // Restore player state on page load/navigation
+    this.restoreGlobalPlayerState()
+    
     // Mark as permanent for Turbo
     this.element.dataset.turboPermanent = true
   }
@@ -167,8 +170,11 @@ export default class extends Controller {
     if (tracks.length > 0) {
       // Use setTimeout to prevent immediate re-triggering and allow proper cleanup
       setTimeout(() => {
-        this.handlePlayRequest({ detail: tracks[0] })
-        this._handlingQueueRequest = false
+        try {
+          this.handlePlayRequest({ detail: tracks[0] })
+        } finally {
+          this._handlingQueueRequest = false
+        }
       }, 50)
     } else {
       this._handlingQueueRequest = false
@@ -330,12 +336,14 @@ export default class extends Controller {
 
   seek(event) {
     if (this.hasSeekBarTarget && this.plyr && this.plyr.duration) {
-      const rect = this.seekBarTarget.getBoundingClientRect()
-      const clickX = event.clientX - rect.left
+      const rect = event.currentTarget.getBoundingClientRect()
+      const clickX = Math.max(0, Math.min(event.clientX - rect.left, rect.width))
       const newTime = (clickX / rect.width) * this.plyr.duration
       
-      this.plyr.currentTime = newTime
-      this.positionValue = newTime
+      // Ensure time is within bounds
+      const clampedTime = Math.max(0, Math.min(newTime, this.plyr.duration))
+      this.plyr.currentTime = clampedTime
+      this.positionValue = clampedTime
     }
   }
 
@@ -425,7 +433,9 @@ export default class extends Controller {
     const state = {
       track_id: this.currentTrackValue.id,
       position: this.positionValue || 0,
-      volume: this.volumeValue || 1.0
+      volume: this.volumeValue || 1.0,
+      is_playing: this.plyr && this.plyr.playing,
+      track_data: this.currentTrackValue // Save full track data for restoration
     }
 
     localStorage.setItem('audio_player_state', JSON.stringify(state))
@@ -443,6 +453,56 @@ export default class extends Controller {
   showPlayer() {
     this.element.classList.remove('translate-y-full')
     this.element.classList.add('translate-y-0')
+    
+    // Save state to remember that player was shown
+    const currentState = this.loadPlayerState()
+    localStorage.setItem('audio_player_state', JSON.stringify({
+      ...currentState,
+      player_visible: true
+    }))
+  }
+
+  hidePlayer() {
+    this.element.classList.add('translate-y-full')
+    this.element.classList.remove('translate-y-0')
+    
+    // Pause audio when hiding player
+    if (this.plyr && this.plyr.playing) {
+      this.plyr.pause()
+      this.updatePlayButton(false)
+    }
+    
+    // Update saved state
+    const currentState = this.loadPlayerState()
+    localStorage.setItem('audio_player_state', JSON.stringify({
+      ...currentState,
+      player_visible: false,
+      is_playing: false
+    }))
+  }
+
+  restoreGlobalPlayerState() {
+    const savedState = this.loadPlayerState()
+    
+    if (savedState.track_id && savedState.track_data) {
+      // Restore the track info even if not playing
+      this.currentTrackValue = savedState.track_data
+      this.updateTrackInfo(savedState.track_data)
+      
+      // Restore volume setting with better validation
+      if (savedState.volume && this.hasVolumeTarget && this.volumeTarget) {
+        this.volumeValue = savedState.volume
+        this.volumeTarget.value = savedState.volume
+        if (this.plyr) {
+          this.plyr.volume = savedState.volume
+        }
+      }
+      
+      if (savedState.is_playing || savedState.player_visible) {
+        // Show player if it was playing or visible before navigation
+        this.showPlayer()
+      }
+    }
   }
 
   showError(message) {
@@ -488,9 +548,5 @@ export default class extends Controller {
     
     // Update UI
     this.updatePlayButton(false)
-  }
-
-  beforeCache() {
-    this.savePlayerState()
   }
 }

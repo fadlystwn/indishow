@@ -33,11 +33,14 @@
         </div>
       <% end %>
 
-      <main class="flex-grow">
+      <!-- Add padding bottom to prevent content from being hidden behind mini player -->
+      <main class="flex-grow pb-20">
         <%= yield %>
       </main>
 
       <%= render 'shared/footer' %>
+      
+      <!-- Global Mini Player - Available on all pages -->
       <%= render 'shared/mini_player' %>
     </div>
   </body>
