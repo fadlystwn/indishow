@@ -48,7 +48,7 @@
             
             <% if user_signed_in? && current_user == @release.user %>
               <%= link_to edit_release_path(@release), class: "text-sm bg-music-surface hover:bg-music-border border border-music-border px-4 py-2 rounded transition-colors" do %>
-                <i class="fas fa-edit mr-2"></i>Edit
+                <i class="fas fa-edit mr-2"></i><%= @release.published? ? 'Edit Published' : 'Edit' %>
               <% end %>
             <% elsif user_signed_in? && current_user.fan? %>
               <button class="bg-music-accent hover:bg-music-accent/90 text-music-background px-6 py-3 rounded transition-colors font-bold">
