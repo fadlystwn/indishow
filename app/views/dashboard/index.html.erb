@@ -84,7 +84,7 @@
                         <% if release.title.present? %>
                           <%= link_to "View", release_path(release), class: "text-blue-600 hover:text-blue-900 mr-3" %>
                         <% end %>
-                        <%= link_to "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" unless release.published? %>
+                        <%= link_to "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" %>
                         <% unless release.published? %>
                           <%= button_to "Publish",
                                         publish_release_path(release),

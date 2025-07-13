@@ -22,6 +22,15 @@ class Track < ApplicationRecord
     duration
   end
 
+  # Display name with featured artist if present
+  def display_title
+    if featured_artist.present?
+      "#{title} (feat. #{featured_artist})"
+    else
+      title
+    end
+  end
+
   private
 
   def set_position

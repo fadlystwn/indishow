@@ -1,108 +1,114 @@
 class TracksController < ApplicationController
-  before_action :authenticate_user!,              except: [ :stream ]
-  before_action :set_service
-  before_action :authorize_artist_user!,          except: [ :stream ]
-  before_action :set_release,                     except: [ :stream ]
-  before_action :set_release_and_track,           only: [ :stream ]
-  before_action :authorize_release_owner!,        only: [ :edit, :update, :destroy ]
-  before_action :set_track,                       only: [ :edit, :update, :destroy ]
-
-  def new
-    @track = @release.tracks.build
-    @next_track_number = @service.get_next_track_number(@release)
-  end
-
-  def create
-    if params[:tracks].present?
-      result = @service.create_multiple_tracks(@release, params[:tracks])
-
-      if result[:success]
-        redirect_to @release, notice: result[:message]
-      else
-        @track = result[:tracks].first # for showing errors
-        @next_track_number = @service.get_next_track_number(@release)
-        render :new, status: :unprocessable_entity
-      end
-    else
-      result = @service.create_single_track(@release, track_params)
-
-      if result[:success]
-        redirect_to @release, notice: result[:message]
-      else
-        @track = result[:track]
-        @next_track_number = @service.get_next_track_number(@release)
-        render :new, status: :unprocessable_entity
-      end
-    end
-  end
+  before_action :authenticate_user!
+  before_action :authorize_artist_user!
+  before_action :set_release
+  before_action :set_track, only: [:edit, :update, :destroy, :replace_audio]
+  before_action :authorize_release_owner!
+  before_action :ensure_published_release, only: [:edit, :update, :replace_audio]
 
   def edit
+    @editor_service = PublishedReleaseEditorService.new(current_user)
+    @editable_fields = @editor_service.editable_track_fields
+    @restricted_fields = @editor_service.restricted_track_fields
   end
 
   def update
-    result = @service.update_track(@track, track_params)
+    @editor_service = PublishedReleaseEditorService.new(current_user)
+    
+    # Validate track changes
+    validation_errors = @editor_service.validate_track_changes(@release, { @track.id => track_params })
+    
+    if validation_errors.any?
+      flash.now[:alert] = validation_errors.join(", ")
+      render :edit, status: :unprocessable_entity
+      return
+    end
 
+    # Update the track
+    result = @editor_service.update_track(@track, track_params)
+    
     if result[:success]
-      redirect_to @release, notice: result[:message]
+      redirect_to edit_release_path(@release), notice: result[:message]
     else
+      flash.now[:alert] = result[:errors].join(", ")
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def replace_audio
+    @editor_service = PublishedReleaseEditorService.new(current_user)
+    
+    unless params[:audio_file].present?
+      flash.now[:alert] = "Please select an audio file to replace the current track."
+      render :edit, status: :unprocessable_entity
+      return
+    end
+
+    result = @editor_service.replace_track_audio(@track, params[:audio_file])
+    
+    if result[:success]
+      redirect_to edit_release_path(@release), notice: result[:message]
+    else
+      flash.now[:alert] = result[:errors].join(", ")
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    result = @service.delete_track(@track)
-    redirect_to @release, success: result[:message]
+    if @release.published?
+      flash[:alert] = "Cannot delete tracks from published releases. Please contact support if you need to remove this track."
+      redirect_to edit_release_path(@release)
+    else
+      @track.destroy
+      redirect_to edit_release_path(@release), notice: "Track was successfully deleted."
+    end
   end
 
   def stream
-    Rails.logger.info "🎵 Stream request for track #{@track.id} (release #{@release.id}) by user #{current_user&.id || 'anonymous'}"
-
-    result = @service.generate_stream_response(@track, current_user)
-
-    if result[:success]
-      Rails.logger.info result[:log_message]
-      render json: { stream_url: result[:stream_url] }
+    if @track.streamable?
+      # Stream the audio file
+      redirect_to rails_blob_path(@track.audio_file, disposition: :inline)
     else
-      Rails.logger.warn result[:log_message]
-      Rails.logger.error result[:backtrace].join("\n") if result[:backtrace]
-      render json: { error: result[:error] }, status: result[:status]
+      render plain: "Track not available for streaming", status: :not_found
     end
   end
 
   private
 
-  def set_service
-    @service = TrackService.new(current_user)
-  end
-
   def set_release
-    @release = Release.find(params[:release_id])
-  end
-
-  def set_release_and_track
-    set_release
-    set_track
+    @release = current_user.releases.find(params[:release_id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to dashboard_path, alert: "Release not found."
   end
 
   def set_track
     @track = @release.tracks.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to edit_release_path(@release), alert: "Track not found."
   end
 
-  def track_params
-    params.require(:track).permit(:title, :duration, :position)
+  def authorize_release_owner!
+    unless @release.user == current_user
+      flash[:alert] = "You are not authorized to perform this action."
+      redirect_to release_path(@release)
+    end
   end
 
   def authorize_artist_user!
-    unless @service.can_manage_tracks?
+    unless current_user&.artist?
       flash[:alert] = "Access denied. Only artists can manage tracks."
       redirect_to root_path
     end
   end
 
-  def authorize_release_owner!
-    unless @service.can_manage_release?(@release)
-      flash[:alert] = "You are not authorized to perform this action."
-      redirect_to release_path(@release)
+  def ensure_published_release
+    unless @release.published?
+      flash[:alert] = "This action is only available for published releases."
+      redirect_to edit_release_path(@release)
     end
+  end
+
+  def track_params
+    params.require(:track).permit(:title, :featured_artist)
   end
 end

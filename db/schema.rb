@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_07_034537) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_12_195654) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -80,8 +80,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_07_034537) do
     t.string "slug"
     t.string "genre"
     t.string "status", default: "draft", null: false
+    t.integer "step", default: 1
     t.index ["slug", "user_id"], name: "index_releases_on_slug_and_user_id", unique: true
     t.index ["status"], name: "index_releases_on_status"
+    t.index ["step"], name: "index_releases_on_step"
     t.index ["user_id"], name: "index_releases_on_user_id"
   end
 
@@ -92,6 +94,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_07_034537) do
     t.integer "release_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "featured_artist"
     t.index ["release_id"], name: "index_tracks_on_release_id"
   end
 
