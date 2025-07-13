@@ -1,9 +1,9 @@
 class TracksController < ApplicationController
-  before_action :authenticate_user!
-  before_action :authorize_artist_user!
+  before_action :authenticate_user!, except: [:stream]
+  before_action :authorize_artist_user!, except: [:stream]
   before_action :set_release
-  before_action :set_track, only: [:edit, :update, :destroy, :replace_audio]
-  before_action :authorize_release_owner!
+  before_action :set_track, only: [:edit, :update, :destroy, :replace_audio, :stream]
+  before_action :authorize_release_owner!, except: [:stream]
   before_action :ensure_published_release, only: [:edit, :update, :replace_audio]
 
   def edit
@@ -65,26 +65,45 @@ class TracksController < ApplicationController
   end
 
   def stream
-    if @track.streamable?
-      # Stream the audio file
-      redirect_to rails_blob_path(@track.audio_file, disposition: :inline)
+    # Use TrackService to generate stream response
+    track_service = TrackService.new(current_user)
+    result = track_service.generate_stream_response(@track, current_user)
+    
+    Rails.logger.info result[:log_message] if result[:log_message]
+    
+    if result[:success]
+      render json: { stream_url: result[:stream_url] }
     else
-      render plain: "Track not available for streaming", status: :not_found
+      render json: { error: result[:error] }, status: result[:status]
     end
   end
 
   private
 
   def set_release
-    @release = current_user.releases.find(params[:release_id])
+    # For streaming, allow access to published releases by any user
+    if params[:action] == 'stream'
+      @release = Release.find(params[:release_id])
+    else
+      # For other actions, only allow access to user's own releases
+      @release = current_user.releases.find(params[:release_id])
+    end
   rescue ActiveRecord::RecordNotFound
-    redirect_to dashboard_path, alert: "Release not found."
+    if params[:action] == 'stream'
+      render json: { error: "Release not found" }, status: :not_found
+    else
+      redirect_to dashboard_path, alert: "Release not found."
+    end
   end
 
   def set_track
     @track = @release.tracks.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to edit_release_path(@release), alert: "Track not found."
+    if params[:action] == 'stream'
+      render json: { error: "Track not found" }, status: :not_found
+    else
+      redirect_to edit_release_path(@release), alert: "Track not found."
+    end
   end
 
   def authorize_release_owner!
