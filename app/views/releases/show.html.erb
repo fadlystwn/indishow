@@ -62,12 +62,13 @@
           </div>
         </div>
 
-        <!-- Album description (placeholder) -->
+        <!-- Album description (real data) -->
         <div class="prose prose-invert max-w-none text-music-text-secondary">
-          <p>Album description would go here. This is where artists typically share information about the release, credits, or story behind the music.</p>
+          <p><%= @release.description.presence || "No description provided." %></p>
         </div>
       </div>
-    </div>      <!-- Track listing (Bandcamp style) -->
+    </div>      
+    <!-- Track listing (Bandcamp style) -->
       <div class="border-t border-music-border pt-8" data-controller="releases">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-xl font-bold">Tracks</h3>
@@ -129,7 +130,7 @@
     <div class="border-t border-music-border mt-10 pt-8">
       <h3 class="text-xl font-bold mb-6">About <%= @release.artist %></h3>
       <div class="prose prose-invert max-w-none text-music-text-secondary">
-        <p>Artist bio would appear here. This section typically contains information about the artist, their influences, and other releases.</p>
+        <p><%= @release.user.artist_profile.bio.presence || "No artist bio available." %></p>
       </div>
     </div>
 
@@ -145,9 +146,8 @@
         <div>
           <h4 class="font-medium text-music-text mb-2">Tags</h4>
           <div class="flex flex-wrap gap-2">
-            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border">Genre</span>
-            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border">Year</span>
-            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border">Mood</span>
+            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border"><%= @release.genre.presence || "Genre N/A" %></span>
+            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border"><%= @release.release_date.year if @release.release_date %></span>
           </div>
         </div>
       </div>
