@@ -1,6 +1,5 @@
 <div class="min-h-screen bg-music-background">
 
-
   <div class="container mx-auto px-4 py-8">
     <!-- Enhanced Filters with Bandcamp-style layout -->
     <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre border border-music-border/50 p-6 mb-8">
@@ -79,112 +78,18 @@
       </div>
     </div>
 
-    <!-- Music Grid (4 columns) with Bandcamp styling -->
-    <% if @releases.any? %>
-     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-        <% @releases.each do |release| %>
-          <div class="bg-gradient-to-br from-music-surface to-music-background/50 rounded-genre shadow-genre hover:shadow-genre-hover overflow-hidden transition-all duration-300 group relative">
-            <!-- Cover Art with Glow Effect -->
-            <div class="aspect-square relative overflow-hidden">
-              <% if release.cover_art.attached? %>
-                <%= image_tag release.cover_art.variant(:medium), 
-                      alt: release.title, 
-                      class: "w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" %>
-              <% else %>
-                <div class="w-full h-full bg-gradient-to-br from-music-primary/10 to-music-secondary/10 flex items-center justify-center">
-                  <div class="relative">
-                    <i class="fas fa-compact-disc text-5xl text-music-text-secondary/30 animate-spin-slow"></i>
-                    <div class="absolute inset-0 rounded-full border-8 border-transparent border-t-music-primary/30 border-r-music-secondary/30 animate-spin-slow"></div>
-                  </div>
-                </div>
-              <% end %>
-              
-              <!-- Gradient Overlay -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
-              <!-- Play Button -->
-              <button class="absolute bottom-4 right-4 w-12 h-12 bg-music-accent text-music-background rounded-full flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
-                <i class="fas fa-play"></i>
-              </button>
-              
-              <!-- Release Type Badge -->
-              <div class="absolute top-4 left-4">
-                <span class="px-3 py-1 bg-music-surface/90 text-music-text text-xs font-bold rounded-full backdrop-blur-sm shadow-sm">
-                  <%= release.release_type.titleize %>
-                </span>
-              </div>
-            </div>
-
-            <!-- Release Info -->
-            <div class="p-5 relative z-10">
-              <!-- Floating Price Tag -->
-              <div class="absolute -top-5 right-4 bg-music-accent text-music-background px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                <%= number_to_currency(release.price) %>
-              </div>
-              
-              <!-- Title & Artist -->
-              <div class="mb-4">
-                <% if release.slug.present? %>
-                  <%= link_to release_path(release), class: "block group" do %>
-                    <h3 class="text-xl font-bold text-music-text hover:text-music-primary transition-colors line-clamp-1">
-                      <%= release.title %>
-                    </h3>
-                  <% end %>
-                <% else %>
-                  <h3 class="text-xl font-bold text-music-text line-clamp-1">
-                    <%= release.title %>
-                  </h3>
-                <% end %>
-                
-                <% if release.user.artist_profile %>
-                  <%= link_to artist_profile_path(release.user.artist_profile), 
-                        class: "text-music-text-secondary hover:text-music-primary transition-colors text-sm" do %>
-                    <%= release.user.artist_profile.name %>
-                  <% end %>
-                <% else %>
-                  <span class="text-music-text-secondary text-sm">
-                    <%= release.user.name_or_email %>
-                  </span>
-                <% end %>
-              </div>
-
-              <!-- Metadata -->
-              <div class="flex justify-between items-center text-sm text-music-text-secondary mb-5">
-                <% if release.genre.present? %>
-                  <span class="inline-flex items-center">
-                    <i class="fas fa-tag text-xs mr-1"></i>
-                    <%= release.genre %>
-                  </span>
-                <% end %>
-                <span>
-                  <%= release.release_date.strftime("%b %Y") %>
-                </span>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex gap-3">
-                <% if release.slug.present? %>
-                  <%= link_to release_path(release), 
-                        class: "flex-1 flex items-center justify-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-background px-3 py-2 rounded-full text-sm font-medium transition-colors shadow-button hover:shadow-md" do %>
-                    <i class="fas fa-eye"></i>
-                    <span>View</span>
-                  <% end %>
-                <% end %>
-                
-                <button class="flex-1 flex items-center justify-center gap-2 bg-music-surface hover:bg-music-primary/10 text-music-text px-3 py-2 rounded-full text-sm font-medium transition-colors shadow-sm hover:shadow-md">
-                  <i class="fas fa-cart-plus"></i>
-                  <span>Add</span>
-                </button>
-              </div>
-            </div>
-            
-            <!-- Hover Glow Effect -->
-            <div class="absolute inset-0 rounded-genre overflow-hidden pointer-events-none">
-              <div class="absolute -inset-1 bg-music-primary/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          </div>
-        <% end %>
-      </div>
+    <!-- Album Grid -->
+    <%= render 'shared/album_list', 
+        releases: @releases,
+        layout: 'grid',
+        show_play_button: true,
+        show_price: true,
+        show_release_type: false,
+        show_artist: true,
+        show_date: true,
+        grid_cols: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+        empty_message: 'No music found',
+        empty_icon: 'fas fa-music' %>
 
       <!-- Pagination - Bandcamp-style -->
       <div class="flex justify-center mt-8">
@@ -199,30 +104,7 @@
                 page_links: false %>
         </div>
       </div>
-    <% else %>
-      <!-- Empty State - Bandcamp-style -->
-      <div class="text-center py-16">
-        <div class="bg-music-surface/50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 border border-music-border/50">
-          <i class="fas fa-music text-4xl text-music-text-secondary/50"></i>
-        </div>
-        <h3 class="text-2xl font-display tracking-tight text-music-text mb-2">No music found</h3>
-        <p class="text-music-text-secondary mb-6 max-w-md mx-auto">
-          <% if params[:genre].present? || params[:type].present? %>
-            Try adjusting your filters to see more results.
-          <% else %>
-            It looks like there's no music available right now. Check back later!
-          <% end %>
-        </p>
-        
-        <% if params[:genre].present? || params[:type].present? %>
-          <%= link_to music_path, 
-                class: "inline-flex items-center gap-2 bg-music-primary hover:bg-music-primary/90 text-music-background px-6 py-3 rounded-button font-display tracking-wider transition-colors shadow-button hover:shadow-genre-hover" do %>
-            <i class="fas fa-filter"></i>
-            <span>CLEAR FILTERS</span>
-          <% end %>
-        <% end %>
-      </div>
-    <% end %>
+
   </div>
 </div>
 
@@ -243,6 +125,7 @@
   .animate-spin-slow {
     animation: spin-slow 8s linear infinite;
   }
+  
   .pagination {
     display: flex;
     list-style: none;

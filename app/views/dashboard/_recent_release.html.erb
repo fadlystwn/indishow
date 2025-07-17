@@ -19,7 +19,7 @@
         
         <tbody class="bg-white divide-y divide-gray-200">
           <% @releases.each do |release| %>
-            <tr>
+            <tr id="<%= dom_id(release) %>">
               <!-- Table rows remain the same as before -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <% if release.cover_art.attached? %>
@@ -50,7 +50,7 @@
               <% if release.title.present? %>
                 <%= link_to "View", release_path(release), class: "text-blue-600 hover:text-blue-900 mr-3" %>
               <% end %>
-              <%= link_to "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" unless release.published? %>
+              <%= link_to release.published? ? "Edit Published" : "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" %>
               <% unless release.published? %>
                 <%= button_to "Publish",
                               publish_release_path(release),
@@ -58,11 +58,11 @@
                               form: { data: { turbo_confirm: "Publish now? You won’t be able to edit after publishing." } },
                               class: "text-green-600 hover:text-green-900 mr-3" %>
               <% end %>
-              <%= link_to "Delete",
+              <%= button_to "Delete",
                           release_path(release),
                           method: :delete,
-                          data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
-                          class: "text-red-600 hover:text-red-900" %>
+                          form: { data: { turbo_confirm: "Are you sure?" } },
+                          class: "text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer" %>
             <% else %>
               <span class="text-gray-500 text-sm">Draft - No actions available</span>
             <% end %>

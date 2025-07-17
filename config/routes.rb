@@ -34,8 +34,11 @@ Rails.application.routes.draw do
 
   resources :releases do
     member { patch :publish }
-    resources :tracks, only: [ :new, :create, :edit, :update, :destroy ] do
-      member { get :stream }
+    resources :tracks, only: [ :edit, :update, :destroy ] do
+      member { 
+        get :stream
+        post :replace_audio  # For replacing track audio files
+      }
     end
   end
   get "home/index"
