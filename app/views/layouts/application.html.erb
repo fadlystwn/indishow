@@ -3,7 +3,7 @@
   <head>
     <title><%= content_for(:title) || "Skenaria" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -14,6 +14,7 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <%= javascript_importmap_tags %>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Font Awesome -->
@@ -32,11 +33,15 @@
         </div>
       <% end %>
 
-      <main class="flex-grow">
+      <!-- Add padding bottom to prevent content from being hidden behind mini player -->
+      <main class="flex-grow pb-20">
         <%= yield %>
       </main>
 
       <%= render 'shared/footer' %>
+      
+      <!-- Global Mini Player - Available on all pages -->
+      <%= render 'shared/mini_player' %>
     </div>
   </body>
 </html>

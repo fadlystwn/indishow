@@ -26,13 +26,14 @@
               <table class="min-w-full divide-y divide-music-border">
                 <thead class="bg-music-background">
                   <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Cover</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Title</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Artist</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Type</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Date</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-music-text-secondary uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cover</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artist</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 
@@ -47,10 +48,14 @@
                         <% end %>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-music-text"><%= release.title %></div>
+                        <div class="text-sm font-medium text-music-text">
+                          <%= release.title.present? ? release.title : content_tag(:em, "Untitled Release", class: "text-gray-500") %>
+                        </div>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-music-text-secondary"><%= release.artist %></div>
+                        <div class="text-sm text-music-text-secondary">
+                          <%= release.artist.present? ? release.artist : content_tag(:em, "Unknown Artist", class: "text-gray-500") %>
+                        </div>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-music-secondary bg-opacity-20 text-music-secondary border border-music-secondary border-opacity-30">
@@ -60,20 +65,41 @@
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-music-text-secondary">
                         <%= release.release_date.strftime("%Y-%m-%d") %>
                       </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                        <% status_color = case release.status
+                            when "published" then "bg-green-100 text-green-800"
+                            when "draft"     then "bg-yellow-100 text-yellow-800"
+                            else "bg-gray-100 text-gray-800"
+                          end %>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_color %>">
+                          <%= release.status.titleize %>
+                        </span>
+                      </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-music-accent font-medium">
                         <%= number_to_currency(release.price) %>
                       </td>
+                     
                       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <% if release.slug.present? && release.persisted? %>
-                          <%= link_to "View", release_path(release), class: "text-music-secondary hover:text-music-primary mr-3 transition-colors" %>
-                          <%= link_to "Edit", edit_release_path(release), class: "text-music-accent hover:text-music-primary mr-3 transition-colors" %>
-                          <%= link_to "Delete", release_path(release), 
-                              method: :delete, 
-                              class: "text-music-primary hover:text-red-400 transition-colors",
-                              data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
-                        <% else %>
-                          <span class="text-music-text-secondary text-sm">Draft - No actions available</span>
+                        <% if release.persisted? %>
+                        <% if release.title.present? %>
+                          <%= link_to "View", release_path(release), class: "text-blue-600 hover:text-blue-900 mr-3" %>
                         <% end %>
+                        <%= link_to "Edit", edit_release_path(release), class: "text-teal-600 hover:text-teal-900 mr-3" unless release.published? %>
+                        <% unless release.published? %>
+                          <%= button_to "Publish",
+                                        publish_release_path(release),
+                                        method: :patch,
+                                        form: { data: { turbo_confirm: "Publish now? You won’t be able to edit after publishing." } },
+                                        class: "text-green-600 hover:text-green-900 mr-3" %>
+                        <% end %>
+                        <%= link_to "Delete",
+                                    release_path(release),
+                                    method: :delete,
+                                    data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                                    class: "text-red-600 hover:text-red-900" %>
+                      <% else %>
+                        <span class="text-gray-500 text-sm">Draft - No actions available</span>
+                      <% end %>
                       </td>
                     </tr>
                   <% end %>

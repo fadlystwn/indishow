@@ -79,6 +79,15 @@ export class Navigation {
     stepInput.name = 'step'
     stepInput.value = '3'
     
+    // Add edit_mode parameter if we're in edit mode
+    if (this.controller.editModeValue) {
+      const editModeInput = document.createElement('input')
+      editModeInput.type = 'hidden'
+      editModeInput.name = 'edit_mode'
+      editModeInput.value = 'true'
+      form.appendChild(editModeInput)
+    }
+    
     // Get prepared track data from TrackUpload
     const trackData = this.controller.trackUpload.prepareFormData()
     

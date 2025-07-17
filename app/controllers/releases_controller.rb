@@ -1,84 +1,68 @@
 class ReleasesController < ApplicationController
-  before_action :authenticate_user!, except: [:show] # Allow public access to show
-  before_action :authorize_artist_user!, except: [:show] # Restrict fan users from all actions except show
-  before_action :set_release, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_release_owner!, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!,              except: [ :show ]
+  before_action :authorize_artist_user!,          except: [ :show ]
+  before_action :set_release,                     only: [ :show, :edit, :update, :destroy, :publish ]
+  before_action :authorize_release_owner!,        only: [ :edit, :update, :destroy, :publish ]
+  before_action :prevent_modifying_published_release!, only: [ :edit, :update, :destroy, :publish ]
 
   def index
-    @releases = current_user.releases.published.order(release_date: :desc)
+    @releases = current_user.releases.order(release_date: :desc)
   end
 
-  def show
-    # @release is already set by set_release
-    # Show page is accessible by everyone (fans can view and buy)
-  end
-
-  def new
-    @release = current_user.releases.new
-  end
-
-  def create
-    Rails.logger.info "📀 Creating release: #{release_params[:title]} by #{release_params[:artist]}"
-    
-    @release = current_user.releases.new(release_params)
-
-    if @release.save
-      Rails.logger.info "✅ Release created successfully: #{@release.title}"
-      redirect_to release_path(@release), notice: "Release was successfully created."
-    else
-      Rails.logger.warn "❌ Release creation failed: #{@release.errors.full_messages.join(', ')}"
-      render :new, status: :unprocessable_entity
-    end
-  end
+  def show; end
 
   def edit
-    # @release is already set by the before_action :set_release
-    respond_to do |format|
-      format.html # Renders the edit template
-      format.turbo_stream # For Turbo Frame responses
-    end
+    # Redirect to the multi-step wizard edit flow
+    redirect_to edit_step2_release_wizard_path(@release.id)
   end
 
   def update
-    Rails.logger.info "📝 Updating release: #{@release.title} (ID: #{@release.id})"
-    
     if @release.update(release_params)
-      Rails.logger.info "✅ Release updated successfully: #{@release.title}"
-      redirect_to release_path(@release), notice: "Release was successfully updated."
+      redirect_to dashboard_path, notice: "Release was successfully updated."
     else
-      Rails.logger.warn "❌ Release update failed: #{@release.errors.full_messages.join(', ')}"
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @release_title = @release.title
+    title = @release.title
     @release.destroy
-
     respond_to do |format|
-      format.html { redirect_to dashboard_path, notice: "Release \"#{@release_title}\" was successfully deleted." }
-      format.turbo_stream { flash.now[:notice] = "Release \"#{@release_title}\" was successfully deleted." }
+      format.html { redirect_to dashboard_path, notice: "Release \"#{title}\" was successfully deleted." }
+      format.turbo_stream { flash.now[:notice] = "Release \"#{title}\" was successfully deleted." }
+    end
+  end
+
+  def publish
+    service = ReleaseWizardService.new(current_user)
+    errors  = service.validate_release_for_publishing(@release)
+
+    if errors.empty?
+      @release.update!(status: "published")
+      redirect_to dashboard_path, notice: "Release published!"
+    else
+      redirect_to edit_release_path(@release), alert: errors.join(", ")
     end
   end
 
   private
 
   def set_release
-    if action_name == 'show'
-      # For show action, only find published releases (public access)
-      @release = if params[:id].match?(/\A\d+\z/)
-                   Release.published.find(params[:id])
-                 else
-                   Release.published.find_by!(slug: params[:id])
-                 end
+    numeric = params[:id].match?(/\A\d+\z/)
+
+    if action_name == "show"
+      scope = Release.published
+      @release = numeric ? scope.find_by(id: params[:id]) : scope.find_by(slug: params[:id])
+      if @release.nil? && user_signed_in?
+        owner_scope = current_user.releases
+        @release = numeric ? owner_scope.find_by(id: params[:id]) : owner_scope.find_by(slug: params[:id])
+      end
     else
-      # For edit/update/destroy, find the release first, then authorize ownership
-      @release = if params[:id].match?(/\A\d+\z/)
-                   Release.find(params[:id])
-                 else
-                   Release.find_by!(slug: params[:id])
-                 end
+      scope = Release
+      @release = numeric ? scope.find_by(id: params[:id]) : scope.find_by(slug: params[:id])
     end
+
+    raise ActiveRecord::RecordNotFound unless @release
   end
 
   def authorize_release_owner!
@@ -94,11 +78,18 @@ class ReleasesController < ApplicationController
       redirect_to root_path
     end
   end
+
+  def prevent_modifying_published_release!
+    if @release.published?
+      flash[:alert] = "This release is already published and cannot be modified."
+      redirect_to release_path(@release)
+    end
+  end
+
   def release_params
     params.require(:release).permit(
       :title,
       :artist,
-      :release_type,
       :release_date,
       :price,
       :description,

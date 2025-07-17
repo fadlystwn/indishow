@@ -1,160 +1,173 @@
+<div class="bg-music-background min-h-screen text-music-text">
 
+  <!-- Bandcamp-style main content layout -->
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Back button row -->
+    <div class="mb-6">
+      <%= link_to artist_profile_path(@release.user.artist_profile), class: "inline-flex items-center text-music-text-secondary hover:text-music-accent transition-colors" do %>
+        <i class="fas fa-arrow-left mr-2"></i>
+        Back to artist
+      <% end %>
+    </div>
 
-<div class="container mx-auto px-4 py-6 bg-music-background min-h-screen">
-  <div class="flex items-center gap-4 mb-6">
-    <%= link_to artist_profile_path(@release.user.artist_profile), class: "text-music-text-secondary hover:text-music-accent transition-colors" do %>
-      <i class="fas fa-arrow-left"></i>
-    <% end %>
-    <h1 class="text-2xl font-bold text-music-text">Release Details</h1>
-  </div>
-
-  <div class="bg-music-surface rounded-genre shadow-genre border border-music-border overflow-hidden">
-    <div class="md:flex">
-      <div class="md:w-1/3">
-        <% if @release.cover_art.attached? %>
-          <%= image_tag @release.cover_art.variant(:medium), class: "w-full h-full object-cover" %>
-        <% else %>
-          <div class="w-full h-64 md:h-full bg-music-surface flex items-center justify-center text-music-text-secondary">
-            <i class="fas fa-compact-disc text-6xl"></i>
-          </div>
-        <% end %>
-      </div>
-
-      <div class="p-6 md:w-2/3">
-        <div class="flex justify-between items-start">
-          <div>
-            <h2 class="text-2xl font-bold text-music-text"><%= @release.title %></h2>
-            <h3 class="text-xl text-music-text-secondary mb-4"><%= @release.artist %></h3>
-          </div>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-music-accent/20 text-music-accent">
-            <%= @release.release_type_human %>
-          </span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mt-6">
-          <div>
-            <p class="text-sm text-music-text-secondary">Release Date</p>
-            <p class="font-medium text-music-text"><%= @release.release_date %></p>
-          </div>
-          <div>
-            <p class="text-sm text-music-text-secondary">Price</p>
-            <p class="font-medium text-music-text"><%= number_to_currency(@release.price) %></p>
-          </div>
-          <div>
-            <p class="text-sm text-music-text-secondary">Added By</p>
-            <p class="font-medium text-music-text"><%= @release.user.email %></p>
-          </div>
-          <div>
-            <p class="text-sm text-music-text-secondary">Created</p>
-            <p class="font-medium text-music-text"><%= @release.created_at.to_formatted_s(:short) %></p>
-          </div>
-        </div>
-
-        <div class="mt-8 flex gap-3">
-          <% if user_signed_in? && current_user == @release.user %>
-            <%# Show Edit/Delete buttons only to the release owner %>
-            <%= link_to edit_release_path(@release), class: "flex-1 flex items-center justify-center gap-2 bg-music-secondary hover:bg-music-secondary/80 text-white px-4 py-2 rounded-button transition-colors shadow-button" do %>
-              <i class="fas fa-edit"></i>
-              <span>Edit Release</span>
-            <% end %>
-            <div class="flex-1">
-              <%= form_with url: release_path(@release), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this release? This action cannot be undone." }, class: "w-full" do %>
-                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-music-primary hover:bg-music-primary/80 text-white px-4 py-2 rounded-button transition-colors border-0 shadow-button">
-                  <i class="fas fa-trash"></i>
-                  <span>Delete Release</span>
-                </button>
-              <% end %>
+    <!-- Album header (Bandcamp style) -->
+    <div class="flex flex-col md:flex-row gap-8 mb-10">
+      <!-- Cover art -->
+      <div class="w-full md:w-1/3 lg:w-1/4 flex-shrink-0">
+        <div class="shadow-lg relative">
+          <% if @release.cover_art.attached? %>
+            <%= image_tag @release.cover_art.variant(:medium), class: "w-full aspect-square object-cover" %>
+          <% else %>
+            <div class="w-full aspect-square bg-gradient-to-br from-music-surface to-music-border/30 flex items-center justify-center">
+              <i class="fas fa-compact-disc text-6xl text-music-text-secondary"></i>
             </div>
-          <% elsif user_signed_in? && current_user.fan? %>
-            <%# Show Buy button only to fan users (non-owners) %>
-            <button class="flex-1 flex items-center justify-center gap-2 bg-music-accent hover:bg-music-accent/80 text-music-background px-4 py-2 rounded-button transition-colors shadow-button">
-              <i class="fas fa-shopping-cart"></i>
-              <span>Buy <%= number_to_currency(@release.price) %></span>
-            </button>
-          <% elsif !user_signed_in? %>
-            <%# Show sign in prompt for non-authenticated users %>
-            <%= link_to new_user_session_path, class: "flex-1 flex items-center justify-center gap-2 bg-music-secondary hover:bg-music-secondary/80 text-white px-4 py-2 rounded-button transition-colors shadow-button" do %>
-              <i class="fas fa-sign-in-alt"></i>
-              <span>Sign in to Purchase</span>
-            <% end %>
-          <% end %>
-          
-          <%# Back button always visible %>
-          <%= link_to artist_profile_path(@release.user.artist_profile), class: "flex-1 flex items-center justify-center gap-2 bg-music-surface hover:bg-music-border text-music-text border border-music-border px-4 py-2 rounded-button transition-colors" do %>
-            <i class="fas fa-user"></i>
-            <span>View Artist</span>
           <% end %>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Tracks Section -->
-  <div class="bg-music-surface rounded-genre shadow-genre border border-music-border mt-6 overflow-hidden">
-    <div class="p-6 border-b border-music-border">
-      <div class="flex justify-between items-center">
-        <h3 class="text-lg font-semibold text-music-text">Tracks</h3>
-        <% if user_signed_in? && current_user == @release.user %>
-          <%# Show Add Track button only to the release owner %>
-          <%= link_to new_release_track_path(@release), class: "inline-flex items-center gap-2 bg-music-secondary hover:bg-music-secondary/80 text-white px-4 py-2 rounded-button transition-colors text-sm shadow-button" do %>
-            <i class="fas fa-plus"></i>
-            <span>Add Track</span>
-          <% end %>
-        <% end %>
+      <!-- Album info -->
+      <div class="flex-1">
+        <div class="mb-6">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2"><%= @release.title %></h1>
+          <h2 class="text-xl md:text-2xl text-music-primary mb-4"><%= @release.artist %></h2>
+          
+          <div class="flex items-center space-x-4 mb-4">
+            <span class="text-sm bg-music-surface px-3 py-1 rounded-full border border-music-border">
+              <%= @release.release_type_human %>
+            </span>
+            <span class="text-sm text-music-text-secondary">
+              Released <%= @release.release_date %>
+            </span>
+          </div>
+        </div>
+
+        <!-- Price and action buttons -->
+        <div class="mb-8">
+          <div class="flex items-center space-x-6 mb-4">
+            <span class="text-2xl font-bold"><%= number_to_currency(@release.price) %></span>
+            
+            <% if user_signed_in? && current_user == @release.user %>
+              <%= link_to edit_release_path(@release), class: "text-sm bg-music-surface hover:bg-music-border border border-music-border px-4 py-2 rounded transition-colors" do %>
+                <i class="fas fa-edit mr-2"></i>Edit
+              <% end %>
+            <% elsif user_signed_in? && current_user.fan? %>
+              <button class="bg-music-accent hover:bg-music-accent/90 text-music-background px-6 py-3 rounded transition-colors font-bold">
+                <i class="fas fa-shopping-cart mr-2"></i>Buy Now
+              </button>
+            <% elsif !user_signed_in? %>
+              <%= link_to new_user_session_path, class: "bg-music-secondary hover:bg-music-secondary/90 text-white px-6 py-3 rounded transition-colors font-bold" do %>
+                <i class="fas fa-sign-in-alt mr-2"></i>Sign In to Purchase
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Album description (placeholder) -->
+        <div class="prose prose-invert max-w-none text-music-text-secondary">
+          <p>Album description would go here. This is where artists typically share information about the release, credits, or story behind the music.</p>
+        </div>
       </div>
-    </div>
+    </div>      <!-- Track listing (Bandcamp style) -->
+      <div class="border-t border-music-border pt-8" data-controller="releases">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold">Tracks</h3>
+          <div class="flex items-center space-x-4">
+            <% if @release.tracks.any?(&:streamable?) %>
+              <button data-action="click->releases#playAll"
+                      data-release-id="<%= @release.id %>"
+                      class="bg-music-accent hover:bg-music-accent/90 text-music-background px-4 py-2 rounded transition-colors font-medium">
+                <i class="fas fa-play mr-2"></i>Play All
+              </button>
+            <% end %>
+            <% if user_signed_in? && current_user == @release.user %>
+              <%= link_to new_release_track_path(@release), class: "text-sm bg-music-surface hover:bg-music-border border border-music-border px-4 py-2 rounded transition-colors" do %>
+                <i class="fas fa-plus mr-2"></i>Add Track
+              <% end %>
+            <% end %>
+          </div>
+        </div>
 
-    <% if @release.tracks.any? %>
-      <div class="divide-y divide-music-border">
-        <% @release.tracks.order(:position).each do |track| %>
-          <div class="p-4 hover:bg-music-background/50 transition-colors">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <span class="text-sm font-medium text-music-text-secondary bg-music-background px-2 py-1 rounded">
-                  #<%= track.position %>
-                </span>
-                <div>
-                  <h4 class="font-medium text-music-text"><%= track.title %></h4>
+      <% if @release.tracks.any? %>
+        <div class="space-y-1">
+          <% @release.tracks.order(:position).each do |track| %>
+            <div class="flex items-center justify-between p-3 hover:bg-music-surface/50 rounded transition-colors group">
+              <div class="flex items-center space-x-4 w-full">
+                <span class="text-music-text-secondary w-8 text-center"><%= track.position %></span>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-medium truncate"><%= track.title %></h4>
                   <% if track.duration.present? %>
-                    <p class="text-sm text-music-text-secondary">
-                      Duration: <%= Time.at(track.duration).utc.strftime("%M:%S") %>
-                    </p>
+                    <p class="text-sm text-music-text-secondary"><%= Time.at(track.duration).utc.strftime("%M:%S") %></p>
+                  <% end %>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <% if user_signed_in? && current_user == @release.user %>
+                    <%= link_to edit_release_track_path(@release, track), class: "text-music-text-secondary hover:text-music-accent transition-colors" do %>
+                      <i class="fas fa-edit"></i>
+                    <% end %>
+                    <%= form_with url: release_track_path(@release, track), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this track?" } do %>
+                      <button type="submit" class="text-music-text-secondary hover:text-music-primary transition-colors">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    <% end %>
+                  <% end %>
+                  <% if track.streamable? %>
+                    <button data-action="click->releases#playTrack"
+                            data-track-id="<%= track.id %>"
+                            data-release-id="<%= @release.id %>"
+                            data-track-title="<%= track.title %>"
+                            data-track-artist="<%= @release.artist %>"
+                            data-track-position="<%= track.position %>"
+                            data-track-duration="<%= track.duration %>"
+                            <% if @release.cover_art.attached? %>
+                              data-track-cover-art="<%= rails_blob_path(@release.cover_art.variant(:thumb), only_path: true) %>"
+                            <% end %>
+                            class="w-8 h-8 flex items-center justify-center bg-music-surface rounded-full text-music-accent hover:bg-music-accent hover:text-music-background transition-colors">
+                      <i class="fas fa-play text-xs"></i>
+                    </button>
+                  <% else %>
+                    <div class="w-8 h-8 flex items-center justify-center bg-music-surface rounded-full text-music-text-secondary cursor-not-allowed">
+                      <i class="fas fa-music text-xs opacity-50"></i>
+                    </div>
                   <% end %>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <% if user_signed_in? && current_user == @release.user %>
-                  <%# Show Edit/Delete buttons only to the release owner %>
-                  <%= link_to edit_release_track_path(@release, track), class: "inline-flex items-center gap-1 px-3 py-1 text-sm bg-music-secondary/20 hover:bg-music-secondary/30 text-music-secondary rounded transition-colors" do %>
-                    <i class="fas fa-edit text-xs"></i>
-                    <span>Edit</span>
-                  <% end %>
-                  <div>
-                    <%= form_with url: release_track_path(@release, track), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this track?" } do %>
-                      <button type="submit" class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-music-primary/20 hover:bg-music-primary/30 text-music-primary rounded transition-colors border-0">
-                        <i class="fas fa-trash text-xs"></i>
-                        <span>Remove</span>
-                      </button>
-                    <% end %>
-                  </div>
-                <% else %>
-                  <%# Show play button or similar for non-owners %>
-                  <button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-music-accent/20 hover:bg-music-accent/30 text-music-accent rounded transition-colors">
-                    <i class="fas fa-play text-xs"></i>
-                    <span>Play</span>
-                  </button>
-                <% end %>
-              </div>
             </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-12 text-music-text-secondary">
+          <i class="fas fa-music text-4xl mb-4"></i>
+          <p class="text-lg">No tracks yet</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Additional Bandcamp-style sections -->
+    <div class="border-t border-music-border mt-10 pt-8">
+      <h3 class="text-xl font-bold mb-6">About <%= @release.artist %></h3>
+      <div class="prose prose-invert max-w-none text-music-text-secondary">
+        <p>Artist bio would appear here. This section typically contains information about the artist, their influences, and other releases.</p>
+      </div>
+    </div>
+
+    <!-- Credits section -->
+    <div class="border-t border-music-border mt-8 pt-8">
+      <h3 class="text-xl font-bold mb-6">Credits</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-music-text-secondary">
+        <div>
+          <h4 class="font-medium text-music-text mb-2">Release Details</h4>
+          <p>Added by: <%= @release.user.email %></p>
+          <p>Created: <%= @release.created_at.to_formatted_s(:short) %></p>
+        </div>
+        <div>
+          <h4 class="font-medium text-music-text mb-2">Tags</h4>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border">Genre</span>
+            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border">Year</span>
+            <span class="text-xs bg-music-surface px-2 py-1 rounded border border-music-border">Mood</span>
           </div>
-        <% end %>
+        </div>
       </div>
-    <% else %>
-      <div class="p-8 text-center text-music-text-secondary">
-        <i class="fas fa-music text-3xl mb-3"></i>
-        <p class="text-lg mb-2">No tracks yet</p>
-        <p class="text-sm">Add your first track to this release</p>
-      </div>
-    <% end %>
+    </div>
   </div>
 </div>
