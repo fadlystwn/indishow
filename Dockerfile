@@ -49,8 +49,8 @@ USER rails:rails
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-EXPOSE 3000
+EXPOSE 5000
 CMD ["./bin/rails", "server"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
-  CMD curl -f http://localhost:3000/up || exit 1
+  CMD curl -f http://localhost:5000/up || exit 1
