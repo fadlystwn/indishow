@@ -1,0 +1,44 @@
+linters:
+  Indentation:
+    enabled: true
+    width: 2
+
+  SpaceAroundErbTag:
+    enabled: true
+
+  TrailingWhitespace:
+    enabled: true
+
+  FinalNewline:
+    enabled: true
+
+  HardCodedString:
+    enabled: false # Enable if you want to enforce I18n
+
+  TagStyle:
+    enabled: true
+    self_closing: require
+
+  NoJavascriptTagHelper:
+    enabled: true
+
+  NoInlineStyles:
+    enabled: true
+
+  # Accessibility plugin rules (if/when available)
+  Accessibility:
+    enabled: true
+    rules:
+      aria-roles: true
+      aria-valid-attr: true
+      aria-valid-attr-value: true
+      button-name: true
+      heading-has-content: true
+      html-has-lang: true
+      label-has-for: true
+      label-implicit: true
+      lang: true
+      no-autofocus: true
+      no-distracting-elements: true
+      scope: true
+      tabindex-no-positive: true 

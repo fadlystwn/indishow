@@ -124,61 +124,17 @@
     <!-- Music Tab -->
     <section data-tabs-target="content" data-content="music" class="mb-12">
       <h2 class="text-2xl font-display tracking-tight mb-6">DISCOGRAPHY</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <% @releases.each do |release| %>
-          <div class="bg-music-surface/80 backdrop-blur-sm rounded-genre shadow-genre hover:shadow-genre-hover overflow-hidden transition-all duration-300 group">
-            <!-- Cover Art -->
-            <div class="aspect-square relative bg-music-background/20">
-              <% if release.cover_art.attached? %>
-                <%= image_tag release.cover_art.variant(:medium), 
-                      class: "w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" %>
-              <% else %>
-                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-music-primary/10 to-music-secondary/10">
-                  <div class="relative">
-                    <i class="fas fa-compact-disc text-5xl text-music-text-secondary/30 animate-spin-slow"></i>
-                    <div class="absolute inset-0 rounded-full border-8 border-transparent border-t-music-primary/30 border-r-music-secondary/30 animate-spin-slow"></div>
-                  </div>
-                </div>
-              <% end %>
-              
-              <!-- Play Button -->
-              <button class="absolute bottom-4 right-4 w-12 h-12 bg-music-accent text-music-background rounded-full flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
-                <i class="fas fa-play"></i>
-              </button>
-              
-              <!-- Release Type Badge -->
-              <div class="absolute top-3 left-3">
-                <span class="px-2 py-1 bg-music-surface/90 text-music-text text-xs font-medium rounded-full backdrop-blur-sm border border-music-border/30">
-                  <%= release.release_type.titleize %>
-                </span>
-              </div>
-            </div>
-
-            <!-- Release Info -->
-            <div class="p-4">
-              <h3 class="font-bold text-music-text mb-1 line-clamp-1">
-                <%= release.title %>
-              </h3>
-              <p class="text-music-text-secondary text-sm mb-3">
-                <%= release.release_date.strftime("%Y") %>
-              </p>
-              
-              <!-- Price and Buy Button -->
-              <div class="flex justify-between items-center">
-                <span class="text-music-accent font-bold">
-                  <%= number_to_currency(release.price) %>
-                </span>
-                <% if release.slug.present? %>
-                  <%= link_to release_path(release), 
-                        class: "px-4 py-1 bg-music-secondary hover:bg-music-secondary/90 text-music-background rounded-button text-sm font-medium transition-colors" do %>
-                    BUY NOW
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
+      <%= render 'shared/album_list', 
+          releases: @releases,
+          layout: 'grid',
+          show_play_button: true,
+          show_price: true,
+          show_release_type: true,
+          show_artist: false,
+          show_date: true,
+          grid_cols: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+          empty_message: 'No releases yet',
+          empty_icon: 'fas fa-compact-disc' %>
     </section>
 
     <!-- About Tab -->

@@ -1,27 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" class="bg-music-background">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skenaria - Discover amazing independent music</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <style>
-    .aspect-w-1 {
-      position: relative;
-      padding-bottom: 100%;
-    }
-    .aspect-w-1 > * {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    }
-  </style>
-</head>
+
 <body class="min-h-screen text-music-text">
   
   <!-- Hero Section -->
@@ -54,51 +31,26 @@
     </div>
   </div>
 
-  <!-- Featured Albums -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold text-music-text">Featured albums</h2>
-      <%= link_to releases_path, class: "text-sm font-medium text-music-primary hover:text-opacity-90" do %>
-        View all
+  <!-- Featured Albums - Bandcamp Style -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white">Featured albums</h2>
+      <%= link_to releases_path, class: "text-sm text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:underline" do %>
+        View all →
       <% end %>
     </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-      <% @featured_releases.each do |release| %>
-        <div class="group bg-music-surface rounded-genre p-4 shadow-genre hover:shadow-genre-hover transition duration-200">
-          <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-genre bg-music-surface relative">
-            <% if release&.cover_art&.attached? %>
-              <%= image_tag release.cover_art.variant(:medium), alt: release&.title || "Album Cover", class: "w-full h-full object-cover object-center group-hover:opacity-75" %>
-            <% else %>
-              <div class="w-full h-full bg-gradient-to-br from-music-primary to-music-secondary flex items-center justify-center">
-                <i class="fas fa-music text-music-text text-4xl"></i>
-              </div>
-            <% end %>
-            <button class="absolute bottom-4 right-4 bg-music-primary rounded-full p-3 opacity-0 group-hover:opacity-100 transition-all transform hover:scale-105 duration-200 shadow-button">
-              <%= icon_tag "play", class: "h-5 w-5 text-music-text" %>
-            </button>
-          </div>
-          <div class="mt-2">
-            <% if release&.slug.present? %>
-              <%= link_to release_path(release), class: "text-sm font-medium text-music-text hover:text-music-primary" do %>
-                <%= release.title %>
-              <% end %>
-            <% else %>
-              <span class="text-sm font-medium text-music-text"><%= release&.title || "Unknown Release" %></span>
-            <% end %>
-            <div class="block text-sm text-music-text-secondary">
-              <%= release&.artist || "Unknown Artist" %>
-            </div>
-          </div>
-          <div class="mt-1 flex justify-between items-center">
-            <span class="text-sm text-music-text-secondary"><%= number_to_currency(release&.price || 0) %></span>
-            <button class="text-xs bg-music-primary hover:bg-opacity-90 px-3 py-1.5 rounded-button text-music-text transition duration-200">
-              + Add to cart
-            </button>
-          </div>
-        </div>
-      <% end %>
-    </div>
+  
+    <%= render 'shared/album_list', 
+        releases: @featured_releases,
+        layout: 'grid',
+        show_play_button: true,
+        show_price: true,
+        show_release_type: false,
+        show_artist: true,
+        show_date: false,
+        grid_cols: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5',
+        empty_message: 'No featured albums',
+        empty_icon: 'fas fa-star' %>
   </div>
 
   <!-- Genres Section -->
@@ -155,6 +107,4 @@
     </div>
   </div>
 
-  
 </body>
-</html>

@@ -78,6 +78,13 @@ GEM
     base64 (0.2.0)
     bcrypt (3.1.20)
     benchmark (0.4.0)
+    better_html (2.1.1)
+      actionview (>= 6.0)
+      activesupport (>= 6.0)
+      ast (~> 2.0)
+      erubi (~> 1.4)
+      parser (>= 2.4)
+      smart_properties
     bigdecimal (3.1.9)
     bindex (0.8.1)
     bootsnap (1.18.4)
@@ -113,6 +120,13 @@ GEM
       dotenv (= 3.1.7)
       railties (>= 6.1)
     drb (2.2.1)
+    erb_lint (0.9.0)
+      activesupport
+      better_html (>= 2.0.1)
+      parser (>= 2.7.1.4)
+      rainbow
+      rubocop (>= 1)
+      smart_properties
     error_highlight (0.7.0)
     erubi (1.13.1)
     factory_bot (6.5.1)
@@ -360,6 +374,7 @@ GEM
       logger
       rack (>= 2.2.4)
       redis-client (>= 0.22.2)
+    smart_properties (1.17.0)
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
@@ -427,6 +442,7 @@ DEPENDENCIES
   debug
   devise
   dotenv-rails
+  erb_lint (~> 0.9.0)
   error_highlight (>= 0.4.0)
   factory_bot_rails
   image_processing (~> 1.2)
@@ -448,7 +464,6 @@ DEPENDENCIES
   sqlite3 (~> 1.6.0)
   stimulus-rails
   tailwindcss-rails (~> 3.3.1)
-  tailwindcss-ruby (~> 3.0)
   turbo-rails
   tzinfo-data
   web-console

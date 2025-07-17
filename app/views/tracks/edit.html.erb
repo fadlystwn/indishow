@@ -1,12 +1,218 @@
-<div class="max-w-2xl mx-auto py-8 px-4">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Track</h1>
-    <p class="text-gray-600">
-      Editing track from: <span class="font-semibold"><%= @release.title %></span>
-    </p>
-  </div>
+<div class="min-h-screen bg-music-background">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl font-display tracking-tight text-music-text">
+          Edit Track
+        </h1>
+        <%= link_to "← Back to Release", edit_release_path(@release), class: "text-music-primary hover:text-music-accent transition-colors" %>
+      </div>
+      
+      <!-- Track Info -->
+      <div class="bg-music-surface rounded-genre shadow-genre border border-music-border p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-semibold text-music-text mb-2">
+              <%= @track.display_title %>
+            </h2>
+            <p class="text-music-text-secondary">
+              Track #<%= @track.position %> from "<%= @release.title %>"
+            </p>
+          </div>
+          <div class="text-right">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-music-primary/10 text-music-primary border border-music-primary/20">
+              Published Release
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-6">
-    <%= render 'form', track: @track %>
+    <!-- Edit Form -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Left Column: Track Metadata -->
+      <div class="bg-music-surface rounded-genre shadow-genre border border-music-border p-6">
+        <h3 class="text-lg font-semibold mb-6 font-display text-music-text">Track Information</h3>
+        
+        <%= form_with(model: [@release, @track], local: true, class: "space-y-6") do |form| %>
+          <% if flash[:alert] %>
+            <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-genre">
+              <h3 class="font-semibold mb-2 text-red-500 flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                Please correct the following errors:
+              </h3>
+              <ul class="list-disc list-inside text-sm text-red-400">
+                <% flash[:alert].split(", ").each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- Position (Read-only) -->
+          <div class="mb-6">
+            <label class="block text-music-text text-sm font-medium mb-2">Track Position</label>
+            <div class="flex items-center">
+              <span class="inline-flex items-center px-3 py-2 rounded-genre text-sm font-medium bg-music-surface text-music-text border border-music-border">
+                #<%= @track.position %>
+              </span>
+              <span class="ml-3 text-sm text-music-text-secondary">
+                <i class="fas fa-lock mr-1"></i>Cannot be changed
+              </span>
+            </div>
+          </div>
+
+          <!-- Duration (Read-only) -->
+          <% if @track.duration.present? %>
+            <div class="mb-6">
+              <label class="block text-music-text text-sm font-medium mb-2">Duration</label>
+              <div class="flex items-center">
+                <span class="inline-flex items-center px-3 py-2 rounded-genre text-sm font-medium bg-music-surface text-music-text border border-music-border">
+                  <%= Time.at(@track.duration).utc.strftime("%M:%S") %>
+                </span>
+                <span class="ml-3 text-sm text-music-text-secondary">
+                  <i class="fas fa-lock mr-1"></i>Cannot be changed
+                </span>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Title (Editable) -->
+          <div class="mb-6">
+            <%= form.label :title, class: "block text-music-text text-sm font-medium mb-2" %>
+            <%= form.text_field :title, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary placeholder-music-text-secondary" %>
+          </div>
+
+          <!-- Featured Artist (Editable) -->
+          <div class="mb-6">
+            <%= form.label :featured_artist, "Featured Artist", class: "block text-music-text text-sm font-medium mb-2" %>
+            <%= form.text_field :featured_artist, class: "w-full px-3 py-2 border border-music-border bg-music-background text-music-text rounded-genre focus:outline-none focus:ring-2 focus:ring-music-primary focus:border-music-primary placeholder-music-text-secondary", placeholder: "e.g., John Doe" %>
+            <p class="text-xs text-music-text-secondary mt-1">Leave blank if no featured artist</p>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-end space-x-4 pt-6 border-t border-music-border/30">
+            <%= link_to "Cancel", edit_release_path(@release), class: "px-6 py-2 border border-music-border bg-music-surface text-music-text rounded-button hover:bg-opacity-80 transition-all duration-200" %>
+            <%= form.submit "Update Track", class: "px-6 py-2 bg-music-primary text-music-background rounded-button hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-music-primary shadow-button transition-all duration-200" %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Right Column: Audio File -->
+      <div class="bg-music-surface rounded-genre shadow-genre border border-music-border p-6">
+        <h3 class="text-lg font-semibold mb-6 font-display text-music-text">Audio File</h3>
+        
+        <!-- Current Audio File -->
+        <div class="mb-6">
+          <h4 class="font-medium text-music-text mb-3">Current Audio File</h4>
+          <% if @track.audio_file.attached? %>
+            <div class="border border-music-border/50 rounded-genre p-4 bg-music-background/20">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="font-medium text-music-text"><%= @track.audio_file.filename %></p>
+                  <p class="text-sm text-music-text-secondary">
+                    <%= number_to_human_size(@track.audio_file.byte_size) %> • 
+                    <%= @track.audio_file.content_type %>
+                  </p>
+                </div>
+                <div class="text-music-primary">
+                  <i class="fas fa-music"></i>
+                </div>
+              </div>
+              
+              <!-- Audio Preview -->
+              <div class="mb-3">
+                <audio controls class="w-full">
+                  <source src="<%= rails_blob_path(@track.audio_file) %>" type="<%= @track.audio_file.content_type %>">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            </div>
+          <% else %>
+            <div class="border border-red-500/30 rounded-genre p-4 bg-red-500/10">
+              <p class="text-red-400 text-sm">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                No audio file attached
+              </p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Replace Audio File -->
+        <div class="border-t border-music-border/30 pt-6">
+          <h4 class="font-medium text-music-text mb-3">Replace Audio File</h4>
+          
+          <%= form_with(url: replace_audio_release_track_path(@release, @track), method: :post, local: true, class: "space-y-4") do |form| %>
+            <div class="border-2 border-dashed border-music-border/50 rounded-genre p-6 text-center bg-music-background/20 hover:border-music-primary hover:bg-music-primary/10 transition-all duration-300 cursor-pointer group"
+                 data-controller="audio-upload"
+                 data-action="dragover->audio-upload#highlight dragleave->audio-upload#unhighlight drop->audio-upload#drop click->audio-upload#triggerFileInput">
+              <div class="upload-container">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-music-surface rounded-full mb-4 group-hover:bg-music-primary/10 transition-colors">
+                  <i class="fas fa-music text-music-text-secondary/50 text-3xl group-hover:text-music-primary transition-colors"></i>
+                </div>
+                <h5 class="text-lg font-medium text-music-text mb-2">Upload New Audio File</h5>
+                <p class="text-music-text-secondary/70 mb-4">
+                  Replace the current audio file with a new one
+                </p>
+                <div class="max-w-sm mx-auto bg-music-surface rounded-genre border border-music-border/50 p-4 mb-4">
+                  <div class="text-sm text-left">
+                    <h6 class="font-medium text-music-text mb-2">Supported Formats:</h6>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div class="flex items-center text-music-text-secondary/80">
+                        <i class="fas fa-check text-music-primary mr-2 text-xs"></i>
+                        <span>WAV, FLAC</span>
+                      </div>
+                      <div class="flex items-center text-music-text-secondary/80">
+                        <i class="fas fa-check text-music-primary mr-2 text-xs"></i>
+                        <span>AIFF, ALAC</span>
+                      </div>
+                      <div class="flex items-center text-music-text-secondary/80">
+                        <i class="fas fa-check text-music-primary mr-2 text-xs"></i>
+                        <span>MP3, AAC</span>
+                      </div>
+                      <div class="flex items-center text-music-text-secondary/80">
+                        <i class="fas fa-check text-music-primary mr-2 text-xs"></i>
+                        <span>Max 100MB</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col items-center">
+                  <label class="inline-flex items-center px-6 py-3 bg-music-primary text-music-background rounded-button cursor-pointer hover:bg-music-primary/90 transition-colors shadow-button hover:shadow-genre-hover">
+                    <i class="fas fa-upload mr-2"></i>
+                    <span class="font-medium tracking-wider">CHOOSE FILE</span>
+                    <%= form.file_field :audio_file, 
+                                      accept: "audio/*",
+                                      class: "hidden",
+                                      data: { audio_upload_target: "input", action: "change->audio-upload#inputChange" } %>
+                  </label>
+                  <p class="text-sm text-music-text-secondary/50 mt-3">
+                    or drag and drop audio file here
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+              <%= link_to "Cancel", edit_release_path(@release), class: "px-6 py-2 border border-music-border bg-music-surface text-music-text rounded-button hover:bg-opacity-80 transition-all duration-200" %>
+              <%= form.submit "Replace Audio", class: "px-6 py-2 bg-music-accent text-music-background rounded-button hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-music-accent shadow-button transition-all duration-200" %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Warning -->
+        <div class="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-genre">
+          <h4 class="font-medium text-yellow-500 mb-2 flex items-center">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Important Note
+          </h4>
+          <p class="text-yellow-400 text-sm">
+            Replacing the audio file will permanently remove the current file. 
+            Make sure you have a backup before proceeding.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

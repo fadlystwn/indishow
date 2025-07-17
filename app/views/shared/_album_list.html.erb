@@ -1,0 +1,210 @@
+<%# Reusable AlbumList Component
+    Usage:
+    <%= render 'shared/album_list', 
+        releases: @releases, 
+        layout: 'grid', # 'grid' or 'list'
+        show_play_button: true,
+        show_price: true,
+        show_release_type: false,
+        show_artist: true,
+        show_date: false,
+        grid_cols: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+        empty_message: 'No albums found',
+        empty_icon: 'fas fa-music'
+    %>
+
+<%# Default values %>
+<% layout ||= 'grid' %>
+<% show_play_button ||= true %>
+<% show_price ||= true %>
+<% show_release_type ||= false %>
+<% show_artist ||= true %>
+<% show_date ||= false %>
+<% grid_cols ||= 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' %>
+<% empty_message ||= 'No albums found' %>
+<% empty_icon ||= 'fas fa-music' %>
+
+<% if releases.any? %>
+  <% if layout == 'grid' %>
+    <div class="grid <%= grid_cols %> gap-4">
+      <% releases.each do |release| %>
+        <div class="bg-white dark:bg-gray-900 rounded-md overflow-hidden transition-all duration-200 group hover:shadow-lg">
+          <!-- Cover Art -->
+          <div class="aspect-square relative">
+            <% if release.cover_art.attached? %>
+              <%= link_to release_path(release) do %>
+                <%= image_tag release.cover_art.variant(:medium), 
+                      alt: release.title, 
+                      class: "w-full h-full object-cover" %>
+              <% end %>
+            <% else %>
+              <div class="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <i class="fas fa-music text-gray-400 text-4xl"></i>
+              </div>
+            <% end %>
+            
+            <!-- Play Button -->
+            <% if show_play_button %>
+              <button class="absolute bottom-3 right-3 w-10 h-10 bg-white/90 text-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm hover:scale-110">
+                <i class="fas fa-play text-sm"></i>
+              </button>
+            <% end %>
+            
+            <!-- Release Type Badge -->
+            <% if show_release_type %>
+              <div class="absolute top-3 left-3">
+                <span class="px-2 py-1 bg-white/90 text-gray-800 text-xs font-medium rounded-full backdrop-blur-sm">
+                  <%= release.release_type.titleize %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Release Info -->
+          <div class="p-3">
+            <!-- Title -->
+            <h3 class="font-medium text-gray-900 dark:text-white mb-1 line-clamp-1">
+              <%= link_to release.title, release_path(release), class: "hover:underline" %>
+            </h3>
+            
+            <!-- Artist -->
+            <% if show_artist %>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                <% if release.user.artist_profile %>
+                  <%= link_to release.user.artist_profile.name, 
+                        artist_profile_path(release.user.artist_profile), 
+                        class: "hover:underline hover:text-black dark:hover:text-white" %>
+                <% else %>
+                  <%= release.user.name_or_email %>
+                <% end %>
+              </p>
+            <% end %>
+            
+            <!-- Date -->
+            <% if show_date %>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <%= release.release_date.strftime("%b %Y") %>
+              </p>
+            <% end %>
+            
+            <!-- Price and metadata -->
+            <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+              <% if show_price %>
+                <span class="font-medium text-black dark:text-white">
+                  <%= number_to_currency(release.price) %>
+                </span>
+              <% end %>
+              
+              <div class="flex items-center space-x-2">
+                <% if release.genre.present? %>
+                  <span><%= release.genre %></span>
+                <% end %>
+                <% if release.genre.present? && show_date %>
+                  <span>•</span>
+                <% end %>
+                <% if show_date %>
+                  <span><%= release.release_date.strftime("%b %Y") %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <!-- List Layout -->
+    <div class="space-y-4">
+      <% releases.each do |release| %>
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div class="flex">
+            <!-- Cover Art -->
+            <div class="w-24 h-24 flex-shrink-0">
+              <% if release.cover_art.attached? %>
+                <%= image_tag release.cover_art.variant(:thumb), class: "w-full h-full object-cover" %>
+              <% else %>
+                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <i class="fas fa-compact-disc text-2xl"></i>
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Release Info -->
+            <div class="flex-1 p-4">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
+                    <%= release.title.presence || "(Untitled)" %>
+                  </h2>
+                  <% if show_artist %>
+                    <p class="text-gray-600 dark:text-gray-300">
+                      <%= release.artist.presence || "(No artist name)" %>
+                    </p>
+                  <% end %>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                  <% if show_release_type %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                      <%= release.release_type_human %>
+                    </span>
+                  <% end %>
+                  <% if release.status == "draft" %>
+                    <span class="text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">Draft</span>
+                  <% elsif release.status == "published" %>
+                    <span class="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Published</span>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center text-sm text-gray-500">
+                <% if show_date %>
+                  <span><%= release.release_date.strftime("%b %-d, %Y") %></span>
+                <% end %>
+                <% if show_price %>
+                  <span><%= number_to_currency(release.price) %></span>
+                <% end %>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex gap-2 mt-3">
+                <% if release.persisted? %>
+                  <%= link_to release_path(release), class: "flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg transition-colors", data: { turbo: false } do %>
+                    <i class="fas fa-eye"></i>
+                    <span>View</span>
+                  <% end %>
+                  <%= link_to edit_release_path(release), class: "flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg transition-colors" do %>
+                    <i class="fas fa-edit"></i>
+                    <span><%= release.published? ? 'Edit Published' : 'Edit' %></span>
+                  <% end %>
+                <% else %>
+                  <span class="text-gray-500 text-sm">Not saved yet</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <!-- Empty State -->
+  <div class="text-center py-16">
+    <div class="bg-gray-100 dark:bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+      <i class="<%= empty_icon %> text-4xl text-gray-400"></i>
+    </div>
+    <h3 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2"><%= empty_message %></h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
+      <% if empty_message.include?("haven't published") %>
+        Start by creating your first release. You can draft and edit before publishing.
+      <% else %>
+        No albums available at this time.
+      <% end %>
+    </p>
+    
+    <% if empty_message.include?("haven't published") %>
+      <%= link_to step1_release_wizard_index_path, class: "inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors" do %>
+        <i class="fas fa-plus"></i>
+        <span>Create Release</span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
