@@ -11,6 +11,7 @@ RUN apt-get update -qq && \
     curl \
     libjemalloc2 \
     libvips \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV RAILS_ENV=production \
