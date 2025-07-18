@@ -1,3 +1,6 @@
+# Alternative storage configuration using environment variables
+# Copy this to storage.yml if you prefer environment variables over Rails credentials
+
 test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>
@@ -5,6 +8,15 @@ test:
 local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
+
+# Cloudflare R2 configuration using environment variables
+r2:
+  service: S3
+  access_key_id: <%= ENV['R2_ACCESS_KEY_ID'] %>
+  secret_access_key: <%= ENV['R2_SECRET_ACCESS_KEY'] %>
+  endpoint: https://<%= ENV['R2_ACCOUNT_ID'] %>.r2.cloudflarestorage.com
+  region: auto
+  bucket: <%= ENV['R2_BUCKET_NAME'] %>
 
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
@@ -31,14 +43,4 @@ local:
 # mirror:
 #   service: Mirror
 #   primary: local
-#   mirrors: [ amazon, google, microsoft ]
-
-# Cloudflare R2 configuration
-# Use bin/rails credentials:edit to set the R2 secrets (as r2:access_key_id|secret_access_key)
-r2:
-  service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:r2, :access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:r2, :secret_access_key) %>
-  endpoint: https://<%= Rails.application.credentials.dig(:r2, :account_id) %>.r2.cloudflarestorage.com
-  region: auto
-  bucket: <%= Rails.application.credentials.dig(:r2, :bucket_name) %>
+#   mirrors: [ amazon, google, microsoft ] 
