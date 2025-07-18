@@ -4,7 +4,7 @@ module ActiveStorageSlugKey
   extend ActiveSupport::Concern
 
   included do
-    before_create_commit :set_custom_blob_key, if: :should_set_custom_key?
+    after_create_commit :set_custom_blob_key, if: :should_set_custom_key?
   end
 
   private
