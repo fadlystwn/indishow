@@ -3,7 +3,6 @@ source "https://rubygems.org"
 # Core Rails gems
 gem "rails", "~> 7.2.2", ">= 7.2.2.1"
 gem "sprockets-rails"
-gem "sqlite3", "~> 1.6.0"
 gem "puma", ">= 5.0"
 gem "bootsnap", require: false
 
@@ -31,7 +30,11 @@ gem "plyr-rails"
 # Platform-specific
 gem "tzinfo-data", platforms: %i[ mswin mswin64 mingw x64_mingw jruby ]
 
+# Use PostgreSQL as the database for Active Record in production
+gem "pg", "~> 1.5"
+
 group :development, :test do
+  gem "sqlite3", "~> 1.6.0"
   # Debugging and testing
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ], require: "debug/prelude"
   gem "rspec-rails"
