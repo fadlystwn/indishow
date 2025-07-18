@@ -10,8 +10,8 @@ class ArtistProfile < Profile
     allow_blank: true
   }
 
-  has_one_attached :avatar
-  has_one_attached :cover_image
+  has_one_attached :avatar, service: :skenaria-avatars
+  has_one_attached :cover_image, service: :skenaria-banners
 
   def to_param
     slug
