@@ -2,7 +2,7 @@ class Track < ApplicationRecord
   include ActiveStorageSlugKey
   belongs_to :release
 
-  has_one_attached :audio_file, service: :skenaria-audio do |attachable|
+  has_one_attached :audio_file, service: :skenaria_audio do |attachable|
     attachable.variant :medium, resize_to_limit: [ nil, nil ]
   end
 

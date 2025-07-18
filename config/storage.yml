@@ -44,7 +44,7 @@ r2:
   bucket: <%= Rails.application.credentials.dig(:r2, :bucket_name) %>
 
 # Skenaria Audio (audio files + album artwork)
-skenaria-audio:
+skenaria_audio:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:r2, :audio_access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:r2, :audio_secret_access_key) %>
@@ -55,7 +55,7 @@ skenaria-audio:
     prefix: "<%= ENV.fetch('AUDIO_UPLOAD_PREFIX', '') %>"
 
 # Skenaria Avatars
-skenaria-avatars:
+skenaria_avatars:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:r2, :avatars_access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:r2, :avatars_secret_access_key) %>
@@ -64,7 +64,7 @@ skenaria-avatars:
   bucket: skenaria-avatars-<%= Rails.env %>
 
 # Skenaria Banners
-skenaria-banners:
+skenaria_banners:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:r2, :banners_access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:r2, :banners_secret_access_key) %>
@@ -73,7 +73,7 @@ skenaria-banners:
   bucket: skenaria-banners-<%= Rails.env %>
 
 # Skenaria User Assets (optional)
-skenaria-user-assets:
+skenaria_user_assets:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:r2, :user_assets_access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:r2, :user_assets_secret_access_key) %>

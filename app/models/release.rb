@@ -24,7 +24,7 @@ class Release < ApplicationRecord
   validate :validate_track_count, if: :should_validate_tracks?
 
   # Active Storage for cover art with variant processing
-  has_one_attached :cover_art, service: :skenaria-audio do |attachable|
+  has_one_attached :cover_art, service: :skenaria_audio do |attachable|
     attachable.variant :thumb, resize_to_limit: [ 300, 300 ]
     attachable.variant :medium, resize_to_limit: [ 600, 600 ]
   end
