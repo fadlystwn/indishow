@@ -34,7 +34,7 @@ skenaria_banners:
 
 skenaria_user_assets:
   service: S3
-  access_key_id: <%= ENV.fetch("R2__ACCESS_KEY_ID") %>
+  access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
   endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
