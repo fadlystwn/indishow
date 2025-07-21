@@ -6,19 +6,11 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-r2:
+skenaria_audio:
   service: S3
   access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
-  region: auto
-  bucket: skenaria-user-assets
-
-skenaria_audio:
-  service: S3
-  access_key_id: <%= ENV.fetch("R2_AUDIO_ACCESS_KEY_ID") %>
-  secret_access_key: <%= ENV.fetch("R2_AUDIO_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_AUDIO_ACCOUNT_ID") %>
+  endpoint: <%= ENV.fetch("R2_ACCOUNT_ID") %>
   region: auto
   bucket: skenaria-audio
   upload:
