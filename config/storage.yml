@@ -10,7 +10,7 @@ r2:
   service: S3
   access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_ENDPOINT")
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
   bucket: <%= ENV.fetch("R2_BUCKET_NAME") %>
 
@@ -18,7 +18,7 @@ skenaria_audio:
   service: S3
   access_key_id: <%= ENV.fetch("R2_AUDIO_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_AUDIO_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_AUDIO_ACCOUNT_ID")
+  endpoint: <%= ENV.fetch("R2_AUDIO_ACCOUNT_ID") %>
   region: auto
   bucket: skenaria-audio
   upload:
@@ -28,7 +28,7 @@ skenaria_avatars:
   service: S3
   access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_ENDPOINT")
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
   bucket: skenaria-avatars
 
@@ -36,7 +36,7 @@ skenaria_banners:
   service: S3
   access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_ENDPOINT")
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
   bucket: skenaria-banners
 
@@ -44,7 +44,7 @@ skenaria_user_assets:
   service: S3
   access_key_id: <%= ENV.fetch("R2__ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_ENDPOINT")
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
   bucket: skenaria-user-assets
 
@@ -52,6 +52,6 @@ staging:
   service: S3
   access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
-  endpoint: <%= ENV.fetch("R2_ENDPOINT")
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
   bucket: staging-bucket
