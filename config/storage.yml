@@ -12,7 +12,7 @@ r2:
   secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
   endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
-  bucket: <%= ENV.fetch("R2_BUCKET_NAME") %>
+  bucket: skenaria-user-assets
 
 skenaria_audio:
   service: S3
