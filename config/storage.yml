@@ -6,77 +6,44 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-# Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
-# amazon:
-#   service: S3
-#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
-#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
-#   region: us-east-1
-#   bucket: your_own_bucket-<%= Rails.env %>
-
-# Remember not to checkin your GCS keyfile to a repository
-# google:
-#   service: GCS
-#   project: your_project
-#   credentials: <%= Rails.root.join("path/to/gcs.keyfile") %>
-#   bucket: your_own_bucket-<%= Rails.env %>
-
-# Use bin/rails credentials:edit to set the Azure Storage secret (as azure_storage:storage_access_key)
-# microsoft:
-#   service: AzureStorage
-#   storage_account_name: your_account_name
-#   storage_access_key: <%= Rails.application.credentials.dig(:azure_storage, :storage_access_key) %>
-#   container: your_container_name-<%= Rails.env %>
-
-# mirror:
-#   service: Mirror
-#   primary: local
-#   mirrors: [ amazon, google, microsoft ]
-
-# Cloudflare R2 configuration
-# Use bin/rails credentials:edit to set the R2 secrets (as r2:access_key_id|secret_access_key)
-r2:
-  service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:r2, :access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:r2, :secret_access_key) %>
-  endpoint: https://<%= Rails.application.credentials.dig(:r2, :account_id) %>.r2.cloudflarestorage.com
-  region: auto
-  bucket: <%= Rails.application.credentials.dig(:r2, :bucket_name) %>
-
-# Skenaria Audio (audio files + album artwork)
 skenaria_audio:
   service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:r2, :audio_access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:r2, :audio_secret_access_key) %>
-  endpoint: https://<%= Rails.application.credentials.dig(:r2, :audio_account_id) %>.r2.cloudflarestorage.com
+  access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
+  secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
-  bucket: skenaria-audio-<%= Rails.env %>
+  bucket: skenaria-audio
   upload:
     prefix: "<%= ENV.fetch('AUDIO_UPLOAD_PREFIX', '') %>"
 
-# Skenaria Avatars
 skenaria_avatars:
   service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:r2, :avatars_access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:r2, :avatars_secret_access_key) %>
-  endpoint: https://<%= Rails.application.credentials.dig(:r2, :avatars_account_id) %>.r2.cloudflarestorage.com
+  access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
+  secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
-  bucket: skenaria-avatars-<%= Rails.env %>
+  bucket: skenaria-avatars
 
-# Skenaria Banners
 skenaria_banners:
   service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:r2, :banners_access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:r2, :banners_secret_access_key) %>
-  endpoint: https://<%= Rails.application.credentials.dig(:r2, :banners_account_id) %>.r2.cloudflarestorage.com
+  access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
+  secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
-  bucket: skenaria-banners-<%= Rails.env %>
+  bucket: skenaria-banners
 
-# Skenaria User Assets (optional)
 skenaria_user_assets:
   service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:r2, :user_assets_access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:r2, :user_assets_secret_access_key) %>
-  endpoint: https://<%= Rails.application.credentials.dig(:r2, :user_assets_account_id) %>.r2.cloudflarestorage.com
+  access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
+  secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
   region: auto
-  bucket: skenaria-user-assets-<%= Rails.env %>
+  bucket: skenaria-user-assets
+
+staging:
+  service: S3
+  access_key_id: <%= ENV.fetch("R2_ACCESS_KEY_ID") %>
+  secret_access_key: <%= ENV.fetch("R2_SECRET_ACCESS_KEY") %>
+  endpoint: <%= ENV.fetch("R2_ENDPOINT") %>
+  region: auto
+  bucket: staging-bucket
