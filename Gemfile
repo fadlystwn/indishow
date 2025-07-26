@@ -8,6 +8,7 @@ gem "bootsnap", require: false
 
 # Frontend and assets
 gem "importmap-rails"
+gem "vite_rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "jbuilder"
