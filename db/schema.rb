@@ -80,10 +80,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_12_195654) do
     t.string "slug"
     t.string "genre"
     t.string "status", default: "draft", null: false
-    t.integer "step", default: 1
     t.index ["slug", "user_id"], name: "index_releases_on_slug_and_user_id", unique: true
     t.index ["status"], name: "index_releases_on_status"
-    t.index ["step"], name: "index_releases_on_step"
     t.index ["user_id"], name: "index_releases_on_user_id"
   end
 
