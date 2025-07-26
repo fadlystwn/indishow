@@ -18,9 +18,10 @@ RUN gem install bundler:2.5.7 && bundle install
 
 COPY . .
 
-# Don't precompile here (Railway doesn't support build-time secrets)
+# Note: Don't precompile assets here unless you handle secrets at build time
 # RUN bundle exec rake assets:precompile
 
 EXPOSE 3000 3036
 
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+# Run DB migration before starting Puma
+CMD bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
