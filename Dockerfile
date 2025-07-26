@@ -1,54 +1,26 @@
-# syntax=docker/dockerfile:1
+FROM ruby:3.2.2-slim
 
-ARG RUBY_VERSION=3.2.2
-FROM ruby:$RUBY_VERSION-slim
-
-LABEL maintainer="fadlystwn@gmail.com"
-
-# Set environment variables
-ENV RAILS_ENV=production \
-    BUNDLER_VERSION=2.5.7 \
-    DEBIAN_FRONTEND=noninteractive \
-    NODE_VERSION=20 \
-    YARN_VERSION=1.22.19
+ENV RAILS_ENV=production
 
 WORKDIR /app
 
-# Install OS packages
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-      build-essential \
-      libpq-dev \
-      libvips \
-      curl \
-      git \
-      sqlite3 \
-      pkg-config \
-      libjemalloc2 \
-      nodejs \
-      gnupg && \
-    rm -rf /var/lib/apt/lists/*
+      build-essential libpq-dev libvips curl git sqlite3 pkg-config
 
-# Install Node.js and Yarn (needed for vite)
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
-    apt-get update && \
+# Node.js + Yarn (for Vite + Tailwind)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
-    npm install --global yarn@$YARN_VERSION && \
-    npm install --global vite
+    npm install -g yarn vite
 
-# Install bundler and gems
 COPY Gemfile Gemfile.lock ./
-RUN gem install bundler -v "$BUNDLER_VERSION" && \
-    bundle install --jobs 4 --retry 3
+RUN gem install bundler:2.5.7 && bundle install
 
-# Add the project files
 COPY . .
 
-# Precompile assets
-RUN bundle exec rake assets:precompile
+# Don't precompile here (Railway doesn't support build-time secrets)
+# RUN bundle exec rake assets:precompile
 
-# Expose ports (e.g., Puma on 3000, Vite on 3036)
 EXPOSE 3000 3036
 
-# Entrypoint to run the server (customize if needed)
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
