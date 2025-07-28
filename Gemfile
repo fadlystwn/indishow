@@ -32,7 +32,7 @@ gem "plyr-rails"
 gem "tzinfo-data", platforms: %i[ mswin mswin64 mingw x64_mingw jruby ]
 
 # Use PostgreSQL as the database for Active Record in production
-gem "pg", "~> 1.5"
+gem "pg", "~> 1.6"
 
 # Cloudflare R2 for Active Storage
 gem "aws-sdk-s3", require: false
