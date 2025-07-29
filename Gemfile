@@ -8,7 +8,6 @@ gem "bootsnap", require: false
 
 # Frontend and assets
 gem "importmap-rails"
-gem "vite_rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "jbuilder"
@@ -40,7 +39,7 @@ gem "aws-sdk-s3", require: false
 group :development, :test do
   gem "sqlite3", "~> 1.6.0"
   # Debugging and testing
-  gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ], require: "debug/prelude"
+  gem "debug", platforms: %i[ mri ruby mswin mswin64 mingw x64_mingw ], require: "debug/prelude"
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "rails-controller-testing"

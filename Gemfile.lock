@@ -138,7 +138,6 @@ GEM
       dotenv (= 3.1.7)
       railties (>= 6.1)
     drb (2.2.1)
-    dry-cli (1.2.0)
     erb_lint (0.9.0)
       activesupport
       better_html (>= 2.0.1)
@@ -217,7 +216,6 @@ GEM
     minitest (5.25.5)
     msgpack (1.8.0)
     multi_xml (0.6.0)
-    mutex_m (0.3.0)
     net-http (0.6.0)
       uri
     net-imap (0.5.6)
@@ -278,8 +276,6 @@ GEM
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
       rack (>= 3.0.0, < 4)
-    rack-proxy (0.7.7)
-      rack
     rack-session (2.1.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -437,15 +433,6 @@ GEM
     uri (1.0.3)
     useragent (0.16.11)
     version_gem (1.1.6)
-    vite_rails (3.0.19)
-      railties (>= 5.1, < 9)
-      vite_ruby (~> 3.0, >= 3.2.2)
-    vite_ruby (3.9.2)
-      dry-cli (>= 0.7, < 2)
-      logger (~> 1.6)
-      mutex_m
-      rack-proxy (~> 0.6, >= 0.6.1)
-      zeitwerk (~> 2.2)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
@@ -501,7 +488,6 @@ DEPENDENCIES
   tailwindcss-rails (~> 3.3.1)
   turbo-rails
   tzinfo-data
-  vite_rails
   web-console
 
 BUNDLED WITH

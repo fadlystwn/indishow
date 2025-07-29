@@ -1,6 +1,55 @@
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+docker-compose.yml
+.env
+.env.*
+
+# Dependencies
+node_modules
+vendor/bundle
+
+# Logs
 log/*
 tmp/*
-node_modules
-.bundle
-vendor/bundle
+!tmp/cache
+!tmp/cache/.keep
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+
+# Testing
+spec/tmp
+coverage/
+.rspec_status
+
+# Rails
+/config/master.key
+/config/credentials/*.key
+/public/assets
+/public/packs
+/public/packs-test
 storage/*
+!storage/.keep
