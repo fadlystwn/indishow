@@ -34,6 +34,9 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
+# Build Tailwind CSS
+RUN bundle exec rails tailwindcss:build
+
 # Create tmp and log directories
 RUN mkdir -p tmp/pids log
 

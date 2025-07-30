@@ -1,7 +1,6 @@
 //= link_tree ../images
 //= link_directory ../stylesheets .css
 //= link_tree ../builds
-//= link tailwind.css
 //= link controllers/application.js
 //= link controllers/index.js
 //= link controllers/audio_player_controller.js
