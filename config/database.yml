@@ -22,6 +22,21 @@ test:
   pool: 1
   timeout: 20000
 
+# Use DATABASE_URL if available (for Docker/Heroku deployments)
+if ENV["DATABASE_URL"]
+  default: &default
+    url: <%= ENV["DATABASE_URL"] %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    timeout: 5000
+
+  development:
+    <<: *default
+
+  test:
+    <<: *default
+    pool: 1
+    timeout: 20000
+end
 
 # SQLite3 write its data on the local filesystem, as such it requires
 # persistent disks. If you are deploying to a managed service, you should
