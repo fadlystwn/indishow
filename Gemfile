@@ -37,7 +37,7 @@ gem "pg", "~> 1.5"
 gem "aws-sdk-s3", require: false
 
 group :development, :test do
-  gem "sqlite3", "~> 1.6.0"
+  gem "sqlite3", "~> 2.7.4"
   # Debugging and testing
   gem "debug", platforms: %i[ mri ruby mswin mswin64 mingw x64_mingw ], require: "debug/prelude"
   gem "rspec-rails"
